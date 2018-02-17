@@ -28,11 +28,13 @@ class State:
 
     def next(self, tree):  #: Tree
         if type(tree) == FunctionCall:
-            old_pos = attr.evolve(self.pos)
             th = theta(self.dir_)
-            self.pos.x += 10.0 * math.sin(th)
-            self.pos.y += 10.0 * math.cos(th)
-            return Line(old_pos, self.pos)
+            old_pos = attr.evolve(self.pos)
+            new_pos = attr.evolve(self.pos)
+            new_pos.x += 10.0 * math.sin(th)
+            new_pos.y += 10.0 * math.cos(th)
+            self.pos = new_pos
+            return Line(old_pos, new_pos)
         elif type(tree) == Modify:
             self.dir_ += 10.0
             return None
