@@ -1,7 +1,9 @@
 from typing import List, Iterable
 import attr
 
+from graftlib.eval_ import eval_debug
 from graftlib.lex import lex
+from graftlib.parse import parse
 
 
 @attr.s
@@ -14,6 +16,6 @@ class World:
 
 def main(world: World):
     """Run the main program and return the status code to emit"""
-    for token in lex(world.stdin):
-        world.write("{}\n".format(token))
+    for command in eval_debug(parse(lex(world.argv[1])), 10):
+        world.stdout.write("{}\n".format(command))
     return 0
