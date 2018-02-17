@@ -2,6 +2,7 @@ from typing import Iterable
 from graftlib.lex import (
     FunctionToken,
     NumberToken,
+    OperatorToken,
     SymbolToken,
     lex,
 )
@@ -23,3 +24,11 @@ def test_number_and_symbol_are_lexed_separately():
 def test_functions_are_lexed():
     assert do_lex(":s3") == [FunctionToken("s"), NumberToken("3")]
     assert do_lex("3:s") == [NumberToken("3"), FunctionToken("s")]
+
+
+def test_operators_are_lexed():
+    assert (
+        do_lex("3=d")
+        ==
+        [NumberToken("3"), OperatorToken("="), SymbolToken("d")]
+    )

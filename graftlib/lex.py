@@ -50,6 +50,11 @@ class NumberToken:
 
 
 @attr.s
+class OperatorToken:
+    value: str = attr.ib()
+
+
+@attr.s
 class SymbolToken:
     value: str = attr.ib()
 
@@ -69,6 +74,7 @@ def collect(c: str, it: Iterator[str], regex: Pattern) -> str:
 
 digit: Pattern = re.compile("[0-9]")
 function: Pattern = re.compile(":")
+operator: Pattern = re.compile("[+-<>=]")
 symbol_letter: Pattern = re.compile("[_a-zA-Z]")
 
 
@@ -77,6 +83,8 @@ def next_token(c: str, it: Iterable[str]):
         return NumberToken(collect(c, it, digit))
     elif function.match(c):
         return FunctionToken(collect("", it, symbol_letter))
+    elif operator.match(c):
+        return OperatorToken(collect(c, it, operator))
     else:
         return SymbolToken(collect(c, it, symbol_letter))
 
