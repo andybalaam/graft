@@ -28,7 +28,6 @@ def test_functions_are_lexed():
 
 def test_operators_are_lexed():
     assert (
-        do_lex("3=d")
-        ==
+        do_lex("3=d") ==
         [NumberToken("3"), OperatorToken("="), SymbolToken("d")]
     )
