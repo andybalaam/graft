@@ -1,10 +1,10 @@
+from typing import Iterator, List
 from graftlib.lex import (
     FunctionToken,
     NumberToken,
     OperatorToken,
     SymbolToken,
 )
-from typing import Iterator, List
 import attr
 
 
@@ -32,11 +32,21 @@ class Symbol:
 
 
 def next_tree(token, it: Iterator):
-    if type(token) == FunctionToken:
+    if type(token) == FunctionToken:   # :foo
         return FunctionCall(token)
-    elif type(token) == SymbolToken:
+    elif type(token) == SymbolToken:   # _bar
         return Symbol(token)
-    else:
+    elif type(token) == NumberToken:   # 3+baz
+        try:
+            op_token = next(it)
+            sym_token = next(it)
+        except StopIteration:
+            return IncompleteTree(
+                [token] if op_token is None else [token, op_token]
+            )
+        sym: Symbol = next_tree(sym_token, it)
+        return Modify(sym=sym.value, op=op_token, value=token)
+    else:                              # +baz
         try:
             next_token = next(it)
         except StopIteration:

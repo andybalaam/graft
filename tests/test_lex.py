@@ -31,3 +31,15 @@ def test_operators_are_lexed():
         do_lex("3=d") ==
         [NumberToken("3"), OperatorToken("="), SymbolToken("d")]
     )
+
+
+def test_function_call_then_add_is_lexed():
+    assert (
+        do_lex(":s95+_ab_c") ==
+        [
+            FunctionToken("s"),
+            NumberToken("95"),
+            OperatorToken("+"),
+            SymbolToken("_ab_c")
+        ]
+    )

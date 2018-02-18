@@ -1,7 +1,7 @@
 from typing import Iterable
-from graftlib.parse import FunctionCall, Modify
-import attr
 import math
+import attr
+from graftlib.parse import FunctionCall, Modify
 
 
 @attr.s
@@ -18,25 +18,40 @@ class Line:
 
 def theta(dir_: float) -> float:
     """Angle in hundreds of a circle to Angle in radians"""
-    return 2 * math.pi * (dir_ / 100.0)
+    return 2 * math.pi * (dir_ / 360.0)
 
 
 @attr.s
 class State:
     pos: Pt = attr.ib()
     dir_: float = attr.ib()
+    step: float = attr.ib()
 
     def next(self, tree):  #: Tree
         if type(tree) == FunctionCall:
             th = theta(self.dir_)
             old_pos = attr.evolve(self.pos)
             new_pos = attr.evolve(self.pos)
-            new_pos.x += 10.0 * math.sin(th)
-            new_pos.y += 10.0 * math.cos(th)
+            new_pos.x += self.step * math.sin(th)
+            new_pos.y += self.step * math.cos(th)
             self.pos = new_pos
             return Line(old_pos, new_pos)
         elif type(tree) == Modify:
-            self.dir_ += 10.0
+            val = float(tree.value.value)
+            sym = tree.sym.value
+            op = tree.op.value
+            if sym == "d":
+                if op == "+":
+                    self.dir_ += val
+                else:
+                    self.dir_ = val
+            elif sym == "s":
+                if op == "+":
+                    self.step += val
+                else:
+                    self.step = val
+            else:
+                raise Exception("No suppprt for custom variables yet: " + sym)
             return None
         else:
             raise Exception("Unknown tree type: " + tree)
@@ -45,8 +60,8 @@ class State:
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(trees: Iterable, n: int) -> Iterable:
     trees_list = list(trees)
-    state = State(pos=Pt(0, 0), dir_=0)
-    for i in range(n):
+    state = State(pos=Pt(0, 0), dir_=0, step=10)
+    for _ in range(n):
         for tree in trees_list:
             command = state.next(tree)
             yield (command, attr.evolve(state))

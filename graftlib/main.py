@@ -1,7 +1,7 @@
 from typing import List, Iterable
 import attr
 
-from graftlib.eval_ import eval_  #, eval_debug
+from graftlib.eval_ import eval_  # , eval_debug
 from graftlib.lex import lex
 from graftlib.parse import parse
 from graftlib.ui.gtk3 import Ui

@@ -38,3 +38,17 @@ def test_function_call_then_increment_is_parsed():
             )
         ]
     )
+
+
+def test_function_call_then_add_is_parsed():
+    assert (
+        do_parse(":s95+d") ==
+        [
+            FunctionCall(FunctionToken("s")),
+            Modify(
+                sym=SymbolToken("d"),
+                op=OperatorToken("+"),
+                value=NumberToken("95"),
+            )
+        ]
+    )
