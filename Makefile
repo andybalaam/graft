@@ -23,4 +23,3 @@ test-full:
 		--pep8 \
 		--pylama \
 		--pylint --pylint-rcfile=.pylintrc \
-

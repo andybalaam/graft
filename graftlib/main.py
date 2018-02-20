@@ -13,11 +13,12 @@ class World:
     stdin: Iterable[str] = attr.ib()
     stdout = attr.ib()
     stderr = attr.ib()
+    random = attr.ib()
 
 
 def main(world: World):
     """Run the main program and return the status code to emit"""
     # for command in eval_debug(parse(lex(world.argv[1])), 10):
     #     world.stdout.write("{}\n".format(command))
-    Ui(eval_(parse(lex(world.argv[1])), 100)).run()
+    Ui(eval_(parse(lex(world.argv[1])), 100, world.random.uniform)).run()
     return 0

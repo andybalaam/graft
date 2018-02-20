@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
+import random
 import sys
 from graftlib.main import main, World
 
 
-exit(main(World(sys.argv, sys.stdin, sys.stdout, sys.stderr)))
+exit(main(World(sys.argv, sys.stdin, sys.stdout, sys.stderr, random)))

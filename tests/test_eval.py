@@ -33,12 +33,12 @@ def round_debug(lines: Iterable[Tuple[Optional[Line], State]]) -> (
         )
 
 
-def do_eval(chars: Iterable[str], n: int = 1):
-    return list(round_lines(eval_(parse(lex(chars)), n)))
+def do_eval(chars: Iterable[str], n: int = 1, rand=None):
+    return list(round_lines(eval_(parse(lex(chars)), n, rand)))
 
 
-def do_eval_debug(chars: Iterable[str], n: int = 1):
-    return list(round_debug(eval_debug(parse(lex(chars)), n)))
+def do_eval_debug(chars: Iterable[str], n: int = 1, rand=None):
+    return list(round_debug(eval_debug(parse(lex(chars)), n, rand)))
 
 
 def test_calling_s_moves_forward():
@@ -56,6 +56,12 @@ def test_incrementing_a_variable_does_nothing():
 
 def test_turn_right_and_move():
     assert do_eval("90+d25=s:S") == [Line(Pt(0, 0), Pt(25, 0))]
+
+
+def test_turn_random_and_move():
+    def r(a, b):
+        return 90
+    assert do_eval(":R~+d:S", rand=r) == [Line(Pt(0, 0), Pt(10, 0))]
 
 
 def tIGNOREest_move_in_a_circle():

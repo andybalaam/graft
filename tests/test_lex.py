@@ -1,5 +1,6 @@
 from typing import Iterable
 from graftlib.lex import (
+    ContinuationToken,
     FunctionToken,
     NumberToken,
     OperatorToken,
@@ -40,6 +41,19 @@ def test_function_call_then_add_is_lexed():
             FunctionToken("S"),
             NumberToken("95"),
             OperatorToken("+"),
-            SymbolToken("_ab_c")
+            SymbolToken("_ab_c"),
+        ]
+    )
+
+
+def test_continuation_is_lexed():
+    assert (
+        do_lex(":R~+d:S") ==
+        [
+            FunctionToken("R"),
+            ContinuationToken(),
+            OperatorToken("+"),
+            SymbolToken("d"),
+            FunctionToken("S"),
         ]
     )

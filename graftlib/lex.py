@@ -1,42 +1,18 @@
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator
 import typing
 import re
 import attr
+
+
+from graftlib.peekable import Peekable
 
 
 Pattern = typing.re.Pattern
 
 
 @attr.s
-class Peekable:
-    _it: Iterator = attr.ib()
-    _nxt = attr.ib(None)
-
-    def __attrs_post_init__(self) -> None:
-        self._nxt = self.move_next()
-
-    def move_next(self) -> Optional[str]:
-        try:
-            return next(self._it)
-        except StopIteration:
-            return None
-
-    def peek(self) -> str:
-        if self._nxt is None:
-            raise StopIteration()
-        else:
-            return self._nxt
-
-    def __iter__(self) -> Iterator[str]:
-        return self
-
-    def __next__(self) -> str:
-        if self._nxt is None:
-            raise StopIteration()
-        else:
-            ret = self._nxt
-            self._nxt = self.move_next()
-            return ret
+class ContinuationToken:
+    pass
 
 
 @attr.s
@@ -72,6 +48,7 @@ def collect(c: str, it: Iterator[str], regex: Pattern) -> str:
     return ret
 
 
+continuation: Pattern = re.compile("~")
 digit: Pattern = re.compile("[0-9]")
 function: Pattern = re.compile(":")
 operator: Pattern = re.compile("[+-<>=]")
@@ -85,6 +62,8 @@ def next_token(c: str, it: Iterable[str]):
         return FunctionToken(collect("", it, symbol_letter))
     elif operator.match(c):
         return OperatorToken(collect(c, it, operator))
+    elif continuation.match(c):
+        return ContinuationToken()
     else:
         return SymbolToken(collect(c, it, symbol_letter))
 

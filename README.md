@@ -2,10 +2,14 @@
 
 ## Examples
 
-Rolling around a circle:
+Perfect circle:
 
-```graft ':S+d'```
+```bash
+graft ':S+d'
+```
 
-Growing a spiral:
+Rough circles:
 
-```graft ':S+d110s'```
+```bash
+./graft ':R~+d+d:S'
+```
