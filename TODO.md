@@ -18,6 +18,10 @@
 * `test_eval.py::tIGNOREest_move_in_a_circle`
 
 ```
+# Colours
+
+# Brush size
+
 # Negative numbers
 assert do_eval("-90+d:S") == [Line(Pt(0, 0), Pt(-10, 0))]
 
@@ -29,6 +33,8 @@ assert do_eval("20=x15=y:J") == [Dot(Pt(20, 15))]
 
 # :L to draw a line to x, y
 assert do_eval("20=x15=y:L") == [Line(Pt(0, 0), Pt(20, 15))]
+
+# "Stamps" - different brush shapes
 
 # Variables
 assert do_eval("180=_a_a+d:S") == [Line(Pt(0, 0), Pt(0, -10))]
