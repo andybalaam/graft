@@ -42,7 +42,7 @@ def do_eval_debug(chars: Iterable[str], n: int = 1):
 
 
 def test_calling_s_moves_forward():
-    assert do_eval(":s") == [Line(Pt(0, 0), Pt(0, 10))]
+    assert do_eval(":S") == [Line(Pt(0, 0), Pt(0, 10))]
 
 
 def test_incrementing_a_variable_does_nothing():
@@ -55,13 +55,13 @@ def test_incrementing_a_variable_does_nothing():
 
 
 def test_turn_right_and_move():
-    assert do_eval("90+d25=s:s") == [Line(Pt(0, 0), Pt(25, 0))]
+    assert do_eval("90+d25=s:S") == [Line(Pt(0, 0), Pt(25, 0))]
 
 
 def tIGNOREest_move_in_a_circle():
     """Waiting for the optimiser to make this readable"""
     assert (
-        do_eval(":s+d", 10) ==
+        do_eval(":S+d", 10) ==
         [
             Line(Pt(0, 0), Pt(0, 10.0)),
         ]

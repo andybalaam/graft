@@ -4,8 +4,8 @@
 
 Rolling around a circle:
 
-```graft ':s+d'```
+```graft ':S+d'```
 
 Growing a spiral:
 
-```graft ':s+d110s'```
+```graft ':S+d110s'```

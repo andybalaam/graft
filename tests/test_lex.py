@@ -22,8 +22,8 @@ def test_number_and_symbol_are_lexed_separately():
 
 
 def test_functions_are_lexed():
-    assert do_lex(":s3") == [FunctionToken("s"), NumberToken("3")]
-    assert do_lex("3:s") == [NumberToken("3"), FunctionToken("s")]
+    assert do_lex(":S3") == [FunctionToken("S"), NumberToken("3")]
+    assert do_lex("3:S") == [NumberToken("3"), FunctionToken("S")]
 
 
 def test_operators_are_lexed():
@@ -35,9 +35,9 @@ def test_operators_are_lexed():
 
 def test_function_call_then_add_is_lexed():
     assert (
-        do_lex(":s95+_ab_c") ==
+        do_lex(":S95+_ab_c") ==
         [
-            FunctionToken("s"),
+            FunctionToken("S"),
             NumberToken("95"),
             OperatorToken("+"),
             SymbolToken("_ab_c")

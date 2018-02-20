@@ -19,7 +19,7 @@ def do_parse(chars: Iterable[str]):
 
 
 def test_function_calls_are_parsed():
-    assert do_parse(":s") == [FunctionCall(FunctionToken("s"))]
+    assert do_parse(":S") == [FunctionCall(FunctionToken("S"))]
 
 
 def test_symbols_are_parsed():
@@ -28,9 +28,9 @@ def test_symbols_are_parsed():
 
 def test_function_call_then_increment_is_parsed():
     assert (
-        do_parse(":s+d") ==
+        do_parse(":S+d") ==
         [
-            FunctionCall(FunctionToken("s")),
+            FunctionCall(FunctionToken("S")),
             Modify(
                 sym=SymbolToken("d"),
                 op=OperatorToken("+"),
@@ -42,9 +42,9 @@ def test_function_call_then_increment_is_parsed():
 
 def test_function_call_then_add_is_parsed():
     assert (
-        do_parse(":s95+d") ==
+        do_parse(":S95+d") ==
         [
-            FunctionCall(FunctionToken("s")),
+            FunctionCall(FunctionToken("S")),
             Modify(
                 sym=SymbolToken("d"),
                 op=OperatorToken("+"),
