@@ -11,6 +11,9 @@ Line = graftlib.eval_.Line  # Silence pylint
 List = typing.List          # Silence pylint
 
 
+max_lines = 500
+
+
 class Ui:
     def __init__(self, commands: Iterable):
         self.commands = commands
@@ -48,6 +51,8 @@ class Ui:
     def on_timeout(self, _user_data):
         try:
             self.lines.append(next(self.commands))
+            if len(self.lines) > max_lines:
+                self.lines = self.lines[-max_lines:]
             self.canvas.queue_draw()
             return True
         except StopIteration:
