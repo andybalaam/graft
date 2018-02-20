@@ -59,7 +59,7 @@ def test_turn_right_and_move():
 
 
 def test_turn_random_and_move():
-    def r(a, b):
+    def r(_a, _b):
         return 90
     assert do_eval(":R~+d:S", rand=r) == [Line(Pt(0, 0), Pt(10, 0))]
 

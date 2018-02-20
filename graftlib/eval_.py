@@ -41,7 +41,7 @@ class State:
     dir_: float = attr.ib()
     step: float = attr.ib()
 
-    def fn_step(self, tree, rand):
+    def _fn_step(self, _tree, _rand):
         th = _theta(self.dir_)
         old_pos = attr.evolve(self.pos)
         new_pos = attr.evolve(self.pos)
@@ -50,35 +50,41 @@ class State:
         self.pos = new_pos
         return Line(old_pos, new_pos)
 
+    def _next_function_call(self, tree, rand):
+        if tree.fn == "S":
+            return self._fn_step(tree, rand)
+        elif tree.fn == "R":
+            raise Exception(
+                "The :R (Random) function does nothing on its own.  " +
+                "You must use its value for something by writing " +
+                "e.g '~+d' after it."
+            )
+        else:
+            raise Exception("Unknown function %s" % tree.fn)
+
+    def _next_modify(self, tree, rand):
+        val = _eval_value(tree.value, rand)
+        if tree.sym == "d":
+            if tree.op == "+":
+                self.dir_ += val
+            else:
+                self.dir_ = val
+        elif tree.sym == "s":
+            if tree.op == "+":
+                self.step += val
+            else:
+                self.step = val
+        else:
+            raise Exception(
+                "No support for custom variables yet: " + tree.sym
+            )
+        return None
+
     def next(self, tree, rand):  #: Tree
         if type(tree) == FunctionCall:
-            if tree.fn == "S":
-                return self.fn_step(tree, rand)
-            elif tree.fn == "R":
-                raise Exception(
-                    "The :R (Random) function does nothing on its own.  " +
-                    "You must use its value for something by writing " +
-                    "e.g '~+d' after it."
-                )
-            else:
-                raise Exception("Unknown function %s" % tree.fn)
+            return self._next_function_call(tree, rand)
         elif type(tree) == Modify:
-            val = _eval_value(tree.value, rand)
-            if tree.sym == "d":
-                if tree.op == "+":
-                    self.dir_ += val
-                else:
-                    self.dir_ = val
-            elif tree.sym == "s":
-                if tree.op == "+":
-                    self.step += val
-                else:
-                    self.step = val
-            else:
-                raise Exception(
-                    "No support for custom variables yet: " + tree.sym
-                )
-            return None
+            return self._next_modify(tree, rand)
         else:
             raise Exception("Unknown tree type: " + tree)
 
