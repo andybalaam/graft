@@ -7,8 +7,8 @@ from graftlib.lex import lex
 from graftlib.lineoptimiser import LineOptimiser
 from graftlib.parse import parse
 from graftlib.world import World
-from graftlib.ui.gtk3 import Gtk3Ui
-from graftlib.ui.gif import GifUi
+from graftlib.ui.gtk3ui import Gtk3Ui
+from graftlib.ui.gifui import GifUi
 
 
 # How far to run the animation initially to decide what
