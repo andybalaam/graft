@@ -5,6 +5,7 @@ from gi.repository import Gtk, GObject
 
 from typing import Iterable, Optional
 import attr
+import itertools
 import typing
 import math
 
@@ -16,6 +17,10 @@ List = typing.List          # Silence pylint
 max_lines = 500
 ms_per_frame = 50
 dot_size = 5
+
+# How far to run the animation initially to decide what
+# out initial zoom level should be.
+lookahead_steps = 50
 
 
 @attr.s
@@ -29,10 +34,17 @@ class Extents:
         self.reset()
 
     def reset(self):
-        self._x_min = -100.0
-        self._x_max = 100.0
-        self._y_min = -100.0
-        self._y_max = 100.0
+        self._x_min = -1.0
+        self._x_max = 1.0
+        self._y_min = -1.0
+        self._y_max = 1.0
+
+    def train_on(self, commands):
+        taken = list(itertools.islice(commands, lookahead_steps))
+        for cmd in taken:
+            self.add(cmd.start)
+            self.add(cmd.end)
+        return itertools.chain(taken, commands)
 
     def centre(self):
         return (
@@ -85,6 +97,8 @@ class WindowAnimator:
     w: float = attr.ib(None, init=False)
     h: float = attr.ib(None, init=False)
 
+    counter: int = attr.ib(0, init=False)
+
     def animate(self, cr, extents, win_w, win_h):
         target_x, target_y = extents.centre()
         target_w, target_h = extents.size()
@@ -96,22 +110,26 @@ class WindowAnimator:
         self.move(cr, target_x, target_y, target_w, target_h, win_w, win_h)
 
     def move(self, cr, target_x, target_y, target_w, target_h, win_w, win_h):
-        self.v_x += 0.3 * (target_x - self.x)
-        self.v_y += 0.3 * (target_y - self.y)
-        self.v_w += 0.3 * (target_w - self.w)
-        self.v_h += 0.3 * (target_h - self.h)
 
-        self.v_x = limit(self.v_x, 10.0) * 0.2
-        self.v_y = limit(self.v_y, 10.0) * 0.2
-        self.v_w = limit(self.v_w, 10.0) * 0.2
-        self.v_h = limit(self.v_h, 10.0) * 0.2
+        if self.counter >= lookahead_steps:
+            self.v_x += 0.3 * (target_x - self.x)
+            self.v_y += 0.3 * (target_y - self.y)
+            self.v_w += 0.3 * (target_w - self.w)
+            self.v_h += 0.3 * (target_h - self.h)
 
-        self.x += self.v_x
-        self.y += self.v_y
-        self.w += self.v_w
-        self.h += self.v_h
+            self.v_x = limit(self.v_x, 10.0) * 0.2
+            self.v_y = limit(self.v_y, 10.0) * 0.2
+            self.v_w = limit(self.v_w, 10.0) * 0.2
+            self.v_h = limit(self.v_h, 10.0) * 0.2
 
-        scale = 0.9 * min(win_w / self.w, win_h / self.h)
+            self.x += self.v_x
+            self.y += self.v_y
+            self.w += self.v_w
+            self.h += self.v_h
+
+        self.counter += 1
+
+        scale = 0.8 * min(win_w / self.w, win_h / self.h)
         x = -self.x * scale + (win_w / 2)
         y = -self.y * scale + (win_h / 2)
 
@@ -121,7 +139,6 @@ class WindowAnimator:
 
 class Ui:
     def __init__(self, commands: Iterable, delete_listener):
-        self.commands = commands
         self.delete_listener = delete_listener
         self.win = Gtk.Window(resizable=True)
         self.canvas = Gtk.DrawingArea()
@@ -135,6 +152,7 @@ class Ui:
         self.pos: Pt = Pt(0.0, 0.0)
         self.extents = Extents()
         self.window_animator = WindowAnimator()
+        self.commands = self.extents.train_on(commands)
 
     def run(self):
         self.win.show_all()
