@@ -58,6 +58,67 @@ class Extents:
             self._y_max = pt.y
 
 
+def limit(val, r):
+    if val < -r:
+        return -r
+    elif val > r:
+        return r
+    else:
+        return val
+
+
+@attr.s
+class WindowAnimator:
+    """
+    Given the translation and scale we _want_ to be at,
+    provide actual translation and scale that smoothly
+    animate towards that.
+    """
+
+    v_x: float = attr.ib(0.0, init=False)
+    v_y: float = attr.ib(0.0, init=False)
+    v_w: float = attr.ib(0.0, init=False)
+    v_h: float = attr.ib(0.0, init=False)
+
+    x: float = attr.ib(None, init=False)
+    y: float = attr.ib(None, init=False)
+    w: float = attr.ib(None, init=False)
+    h: float = attr.ib(None, init=False)
+
+    def animate(self, cr, extents, win_w, win_h):
+        target_x, target_y = extents.centre()
+        target_w, target_h = extents.size()
+        if self.x is None:
+            self.x = target_x
+            self.y = target_y
+            self.w = target_w
+            self.h = target_h
+        self.move(cr, target_x, target_y, target_w, target_h, win_w, win_h)
+
+    def move(self, cr, target_x, target_y, target_w, target_h, win_w, win_h):
+        self.v_x += 0.3 * (target_x - self.x)
+        self.v_y += 0.3 * (target_y - self.y)
+        self.v_w += 0.3 * (target_w - self.w)
+        self.v_h += 0.3 * (target_h - self.h)
+
+        self.v_x = limit(self.v_x, 10.0) * 0.2
+        self.v_y = limit(self.v_y, 10.0) * 0.2
+        self.v_w = limit(self.v_w, 10.0) * 0.2
+        self.v_h = limit(self.v_h, 10.0) * 0.2
+
+        self.x += self.v_x
+        self.y += self.v_y
+        self.w += self.v_w
+        self.h += self.v_h
+
+        scale = 0.9 * min(win_w / self.w, win_h / self.h)
+        x = -self.x * scale + (win_w / 2)
+        y = -self.y * scale + (win_h / 2)
+
+        cr.translate(x, y)
+        cr.scale(scale, scale)
+
+
 class Ui:
     def __init__(self, commands: Iterable, delete_listener):
         self.commands = commands
@@ -73,33 +134,19 @@ class Ui:
         self.lines: List[Line] = []
         self.pos: Pt = Pt(0.0, 0.0)
         self.extents = Extents()
+        self.window_animator = WindowAnimator()
 
     def run(self):
         self.win.show_all()
         Gtk.main()
 
-    def _centre_on_drawing(self, cr):
-        win_w = self.canvas.get_allocated_width()
-        win_h = self.canvas.get_allocated_height()
-        x, y = self.extents.centre()
-        w, h = self.extents.size()
-        scale = 0.9 * min(win_w / w, win_h / h)
-        cr.translate(-x * scale + (win_w / 2), -y * scale + (win_h / 2))
-        cr.scale(scale, scale)
-
-        # cr.arc(x, y, 10, 0, 2 * math.pi)
-        # cr.stroke()
-        # cr.arc(self.extents._x_min, self.extents._y_min, 2, 0, 2 * math.pi)
-        # cr.stroke()
-        # cr.arc(self.extents._x_min, self.extents._y_max, 4, 0, 2 * math.pi)
-        # cr.stroke()
-        # cr.arc(self.extents._x_max, self.extents._y_min, 2, 0, 2 * math.pi)
-        # cr.stroke()
-        # cr.arc(self.extents._x_max, self.extents._y_max, 4, 0, 2 * math.pi)
-        # cr.stroke()
-
     def on_draw(self, _win, cr, _user_data: Optional):
-        self._centre_on_drawing(cr)
+        self.window_animator.animate(
+            cr,
+            self.extents,
+            self.canvas.get_allocated_width(),
+            self.canvas.get_allocated_height(),
+        )
 
         self.extents.reset()
         for line in self.lines:
