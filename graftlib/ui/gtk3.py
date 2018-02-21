@@ -10,7 +10,6 @@ from graftlib.animation import Animation
 
 
 ms_per_frame = 50
-dot_size = 5
 
 
 class Gtk3Ui:
@@ -46,7 +45,7 @@ class Gtk3Ui:
         cr.arc(
             self.animation.pos.x,
             self.animation.pos.y,
-            dot_size,
+            self.animation.dot_size,
             0,
             2 * math.pi
         )

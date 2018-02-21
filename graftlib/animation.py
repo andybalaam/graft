@@ -17,6 +17,7 @@ class Animation:
             delete_listener,
             lookahead_steps,
             max_lines,
+            dot_size,
     ):
         self.lines: List[Line] = []
         self.pos: Pt = Pt(0.0, 0.0)
@@ -25,6 +26,7 @@ class Animation:
         self.commands = self.extents.train_on(commands, lookahead_steps)
         self.delete_listener = delete_listener
         self.max_lines = max_lines
+        self.dot_size = dot_size
 
     def step(self):
         try:

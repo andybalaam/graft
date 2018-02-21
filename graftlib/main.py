@@ -20,6 +20,10 @@ lookahead_steps = 100
 max_lines = 500
 
 
+# Size of the dot indicating where we are.
+dot_size = 5
+
+
 def main_gif(
         animation: Animation,
         frames: Optional[int],
@@ -48,7 +52,7 @@ def make_animation(program: str, frames: Optional[int], rand):
     the random number generator supplied.
     """
     opt = LineOptimiser(eval_(parse(lex(program)), frames, rand))
-    return Animation(opt, opt, lookahead_steps, max_lines)
+    return Animation(opt, opt, lookahead_steps, max_lines, dot_size)
 
 
 def main(world: World) -> int:
