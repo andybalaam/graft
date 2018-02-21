@@ -2,10 +2,6 @@
 
 ## UI
 
-* Check the first 2 secs or so, then zoom to fit that
-* Zoom continuously (smoothly?) to fit size
-* Optimise so repeated lines (rounded to 0.1) are not drawn
-* Hard limit on number of lines, deleting oldest first
 * Command line control of number of frames, max lines, gif generation etc.
 * Gif generation
 

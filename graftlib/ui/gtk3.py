@@ -3,9 +3,9 @@ import gi
 gi.require_version('Gtk', '3.0')  # nopep8
 from gi.repository import Gtk, GObject
 
-from typing import Iterable, Optional
 import attr
 import itertools
+from typing import Iterable, Optional
 import typing
 import math
 
@@ -80,6 +80,17 @@ def limit(val, r):
 
 
 @attr.s
+class SmoothValue:
+    value: float = attr.ib()
+    _v: float = attr.ib(0, init=False)
+
+    def set_target(self, target: float):
+        self._v += 0.3 * (target - self.value)  # Acceleration
+        self._v = limit(self._v, 10.0) * 0.2     # Limit + damping
+        self.value += self._v
+
+
+@attr.s
 class WindowAnimator:
     """
     Given the translation and scale we _want_ to be at,
@@ -87,53 +98,43 @@ class WindowAnimator:
     animate towards that.
     """
 
-    v_x: float = attr.ib(0.0, init=False)
-    v_y: float = attr.ib(0.0, init=False)
-    v_w: float = attr.ib(0.0, init=False)
-    v_h: float = attr.ib(0.0, init=False)
-
-    x: float = attr.ib(None, init=False)
-    y: float = attr.ib(None, init=False)
-    w: float = attr.ib(None, init=False)
-    h: float = attr.ib(None, init=False)
+    x: Optional[SmoothValue] = attr.ib(None, init=False)
+    y: Optional[SmoothValue] = attr.ib(None, init=False)
+    w: Optional[SmoothValue] = attr.ib(None, init=False)
+    h: Optional[SmoothValue] = attr.ib(None, init=False)
 
     counter: int = attr.ib(0, init=False)
 
-    def animate(self, cr, extents, win_w, win_h):
-        target_x, target_y = extents.centre()
-        target_w, target_h = extents.size()
+    def animate(self, cr, extents, window_size):
+        centre = extents.centre()
+        size = extents.size()
         if self.x is None:
-            self.x = target_x
-            self.y = target_y
-            self.w = target_w
-            self.h = target_h
-        self.move(cr, target_x, target_y, target_w, target_h, win_w, win_h)
+            self.x = SmoothValue(centre[0])
+            self.y = SmoothValue(centre[1])
+            self.w = SmoothValue(size[0])
+            self.h = SmoothValue(size[1])
+        self.move(cr, centre, size, window_size)
 
-    def move(self, cr, target_x, target_y, target_w, target_h, win_w, win_h):
+    def move(self, cr, centre, size, window_size):
 
         if self.counter >= lookahead_steps:
-            self.v_x += 0.3 * (target_x - self.x)
-            self.v_y += 0.3 * (target_y - self.y)
-            self.v_w += 0.3 * (target_w - self.w)
-            self.v_h += 0.3 * (target_h - self.h)
-
-            self.v_x = limit(self.v_x, 10.0) * 0.2
-            self.v_y = limit(self.v_y, 10.0) * 0.2
-            self.v_w = limit(self.v_w, 10.0) * 0.2
-            self.v_h = limit(self.v_h, 10.0) * 0.2
-
-            self.x += self.v_x
-            self.y += self.v_y
-            self.w += self.v_w
-            self.h += self.v_h
-
+            self.x.set_target(centre[0])
+            self.y.set_target(centre[1])
+            self.w.set_target(size[0])
+            self.h.set_target(size[1])
         self.counter += 1
 
-        scale = 0.8 * min(win_w / self.w, win_h / self.h)
+        scale = (
+            0.8 *
+            min(
+                window_size[0] / self.w.value,
+                window_size[1] / self.h.value
+            )
+        )
         if scale > 2.0:
             scale = 2.0
-        x = -self.x * scale + (win_w / 2)
-        y = -self.y * scale + (win_h / 2)
+        x = -self.x.value * scale + (window_size[0] / 2)
+        y = -self.y.value * scale + (window_size[1] / 2)
 
         cr.translate(x, y)
         cr.scale(scale, scale)
@@ -164,8 +165,10 @@ class Ui:
         self.window_animator.animate(
             cr,
             self.extents,
-            self.canvas.get_allocated_width(),
-            self.canvas.get_allocated_height(),
+            (
+                self.canvas.get_allocated_width(),
+                self.canvas.get_allocated_height(),
+            )
         )
 
         self.extents.reset()
