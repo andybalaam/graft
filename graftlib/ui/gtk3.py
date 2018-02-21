@@ -20,7 +20,7 @@ dot_size = 5
 
 # How far to run the animation initially to decide what
 # out initial zoom level should be.
-lookahead_steps = 50
+lookahead_steps = 100
 
 
 @attr.s
@@ -34,10 +34,10 @@ class Extents:
         self.reset()
 
     def reset(self):
-        self._x_min = -1.0
-        self._x_max = 1.0
-        self._y_min = -1.0
-        self._y_max = 1.0
+        self._x_min = 1_000_000.0
+        self._x_max = -1_000_000.0
+        self._y_min = 1_000_000.0
+        self._y_max = -1_000_000.0
 
     def train_on(self, commands):
         taken = list(itertools.islice(commands, lookahead_steps))
@@ -130,6 +130,8 @@ class WindowAnimator:
         self.counter += 1
 
         scale = 0.8 * min(win_w / self.w, win_h / self.h)
+        if scale > 2.0:
+            scale = 2.0
         x = -self.x * scale + (win_w / 2)
         y = -self.y * scale + (win_h / 2)
 
