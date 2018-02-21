@@ -1,17 +1,17 @@
-from typing import Iterable
+from typing import Iterable, Optional
 import math
 import attr
 from graftlib.parse import FunctionCall, Modify, Number
 
 
-@attr.s
+@attr.s(cmp=True, frozen=True)
 class Pt:
     x: float = attr.ib()
     y: float = attr.ib()
 
 
-@attr.s
-class Line:
+@attr.s(cmp=True, frozen=True)
+class Line():
     start: Pt = attr.ib()
     end: Pt = attr.ib()
 
@@ -44,9 +44,11 @@ class State:
     def _fn_step(self, _tree, _rand):
         th = _theta(self.dir_)
         old_pos = attr.evolve(self.pos)
-        new_pos = attr.evolve(self.pos)
-        new_pos.x += self.step * math.sin(th)
-        new_pos.y += self.step * math.cos(th)
+        new_pos = attr.evolve(
+            self.pos,
+            x=self.pos.x + self.step * math.sin(th),
+            y=self.pos.y + self.step * math.cos(th),
+        )
         self.pos = new_pos
         return Line(old_pos, new_pos)
 
@@ -90,17 +92,23 @@ class State:
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_debug(trees: Iterable, n: int, rand) -> Iterable:
+def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
     trees_list = list(trees)
-    state = State(pos=Pt(0, 0), dir_=0, step=10)
-    for _ in range(n):
+    state = State(pos=Pt(0.0, 0.0), dir_=0, step=10)
+    i = 0
+    while n is None or i < n:
+        i += 1
         for tree in trees_list:
             command = state.next(tree, rand)
             yield (command, attr.evolve(state))
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_(trees: Iterable, n: int, rand) -> Iterable:
+def eval_(trees: Iterable, n: Optional[int], rand) -> Iterable:
+    """
+    Run the supplied program n times, or for ever if n is None.
+    """
+
     return filter(
         lambda x: x is not None,
         map(

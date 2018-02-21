@@ -15,11 +15,12 @@ setup:
 
 
 test:
-	pytest-3 --quiet
+	pytest-3 -vv
 
 
 test-full:
 	pytest-3 \
+		--quiet \
 		--pep8 \
 		--pylama \
 		--pylint --pylint-rcfile=.pylintrc \

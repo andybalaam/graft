@@ -8,27 +8,19 @@ from graftlib.eval_ import (
 )
 from graftlib.lex import lex
 from graftlib.parse import parse
-
-
-def round_float(x: float) -> float:
-    """Round to 1 decimal place"""
-    return float(int(x * 1000.0) / 1000.0)
-
-
-def round_pt(pt: Pt) -> Pt:
-    return Pt(round_float(pt.x), round_float(pt.y))
+from graftlib.round_ import round_line
 
 
 def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
     for ln in lines:
-        yield Line(round_pt(ln.start), round_pt(ln.end))
+        yield round_line(ln)
 
 
 def round_debug(lines: Iterable[Tuple[Optional[Line], State]]) -> (
         Iterable[Tuple[Optional[Line], State]]):
     for (ln, state) in lines:
         yield (
-            None if ln is None else Line(round_pt(ln.start), round_pt(ln.end)),
+            None if ln is None else round_line(ln.start),
             state
         )
 
@@ -42,7 +34,13 @@ def do_eval_debug(chars: Iterable[str], n: int = 1, rand=None):
 
 
 def test_calling_s_moves_forward():
-    assert do_eval(":S") == [Line(Pt(0, 0), Pt(0, 10))]
+    assert (
+        do_eval(":S:S") ==
+        [
+            Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+            Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
+        ]
+    )
 
 
 def test_incrementing_a_variable_does_nothing():
