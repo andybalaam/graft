@@ -9,3 +9,4 @@ class World:
     stdout = attr.ib()
     stderr = attr.ib()
     random = attr.ib()
+    fs = attr.ib()
