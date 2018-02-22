@@ -17,7 +17,6 @@ class _SmoothValue:
     _v: float = attr.ib(0, init=False)
 
     def set_target(self, target: float):
-        # TODO: if acceleration is huge, just jump there
         self._v += 0.5 * (target - self.value)  # Acceleration
         self._v = _limit(self._v, 200.0) * 0.2     # Limit + damping
         self.value += self._v

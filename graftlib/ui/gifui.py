@@ -1,5 +1,5 @@
-import cairo
 import subprocess
+import cairo
 
 from graftlib.animation import Animation
 from graftlib.world import World
