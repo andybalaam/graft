@@ -62,8 +62,8 @@ class WindowAnimator:
         scale = (
             0.8 *
             min(
-                window_size[0] / self.w.value,
-                window_size[1] / self.h.value
+                window_size[0] / self.w.value if self.w.value != 0 else 1,
+                window_size[1] / self.h.value if self.h.value != 0 else 1,
             )
         )
         if scale > 2.0:
