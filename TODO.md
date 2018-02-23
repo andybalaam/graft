@@ -2,7 +2,6 @@
 
 ## Now
 
-* If acceleration is huge, just jump there
 * Multiplying: `+d1.1s:S`
 * `test_eval.py::tIGNOREest_move_in_a_circle`
 * Colours

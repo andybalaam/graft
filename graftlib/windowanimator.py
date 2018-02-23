@@ -16,10 +16,16 @@ class _SmoothValue:
     value: float = attr.ib()
     _v: float = attr.ib(0, init=False)
 
-    def set_target(self, target: float):
-        self._v += 0.5 * (target - self.value)  # Acceleration
-        self._v = _limit(self._v, 200.0) * 0.2     # Limit + damping
-        self.value += self._v
+    def set_target(self, target: float, movement_scale: float):
+        dist = target - self.value
+        if abs(dist) > abs(movement_scale):
+            # If far away, jump straight there
+            self.value = target
+        else:
+            # But normally, move smoothly towards the best value
+            self._v += 0.5 * dist                   # Acceleration
+            self._v = _limit(self._v, 200.0) * 0.2  # Limit + damping
+            self.value += self._v
 
 
 @attr.s
@@ -52,10 +58,10 @@ class WindowAnimator:
     def move(self, centre, size, window_size) -> (float, float, float):
 
         if self.counter >= self.lookahead_steps:
-            self.x.set_target(centre[0])
-            self.y.set_target(centre[1])
-            self.w.set_target(size[0])
-            self.h.set_target(size[1])
+            self.x.set_target(centre[0], size[0])
+            self.y.set_target(centre[1], size[1])
+            self.w.set_target(size[0], size[0])
+            self.h.set_target(size[1], size[1])
         self.counter += 1
 
         scale = (
