@@ -22,14 +22,17 @@ def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
         line_width = min_visible_line_width / scale
     cairo_cr.set_line_width(line_width)
 
+    # Minus signs on y coords because we are reversing the y axis.
+    # See the same thing in extents too (but nowhere else).
+
     for line in animation.lines:
-        cairo_cr.move_to(line.start.x, line.start.y)
-        cairo_cr.line_to(line.end.x, line.end.y)
+        cairo_cr.move_to(line.start.x, -line.start.y)
+        cairo_cr.line_to(line.end.x, -line.end.y)
     cairo_cr.stroke()
 
     cairo_cr.arc(
         animation.pos.x,
-        animation.pos.y,
+        -animation.pos.y,
         animation.dot_size,
         0,
         2 * math.pi

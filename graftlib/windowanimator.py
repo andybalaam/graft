@@ -50,7 +50,9 @@ class WindowAnimator:
         size = extents.size()
         if self.x is None:
             self.x = _SmoothValue(centre[0])
-            self.y = _SmoothValue(centre[1])
+            # Minus sign here because we are reversing the y axis.
+            # See the same thing in cairo_draw too (but nowhere else).
+            self.y = _SmoothValue(-centre[1])
             self.w = _SmoothValue(size[0])
             self.h = _SmoothValue(size[1])
         return self.move(centre, size, window_size)
@@ -59,7 +61,9 @@ class WindowAnimator:
 
         if self.counter >= self.lookahead_steps:
             self.x.set_target(centre[0], size[0])
-            self.y.set_target(centre[1], size[1])
+            # Minus sign here because we are reversing the y axis.
+            # See the same thing in cairo_draw too (but nowhere else).
+            self.y.set_target(-centre[1], size[1])
             self.w.set_target(size[0], size[0])
             self.h.set_target(size[1], size[1])
         self.counter += 1
