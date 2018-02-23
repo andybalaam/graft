@@ -3,6 +3,9 @@ import math
 from graftlib.animation import Animation
 
 
+min_visible_line_width = 0.2
+
+
 def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
 
     x, y, scale = animation.animate_window(win_w, win_h)
@@ -13,7 +16,11 @@ def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
     cairo_cr.paint()
 
     cairo_cr.set_source_rgb(0.0, 0.0, 0.0)
-    cairo_cr.set_line_width(3.0)
+
+    line_width = 3.0
+    if line_width * scale < min_visible_line_width:
+        line_width = min_visible_line_width / scale
+    cairo_cr.set_line_width(line_width)
 
     for line in animation.lines:
         cairo_cr.move_to(line.start.x, line.start.y)
