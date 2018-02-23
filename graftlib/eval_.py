@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Tuple
 import math
 import operator
 
@@ -16,6 +16,7 @@ class Pt:
 class Line():
     start: Pt = attr.ib()
     end: Pt = attr.ib()
+    color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
 
 
 def _theta(dir_: float) -> float:
@@ -37,11 +38,26 @@ def _eval_value(tree, rand):
         )
 
 
+def _operator_fn(opstr: str):
+    if opstr == "=":
+        return lambda x, y: y
+    elif opstr == "+":
+        return operator.add
+    elif opstr == "":
+        return operator.mul
+    else:
+        raise Exception("Unknown operator '%s'." % opstr)
+
+
 @attr.s
 class State:
     pos: Pt = attr.ib()
     dir_: float = attr.ib()
     step: float = attr.ib()
+    red: float = attr.ib(0.0, init=False)
+    green: float = attr.ib(0.0, init=False)
+    blue: float = attr.ib(0.0, init=False)
+    alpha: float = attr.ib(100.0, init=False)
 
     def _fn_step(self, _tree, _rand):
         th = _theta(self.dir_)
@@ -52,7 +68,8 @@ class State:
             y=self.pos.y + self.step * math.cos(th),
         )
         self.pos = new_pos
-        return Line(old_pos, new_pos)
+        color = (self.red, self.green, self.blue, self.alpha)
+        return Line(old_pos, new_pos, color=color)
 
     def _next_function_call(self, tree, rand):
         if tree.fn == "S":
@@ -68,23 +85,20 @@ class State:
 
     def _next_modify(self, tree, rand):
         val = _eval_value(tree.value, rand)
-
-        def operator_fn(opstr: str):
-            if tree.op == "=":
-                return lambda x, y: y
-            elif opstr == "+":
-                return operator.add
-            elif tree.op == "":
-                return operator.mul
-            else:
-                raise Exception("Unknown operator '%s'." % tree.op)
-
-        op = operator_fn(tree.op)
+        op = _operator_fn(tree.op)
 
         if tree.sym == "d":
             self.dir_ = op(self.dir_, val)
         elif tree.sym == "s":
             self.step = op(self.step, val)
+        elif tree.sym == "r":
+            self.red = op(self.red, val)
+        elif tree.sym == "g":
+            self.green = op(self.green, val)
+        elif tree.sym == "b":
+            self.blue = op(self.blue, val)
+        elif tree.sym == "a":
+            self.alpha = op(self.alpha, val)
         else:
             raise Exception(
                 "No support for custom variables yet: " + tree.sym

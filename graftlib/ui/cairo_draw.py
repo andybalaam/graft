@@ -1,9 +1,17 @@
 import math
 
+from typing import Tuple
+
 from graftlib.animation import Animation
 
 
 min_visible_line_width = 1.0
+
+
+def divide_by_100(rgba: Tuple[float, float, float, float]) -> (
+        Tuple[float, float, float, float]
+):
+    return tuple(abs(x) / 100.0 for x in rgba)
 
 
 def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
@@ -26,9 +34,10 @@ def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
     # See the same thing in extents too (but nowhere else).
 
     for line in animation.lines:
+        cairo_cr.set_source_rgba(*divide_by_100(line.color))
         cairo_cr.move_to(line.start.x, -line.start.y)
         cairo_cr.line_to(line.end.x, -line.end.y)
-    cairo_cr.stroke()
+        cairo_cr.stroke()
 
     cairo_cr.arc(
         animation.pos.x,

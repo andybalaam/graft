@@ -72,6 +72,16 @@ def test_turn_random_and_move():
     assert do_eval(":R~+d:S", rand=r) == [Line(Pt(0, 0), Pt(10, 0))]
 
 
+def test_draw_in_different_colour():
+    assert (
+        do_eval("0.9=r0.5=g0.1=b0.5=a:S0.1=a:S") ==
+        [
+            Line(Pt(0.0, 0.0), Pt(0, 10.0), color=(0.9, 0.5, 0.1, 0.5)),
+            Line(Pt(0.0, 10.0), Pt(0, 20.0), color=(0.9, 0.5, 0.1, 0.1)),
+        ]
+    )
+
+
 def test_move_in_a_circle():
     assert (
         do_eval(":S+d", 36) ==

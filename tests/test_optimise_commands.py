@@ -17,6 +17,12 @@ def test_lines_are_rounded_to_1_decimal_place():
     assert opt(bef) == aft
 
 
+def test_colours_are_modulod_to_within_minus_100_100():
+    bef = [n(p(0.1, 0.6), p(0.5, 2.9), color=(-101.0, 102.0, 1.1, 2.4))]
+    aft = [n(p(0.1, 0.6), p(0.5, 2.9), color=(99.0, -98.0, 1.1, 2.4))]
+    assert opt(bef) == aft
+
+
 def test_distinct_lines_are_preserved():
     bef = [n(p(0.12, 0.56), p(0.5, 0.91)), n(p(2.31, 1.4), p(0.5, 0.91))]
     aft = [n(p(0.1, 0.6), p(0.5, 0.9)), n(p(2.3, 1.4), p(0.5, 0.9))]
@@ -26,6 +32,26 @@ def test_distinct_lines_are_preserved():
 def test_lines_identical_after_rounding_are_elided():
     bef = [n(p(0.12, 0.56), p(0.5, 0.91)), n(p(0.09, 0.61), p(0.46, 0.91))]
     aft = [n(p(0.1, 0.6), p(0.5, 0.9)), e(p(0.1, 0.6), p(0.5, 0.9))]
+    assert opt(bef) == aft
+
+
+def test_lines_identical_but_different_colours_are_not_elided():
+    bef = [
+        n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
+        n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.5))
+    ]
+    assert opt(bef) == bef
+
+
+def test_lines_identical_including_colours_are_elided():
+    bef = [
+        n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
+        n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4))
+    ]
+    aft = [
+        n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
+        e(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
+    ]
     assert opt(bef) == aft
 
 

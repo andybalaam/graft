@@ -1,4 +1,4 @@
-from typing import Iterator, Set, Union
+from typing import Iterator, Set, Tuple, Union
 import attr
 
 from graftlib.eval_ import Line, Pt
@@ -9,6 +9,7 @@ from graftlib.round_ import round_line
 class ElidedLine:
     start: Pt = attr.ib()
     end: Pt = attr.ib()
+    color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
 
 
 @attr.s
@@ -29,7 +30,7 @@ class LineOptimiser:
     def __next__(self) -> Union[Line, ElidedLine]:
         ln = round_line(next(self.lines))
         if ln in self.seen_lines:
-            return ElidedLine(ln.start, ln.end)
+            return ElidedLine(ln.start, ln.end, ln.color)
         else:
             self.seen_lines.add(ln)
             return ln
