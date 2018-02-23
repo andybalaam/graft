@@ -2,8 +2,6 @@
 
 ## Now
 
-* Multiplying: `+d1.1s:S`
-* `test_eval.py::tIGNOREest_move_in_a_circle`
 * Colours
 * Brush size
 * Mastodon app

@@ -72,11 +72,45 @@ def test_turn_random_and_move():
     assert do_eval(":R~+d:S", rand=r) == [Line(Pt(0, 0), Pt(10, 0))]
 
 
-def tIGNOREest_move_in_a_circle():
-    """Waiting for the optimiser to make this readable"""
+def test_move_in_a_circle():
     assert (
-        do_eval(":S+d", 10) ==
+        do_eval(":S+d", 36) ==
         [
-            Line(Pt(0, 0), Pt(0, 10.0)),
+            Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+            Line(start=Pt(x=0.0, y=10.0), end=Pt(x=1.7, y=19.8)),
+            Line(start=Pt(x=1.7, y=19.8), end=Pt(x=5.2, y=29.2)),
+            Line(start=Pt(x=5.2, y=29.2), end=Pt(x=10.2, y=37.9)),
+            Line(start=Pt(x=10.2, y=37.9), end=Pt(x=16.6, y=45.6)),
+            Line(start=Pt(x=16.6, y=45.6), end=Pt(x=24.2, y=52.0)),
+            Line(start=Pt(x=24.2, y=52.0), end=Pt(x=32.9, y=57.0)),
+            Line(start=Pt(x=32.9, y=57.0), end=Pt(x=42.3, y=60.4)),
+            Line(start=Pt(x=42.3, y=60.4), end=Pt(x=52.2, y=62.2)),
+            Line(start=Pt(x=52.2, y=62.2), end=Pt(x=62.2, y=62.2)),
+            Line(start=Pt(x=62.2, y=62.2), end=Pt(x=72.0, y=60.4)),
+            Line(start=Pt(x=72.0, y=60.4), end=Pt(x=81.4, y=57.0)),
+            Line(start=Pt(x=81.4, y=57.0), end=Pt(x=90.1, y=52.0)),
+            Line(start=Pt(x=90.1, y=52.0), end=Pt(x=97.7, y=45.6)),
+            Line(start=Pt(x=97.7, y=45.6), end=Pt(x=104.1, y=37.9)),
+            Line(start=Pt(x=104.1, y=37.9), end=Pt(x=109.1, y=29.2)),
+            Line(start=Pt(x=109.1, y=29.2), end=Pt(x=112.6, y=19.8)),
+            Line(start=Pt(x=112.6, y=19.8), end=Pt(x=114.3, y=10.0)),
+            Line(start=Pt(x=114.3, y=10.0), end=Pt(x=114.3, y=0.0)),
+            Line(start=Pt(x=114.3, y=0.0), end=Pt(x=112.6, y=-9.8)),
+            Line(start=Pt(x=112.6, y=-9.8), end=Pt(x=109.1, y=-19.2)),
+            Line(start=Pt(x=109.1, y=-19.2), end=Pt(x=104.1, y=-27.9)),
+            Line(start=Pt(x=104.1, y=-27.9), end=Pt(x=97.7, y=-35.6)),
+            Line(start=Pt(x=97.7, y=-35.6), end=Pt(x=90.1, y=-42.0)),
+            Line(start=Pt(x=90.1, y=-42.0), end=Pt(x=81.4, y=-47.0)),
+            Line(start=Pt(x=81.4, y=-47.0), end=Pt(x=72.0, y=-50.4)),
+            Line(start=Pt(x=72.0, y=-50.4), end=Pt(x=62.2, y=-52.2)),
+            Line(start=Pt(x=62.2, y=-52.2), end=Pt(x=52.2, y=-52.2)),
+            Line(start=Pt(x=52.2, y=-52.2), end=Pt(x=42.3, y=-50.4)),
+            Line(start=Pt(x=42.3, y=-50.4), end=Pt(x=32.9, y=-47.0)),
+            Line(start=Pt(x=32.9, y=-47.0), end=Pt(x=24.2, y=-42.0)),
+            Line(start=Pt(x=24.2, y=-42.0), end=Pt(x=16.6, y=-35.6)),
+            Line(start=Pt(x=16.6, y=-35.6), end=Pt(x=10.2, y=-27.9)),
+            Line(start=Pt(x=10.2, y=-27.9), end=Pt(x=5.2, y=-19.2)),
+            Line(start=Pt(x=5.2, y=-19.2), end=Pt(x=1.7, y=-9.8)),
+            Line(start=Pt(x=1.7, y=-9.8), end=Pt(x=-0.0, y=-0.0))
         ]
     )
