@@ -23,8 +23,8 @@ class _SmoothValue:
             self.value = target
         else:
             # But normally, move smoothly towards the best value
-            self._v += 0.5 * dist                   # Acceleration
-            self._v = _limit(self._v, 200.0) * 0.2  # Limit + damping
+            self._v += 0.5 * dist                            # Acceleration
+            self._v = _limit(self._v, movement_scale) * 0.2  # Limit + damping
             self.value += self._v
 
 
