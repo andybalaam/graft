@@ -31,6 +31,24 @@ def test_function_call_then_increment_is_parsed():
     )
 
 
+def test_number_being_added_is_parsed():
+    assert (
+        do_parse("3+d") ==
+        [
+            Modify(sym="d", op="+", value=Number("3"))
+        ]
+    )
+
+
+def test_number_being_multiplied_is_parsed():
+    assert (
+        do_parse("3d") ==
+        [
+            Modify(sym="d", op="", value=Number("3"))
+        ]
+    )
+
+
 def test_function_call_then_add_is_parsed():
     assert (
         do_parse(":S95+d") ==

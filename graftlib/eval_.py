@@ -1,5 +1,7 @@
 from typing import Iterable, Optional
 import math
+import operator
+
 import attr
 from graftlib.parse import FunctionCall, Modify, Number
 
@@ -66,16 +68,23 @@ class State:
 
     def _next_modify(self, tree, rand):
         val = _eval_value(tree.value, rand)
+
+        def operator_fn(opstr: str):
+            if tree.op == "=":
+                return lambda x, y: y
+            elif opstr == "+":
+                return operator.add
+            elif tree.op == "":
+                return operator.mul
+            else:
+                raise Exception("Unknown operator '%s'." % tree.op)
+
+        op = operator_fn(tree.op)
+
         if tree.sym == "d":
-            if tree.op == "+":
-                self.dir_ += val
-            else:
-                self.dir_ = val
+            self.dir_ = op(self.dir_, val)
         elif tree.sym == "s":
-            if tree.op == "+":
-                self.step += val
-            else:
-                self.step = val
+            self.step = op(self.step, val)
         else:
             raise Exception(
                 "No support for custom variables yet: " + tree.sym
@@ -94,7 +103,7 @@ class State:
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
     trees_list = list(trees)
-    state = State(pos=Pt(0.0, 0.0), dir_=0, step=10)
+    state = State(pos=Pt(0.0, 0.0), dir_=0.0, step=10.0)
     i = 0
     while n is None or i < n:
         i += 1

@@ -6,6 +6,8 @@
 * `test_eval.py::tIGNOREest_move_in_a_circle`
 * Colours
 * Brush size
+* Mastodon app
+* Line and character numbers in lex/parse/eval errors
 
 ### Negative numbers
 ```
@@ -39,6 +41,7 @@ assert do_eval("180=_a_a+d:S") == [Line(Pt(0, 0), Pt(0, -10))]
 
 ## Later
 
+* Original code you typed in lex/parse/eval errors
 * Command line control of number of frames, max lines etc.
 * Use Generic types in lots of places including Peekable
 

@@ -74,8 +74,28 @@ def next_tree_for_token(so_far, tok, it):
         val = tok
         return next_tree(Number(val.value), it)
     elif tok_type == SymbolToken:
-        sym = tok
-        return next_tree(Symbol(sym.value), it)
+        if so_far is None:
+            sym = tok
+            return next_tree(Symbol(sym.value), it)
+        else:
+            if type(so_far) == Number:
+                return next_tree(
+                    Modify(value=so_far, op="", sym=tok.value),
+                    it
+                )
+            else:
+                raise Exception(
+                    (
+                        "Parse error: don't know what to do with " +
+                        "'{so_far}' before the symbol {tok}.  You can " +
+                        "have a number before a symbol, " +
+                        "or an operator like +, but not a {type_so_far}."
+                    ).format(
+                        so_far=so_far,
+                        tok=tok.value,
+                        type_so_far=type(so_far).__name__,
+                    )
+                )
     else:
         raise Exception(
             "Parse error: the token %s is an unknown type (%s)" %

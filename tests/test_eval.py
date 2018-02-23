@@ -43,12 +43,22 @@ def test_calling_s_moves_forward():
     )
 
 
-def test_incrementing_a_variable_does_nothing():
+def test_incrementing_a_variable_adds_ten():
     assert do_eval("+d") == []
 
     assert (
         do_eval_debug("+d") ==
-        [(None, State(pos=Pt(0, 0), dir_=10, step=10))]
+        [(None, State(pos=Pt(0.0, 0.0), dir_=10.0, step=10.0))]
+    )
+
+
+def test_multiplying_a_variable():
+    assert (
+        do_eval_debug("2=d3d") ==
+        [
+            (None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0)),
+            (None, State(pos=Pt(0.0, 0.0), dir_=6.0, step=10.0)),
+        ]
     )
 
 
