@@ -42,9 +42,9 @@ def test_number_being_added_is_parsed():
 
 def test_number_being_multiplied_is_parsed():
     assert (
-        do_parse("3d") ==
+        do_parse("3.5d") ==
         [
-            Modify(sym="d", op="", value=Number("3"))
+            Modify(sym="d", op="", value=Number("3.5"))
         ]
     )
 

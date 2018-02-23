@@ -54,10 +54,10 @@ def test_incrementing_a_variable_adds_ten():
 
 def test_multiplying_a_variable():
     assert (
-        do_eval_debug("2=d3d") ==
+        do_eval_debug("2=d3.1d") ==
         [
             (None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0)),
-            (None, State(pos=Pt(0.0, 0.0), dir_=6.0, step=10.0)),
+            (None, State(pos=Pt(0.0, 0.0), dir_=6.2, step=10.0)),
         ]
     )
 

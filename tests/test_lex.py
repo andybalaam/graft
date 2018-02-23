@@ -34,6 +34,10 @@ def test_operators_are_lexed():
     )
 
 
+def test_decimals_are_lexed():
+    assert do_lex("1.1d") == [NumberToken("1.1"), SymbolToken("d")]
+
+
 def test_function_call_then_add_is_lexed():
     assert (
         do_lex(":S95+_ab_c") ==
