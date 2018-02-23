@@ -3,7 +3,7 @@ import math
 from graftlib.animation import Animation
 
 
-min_visible_line_width = 0.2
+min_visible_line_width = 1.0
 
 
 def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
