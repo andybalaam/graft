@@ -55,7 +55,7 @@ class GifUi:
                 "{dir_}/frame_*.png".format(dir_=tmpdir),
                 self.filename
             ]
-            self.world.stdout.write("$ %s\n" % (" ".join(args)))
+            # self.world.stdout.write("$ %s\n" % (" ".join(args)))
             subprocess.run(args)
 
     def _draw_frame(self, frame_number, tmpdir):
