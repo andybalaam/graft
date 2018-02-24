@@ -10,6 +10,7 @@ class ElidedLine:
     start: Pt = attr.ib()
     end: Pt = attr.ib()
     color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
+    size: float = attr.ib(default=5.0)
 
 
 @attr.s
@@ -30,7 +31,7 @@ class LineOptimiser:
     def __next__(self) -> Union[Line, ElidedLine]:
         ln = round_line(next(self.lines))
         if ln in self.seen_lines:
-            return ElidedLine(ln.start, ln.end, ln.color)
+            return ElidedLine(ln.start, ln.end, ln.color, ln.size)
         else:
             self.seen_lines.add(ln)
             return ln

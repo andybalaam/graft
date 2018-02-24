@@ -43,6 +43,28 @@ def test_lines_identical_but_different_colours_are_not_elided():
     assert opt(bef) == bef
 
 
+def test_lines_identical_but_different_sizes_are_not_elided():
+    bef = [
+        n(p(0.1, 0.5), p(0.5, 0.9), size=5.0),
+        n(p(0.1, 0.5), p(0.5, 0.9), size=50.0),
+    ]
+    assert opt(bef) == bef
+
+
+def test_sizes_are_modulod_within_100():
+    bef = [
+        n(p(0.1, 0.5), p(0.5, 0.9), size=105.0),
+        n(p(0.1, 0.5), p(0.5, 0.9), size=-130.0),
+        n(p(0.1, 0.5), p(0.5, 0.9), size=-30.0),
+    ]
+    aft = [
+        n(p(0.1, 0.5), p(0.5, 0.9), size=-95.0),
+        n(p(0.1, 0.5), p(0.5, 0.9), size=70.0),
+        n(p(0.1, 0.5), p(0.5, 0.9), size=-30.0),
+    ]
+    assert opt(bef) == aft
+
+
 def test_lines_identical_including_colours_are_elided():
     bef = [
         n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
@@ -51,6 +73,18 @@ def test_lines_identical_including_colours_are_elided():
     aft = [
         n(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
         e(p(0.1, 0.5), p(0.5, 0.9), color=(0, 0.2, 0.3, 0.4)),
+    ]
+    assert opt(bef) == aft
+
+
+def test_lines_identical_including_sizes_are_elided():
+    bef = [
+        n(p(0.1, 0.5), p(0.5, 0.9), size=20.0),
+        n(p(0.1, 0.5), p(0.5, 0.9), size=220.0),
+    ]
+    aft = [
+        n(p(0.1, 0.5), p(0.5, 0.9), size=20.0),
+        e(p(0.1, 0.5), p(0.5, 0.9), size=20.0),  # modulo'd within (-100,100]
     ]
     assert opt(bef) == aft
 

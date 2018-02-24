@@ -82,6 +82,21 @@ def test_draw_in_different_colour():
     )
 
 
+def test_draw_in_different_size():
+    assert (
+        do_eval("20=z:S5=r:S") ==
+        [
+            Line(Pt(0.0, 0.0), Pt(0, 10.0), size=20.0),
+            Line(
+                Pt(0.0, 10.0),
+                Pt(0, 20.0),
+                size=20.0,
+                color=(5.0, 0.0, 0.0, 100.0),
+            ),
+        ]
+    )
+
+
 def test_move_in_a_circle():
     assert (
         do_eval(":S+d", 36) ==

@@ -17,6 +17,7 @@ class Line():
     start: Pt = attr.ib()
     end: Pt = attr.ib()
     color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
+    size: float = attr.ib(default=5.0)
 
 
 def _theta(dir_: float) -> float:
@@ -58,6 +59,7 @@ class State:
     green: float = attr.ib(0.0, init=False)
     blue: float = attr.ib(0.0, init=False)
     alpha: float = attr.ib(100.0, init=False)
+    size: float = attr.ib(5.0, init=False)
 
     def _fn_step(self, _tree, _rand):
         th = _theta(self.dir_)
@@ -69,7 +71,7 @@ class State:
         )
         self.pos = new_pos
         color = (self.red, self.green, self.blue, self.alpha)
-        return Line(old_pos, new_pos, color=color)
+        return Line(old_pos, new_pos, color=color, size=self.size)
 
     def _next_function_call(self, tree, rand):
         if tree.fn == "S":
@@ -99,6 +101,8 @@ class State:
             self.blue = op(self.blue, val)
         elif tree.sym == "a":
             self.alpha = op(self.alpha, val)
+        elif tree.sym == "z":
+            self.size = op(self.size, val)
         else:
             raise Exception(
                 "No support for custom variables yet: " + tree.sym
