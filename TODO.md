@@ -20,12 +20,9 @@ assert do_eval("{:S},2:R") == [...]
 assert do_eval("90-d:S") == [Line(Pt(0, 0), Pt(-10, 0))]
 ```
 
-### Decimals
-
-
-### Co-ordinate built-ins, :J to write a Dot
+### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y
 ```
-assert do_eval("20=x15=y:J") == [Dot(Pt(20, 15))]
+assert do_eval("20=x15=y:D") == [Dot(Pt(20, 15))]
 # :L to draw a line to x, y
 assert do_eval("20=x15=y:L") == [Line(Pt(0, 0), Pt(20, 15))]
 ```
