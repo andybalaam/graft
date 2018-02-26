@@ -18,6 +18,10 @@ Rough circles:
 
 ## Mastodon bot
 
+The easiest way to try crafting a generative animation is to toot a program
+mentioning @graft@mastodon.social.  If you've never tooted before, see
+[Mastodon.social](https://mastodon.social) to find out how to register.
+
 Pre-requisites:
 
 ```bash
