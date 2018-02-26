@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+import random
+import sys
+
+from graftbot.main import main
+from graftlib.main import World
+from graftlib.realfs import RealFs
+
+
+exit(
+    main(
+        World(
+            sys.argv,
+            sys.stdin,
+            sys.stdout,
+            sys.stderr,
+            random,
+            RealFs()
+        )
+    )
+)
