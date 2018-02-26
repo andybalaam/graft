@@ -57,15 +57,13 @@ def main(world: World) -> int:
                 "You must supply --password if you supply --user\n")
             return 2
         else:
-            return log_in(world, api_base_url, args.user, args.password)
+            return log_in(api_base_url, args.user, args.password)
     elif args.password:
-            world.stderr.write(
-                "You must supply --user if you supply --password\n")
-            return 2
+        world.stderr.write(
+            "You must supply --user if you supply --password\n")
+        return 2
 
     if args.toot:
-        return toot(world, api_base_url, args.toot)
+        return toot(api_base_url, args.toot)
 
     return sit_waiting(world, api_base_url)
-
-    return 0

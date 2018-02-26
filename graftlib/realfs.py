@@ -1,4 +1,5 @@
 from tempfile import TemporaryDirectory
+import os
 
 
 class RealFs:
@@ -15,3 +16,6 @@ class RealFs:
     def write_file(self, file_name, file_contents):
         with open(file_name, "w") as f:
             f.write(file_contents)
+
+    def makedirs(self, dir_path):
+        os.makedirs(dir_path, exist_ok=True)

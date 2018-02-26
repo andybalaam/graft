@@ -5,9 +5,9 @@ import time
 
 from mastodon import Mastodon
 
-import graftlib
 import graftbot.dirs
 from graftbot.strip_html import strip_html
+import graftlib
 from graftlib.world import World
 
 
@@ -21,7 +21,7 @@ def _update_last_notif(world, id_):
 
 
 def _make_gif(world, program):
-    os.makedirs("bot-gifs", exist_ok=True)
+    world.fs.makedirs("bot-gifs")
 
     gif_file = os.path.join("bot-gifs", "gif-{}.gif".format(
         datetime.now(tz=timezone.utc).isoformat()))
@@ -36,7 +36,7 @@ def _make_gif(world, program):
         stderr=world.stderr,
         random=world.random,
         fs=world.fs
-        )
+    )
     graftlib.main.main(lib_world)
     return gif_file
 
@@ -96,7 +96,7 @@ def _run_and_toot(world, mastodon, n):
             notif_id=n["id"],
             acct=acct,
             toot=toot,
-            )
+        )
     )
 
     try:
