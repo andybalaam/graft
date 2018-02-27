@@ -2,15 +2,16 @@ from html.parser import HTMLParser
 
 
 # Credit: https://stackoverflow.com/a/925630/22610
-class MLStripper(HTMLParser):
+class MLStripper(HTMLParser):  # pylint: disable=abstract-method
     def __init__(self):
+        HTMLParser.__init__(self)
         self.reset()
         self.strict = False
         self.convert_charrefs = True
         self.fed = []
 
-    def handle_data(self, d):
-        self.fed.append(d)
+    def handle_data(self, data):
+        self.fed.append(data)
 
     def get_data(self):
         return ''.join(self.fed)
