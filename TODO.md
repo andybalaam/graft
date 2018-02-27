@@ -2,7 +2,6 @@
 
 ## Now
 
-* Mastodon app
 * Line and character numbers in lex/parse/eval errors
 
 ### Negative numbers
