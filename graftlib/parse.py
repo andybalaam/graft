@@ -55,6 +55,68 @@ def swallow_continuations(tok, it: Peekable):
     return tok
 
 
+def next_tree_fn(so_far, tok, it):
+    return next_tree(FunctionCall(tok.value, so_far), it)
+
+
+def next_tree_op(so_far, tok, it):
+    try:
+        if so_far is None:
+            if tok.value == "-":
+                return next_tree(Negate(), it)
+
+        rhs = next_tree(None, it)
+    except StopIteration:
+        raise Exception(
+            (
+                "Parse error: I don't know how to handle an "
+                "operator (%s) at the end of an expression - it should " +
+                "be followed by a number or symbol."
+            ) % tok.value
+        )
+
+    if type(rhs) != Symbol:
+        raise Exception(
+            "Parse error: we can only do operations to variables, but " +
+            "after '%s' I found a %s (%s)." %
+            (tok.value, type(rhs).__name__, str(rhs))
+        )
+    return next_tree(
+        Modify(value=so_far, op=tok.value, sym=rhs.value),
+        it
+    )
+
+
+def next_tree_num(so_far, tok, it):
+    negate: bool = (type(so_far) == Negate)
+    return next_tree(Number(tok.value, negate=negate), it)
+
+
+def next_tree_sym(so_far, tok, it):
+    if so_far is None:
+        sym = tok
+        return next_tree(Symbol(sym.value), it)
+    else:
+        if type(so_far) == Number:
+            return next_tree(
+                Modify(value=so_far, op="", sym=tok.value),
+                it
+            )
+        else:
+            raise Exception(
+                (
+                    "Parse error: don't know what to do with " +
+                    "'{so_far}' before the symbol {tok}.  You can " +
+                    "have a number before a symbol, " +
+                    "or an operator like +, but not a {type_so_far}."
+                ).format(
+                    so_far=so_far,
+                    tok=tok.value,
+                    type_so_far=type(so_far).__name__,
+                )
+            )
+
+
 def next_tree_for_token(so_far, tok, it):
     # We have decided at this point that any so_far we do have
     # is OK to pass on to the next person, so we get rid of
@@ -63,59 +125,13 @@ def next_tree_for_token(so_far, tok, it):
 
     tok_type = type(tok)
     if tok_type == FunctionToken:
-        return next_tree(FunctionCall(tok.value, so_far), it)
+        return next_tree_fn(so_far, tok, it)
     elif tok_type == OperatorToken:
-        try:
-            if so_far is None:
-                if tok.value == "-":
-                    return next_tree(Negate(), it)
-
-            rhs = next_tree(None, it)
-        except StopIteration:
-            raise Exception(
-                (
-                    "Parse error: I don't know how to handle an "
-                    "operator (%s) at the end of an expression - it should " +
-                    "be followed by a number or symbol."
-                ) % tok.value
-            )
-
-        if type(rhs) != Symbol:
-            raise Exception(
-                "Parse error: we can only do operations to variables, but " +
-                "after '%s' I found a %s (%s)." %
-                (tok.value, type(rhs).__name__, str(rhs))
-            )
-        return next_tree(
-            Modify(value=so_far, op=tok.value, sym=rhs.value),
-            it
-        )
+        return next_tree_op(so_far, tok, it)
     elif tok_type == NumberToken:
-        negate: bool = type(so_far) == Negate
-        return next_tree(Number(tok.value, negate=negate), it)
+        return next_tree_num(so_far, tok, it)
     elif tok_type == SymbolToken:
-        if so_far is None:
-            sym = tok
-            return next_tree(Symbol(sym.value), it)
-        else:
-            if type(so_far) == Number:
-                return next_tree(
-                    Modify(value=so_far, op="", sym=tok.value),
-                    it
-                )
-            else:
-                raise Exception(
-                    (
-                        "Parse error: don't know what to do with " +
-                        "'{so_far}' before the symbol {tok}.  You can " +
-                        "have a number before a symbol, " +
-                        "or an operator like +, but not a {type_so_far}."
-                    ).format(
-                        so_far=so_far,
-                        tok=tok.value,
-                        type_so_far=type(so_far).__name__,
-                    )
-                )
+        return next_tree_sym(so_far, tok, it)
     else:
         raise Exception(
             "Parse error: the token %s is an unknown type (%s)" %
