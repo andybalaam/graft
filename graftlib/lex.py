@@ -51,7 +51,7 @@ def collect(c: str, it: Iterator[str], regex: Pattern) -> str:
 continuation: Pattern = re.compile("~")
 digit: Pattern = re.compile("[0-9.]")
 function: Pattern = re.compile(":")
-operator: Pattern = re.compile("[-+<>=]")
+operator: Pattern = re.compile("[-+/=]")
 symbol_letter: Pattern = re.compile("[_a-zA-Z]")
 
 

@@ -48,6 +48,8 @@ def _operator_fn(opstr: str):
         return operator.sub
     elif opstr == "":
         return operator.mul
+    elif opstr == "/":
+        return operator.truediv
     else:
         raise Exception("Unknown operator '%s'." % opstr)
 

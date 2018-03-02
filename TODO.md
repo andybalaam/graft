@@ -1,17 +1,8 @@
 # Graft TODO
 
-## Now
-
-* Line and character numbers in lex/parse/eval errors
-
 ### Repeat command
 ```
-assert do_eval("{:S},2:R") == [...]
-```
-
-### Divide
-```
-assert do_eval("50=d9/d:S") == [Line(Pt(0, 0), Pt(5, 0))]
+assert do_eval("{:S},2:L") == [...]
 ```
 
 ### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y
@@ -28,6 +19,7 @@ assert do_eval("180=_a_a+d:S") == [Line(Pt(0, 0), Pt(0, -10))]
 
 ## Later
 
+* Line and character numbers in lex/parse/eval errors
 * Original code you typed in lex/parse/eval errors
 * Command line control of number of frames, max lines etc.
 * Use Generic types in lots of places including Peekable
@@ -65,4 +57,3 @@ assert (
 )
 
 ### Defining your own macros/functions
-```
