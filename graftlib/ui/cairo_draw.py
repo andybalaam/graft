@@ -2,6 +2,7 @@ import math
 
 from typing import Tuple
 
+import cairo
 from graftlib.animation import Animation
 
 
@@ -31,6 +32,8 @@ def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
 
     cairo_cr.set_source_rgb(1.0, 1.0, 1.0)
     cairo_cr.paint()
+
+    cairo_cr.set_line_cap(cairo.LINE_CAP_ROUND)
 
     for line in animation.lines:
         cairo_cr.set_line_width(calc_line_size(line.size, scale))
