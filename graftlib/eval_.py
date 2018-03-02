@@ -117,7 +117,7 @@ class State:
         elif type(tree) == Modify:
             return self._next_modify(tree, rand)
         else:
-            raise Exception("Unknown tree type: " + tree)
+            raise Exception("Unknown tree type: " + str(tree))
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]

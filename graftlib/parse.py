@@ -33,11 +33,6 @@ class Number:
 
 
 @attr.s
-class Negate:  # Temporary value representing "-", never returned
-    pass       # from a full parse, as it gets combined into a Number.
-
-
-@attr.s
 class Modify:
     sym: str = attr.ib()
     op: str = attr.ib()
@@ -63,7 +58,10 @@ def next_tree_op(so_far, tok, it):
     try:
         if so_far is None:
             if tok.value == "-":
-                return next_tree(Negate(), it)
+                if type(it.peek()) == NumberToken:
+                    ret = next_tree(None, Peekable(iter([next(it)])))
+                    ret.negate = not ret.negate
+                    return next_tree(ret, it)
 
         rhs = next_tree(None, it)
     except StopIteration:
@@ -88,8 +86,15 @@ def next_tree_op(so_far, tok, it):
 
 
 def next_tree_num(so_far, tok, it):
-    negate: bool = (type(so_far) == Negate)
-    return next_tree(Number(tok.value, negate=negate), it)
+    if so_far is not None:
+        raise Exception(
+            (
+                "Parse error: I don't know how to deal with a %s " +
+                "('%s') before a number (%s)."
+            ) % (type(so_far), str(so_far), tok.value)
+
+        )
+    return next_tree(Number(tok.value), it)
 
 
 def next_tree_sym(so_far, tok, it):
