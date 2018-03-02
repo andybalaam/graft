@@ -44,6 +44,10 @@ def test_operators_are_lexed():
         do_lex("3=d") ==
         [NumberToken("3"), OperatorToken("="), SymbolToken("d")]
     )
+    assert (
+        do_lex("3-d") ==
+        [NumberToken("3"), OperatorToken("-"), SymbolToken("d")]
+    )
 
 
 def test_decimals_are_lexed():

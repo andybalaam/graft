@@ -41,6 +41,15 @@ def test_number_being_added_is_parsed():
     )
 
 
+def test_number_being_subtracted_is_parsed():
+    assert (
+        do_parse("3-d") ==
+        [
+            Modify(sym="d", op="-", value=Number("3"))
+        ]
+    )
+
+
 def test_negative_number_is_parsed():
     assert do_parse("-3") == [Number("3", negate=True)]
 

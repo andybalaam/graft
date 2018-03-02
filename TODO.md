@@ -4,19 +4,14 @@
 
 * Line and character numbers in lex/parse/eval errors
 
-### Negative numbers
-```
-assert do_eval("-90+d:S") == [Line(Pt(0, 0), Pt(-10, 0))]
-```
-
 ### Repeat command
 ```
 assert do_eval("{:S},2:R") == [...]
 ```
 
-### Minus, divide
+### Divide
 ```
-assert do_eval("90-d:S") == [Line(Pt(0, 0), Pt(-10, 0))]
+assert do_eval("50=d9/d:S") == [Line(Pt(0, 0), Pt(5, 0))]
 ```
 
 ### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y

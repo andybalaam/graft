@@ -44,6 +44,8 @@ def _operator_fn(opstr: str):
         return lambda x, y: y
     elif opstr == "+":
         return operator.add
+    elif opstr == "-":
+        return operator.sub
     elif opstr == "":
         return operator.mul
     else:

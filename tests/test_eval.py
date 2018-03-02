@@ -52,6 +52,17 @@ def test_incrementing_a_variable_adds_ten():
     )
 
 
+def test_subtrating():
+    assert (
+        do_eval_debug("2-d") ==
+        [(None, State(pos=Pt(0.0, 0.0), dir_=-2.0, step=10.0))]
+    )
+    assert (
+        do_eval_debug("-2-d") ==
+        [(None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0))]
+    )
+
+
 def test_adding_a_negative_subtracts():
     assert (
         do_eval_debug("-2+d") ==
