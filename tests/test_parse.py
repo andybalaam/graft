@@ -1,4 +1,3 @@
-import pytest
 from typing import Iterable
 from graftlib.lex import lex
 from graftlib.parse import (
@@ -8,6 +7,7 @@ from graftlib.parse import (
     Symbol,
     parse,
 )
+import pytest
 
 
 def do_parse(chars: Iterable[str]):
