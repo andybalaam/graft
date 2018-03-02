@@ -1,3 +1,4 @@
+import pytest
 from typing import Iterable
 from graftlib.lex import lex
 from graftlib.parse import (
@@ -38,6 +39,42 @@ def test_number_being_added_is_parsed():
             Modify(sym="d", op="+", value=Number("3"))
         ]
     )
+
+
+def test_negative_number_is_parsed():
+    assert do_parse("-3") == [Number("3", negate=True)]
+
+
+def test_plus_not_allowed_before_number():
+    with pytest.raises(Exception) as e1:
+        do_parse("+3")
+    assert "after '+' I found a Number" in str(e1)
+
+
+def test_negative_number_in_middle_of_other_expressions_is_parsed():
+    assert (
+        do_parse(":S-3+d") ==
+        [
+            FunctionCall("S"),
+            Modify(
+                sym="d",
+                op="+",
+                value=Number("3", negate=True)
+            )
+        ]
+    )
+
+
+def test_trailing_operator_is_an_error():
+    with pytest.raises(Exception) as e1:
+        do_parse("+")
+    assert "operator (+) at the end" in str(e1)
+    with pytest.raises(Exception) as e2:
+        do_parse("3+")
+    assert "operator (+) at the end" in str(e2)
+    with pytest.raises(Exception) as e3:
+        do_parse("a~+")
+    assert "operator (+) at the end" in str(e3)
 
 
 def test_number_being_multiplied_is_parsed():

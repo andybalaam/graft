@@ -29,9 +29,9 @@ def test_operator_followed_by_number_makes_two_tokens():
     )
 
 
-# def test_negative_number_is_lexed():
-#     assert do_lex("-90") == [NumberToken("-90")]
-#     assert do_lex("-0.03") == [NumberToken("-0.03")]
+def test_negative_sign_is_lexed_as_operator_number():
+    assert do_lex("-90") == [OperatorToken("-"), NumberToken("90")]
+    assert do_lex("-0.03") == [OperatorToken("-"), NumberToken("0.03")]
 
 
 def test_functions_are_lexed():

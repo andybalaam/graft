@@ -29,6 +29,12 @@ class IncompleteTree:
 @attr.s
 class Number:
     value: str = attr.ib()
+    negate: bool = attr.ib(default=False)
+
+
+@attr.s
+class Negate:  # Temporary value representing "-", never returned
+    pass       # from a full parse, as it gets combined into a Number.
 
 
 @attr.s
@@ -59,20 +65,34 @@ def next_tree_for_token(so_far, tok, it):
     if tok_type == FunctionToken:
         return next_tree(FunctionCall(tok.value, so_far), it)
     elif tok_type == OperatorToken:
-        rhs = next_tree(None, it)
+        try:
+            if so_far is None:
+                if tok.value == "-":
+                    return next_tree(Negate(), it)
+
+            rhs = next_tree(None, it)
+        except StopIteration:
+            raise Exception(
+                (
+                    "Parse error: I don't know how to handle an "
+                    "operator (%s) at the end of an expression - it should " +
+                    "be followed by a number or symbol."
+                ) % tok.value
+            )
+
         if type(rhs) != Symbol:
             raise Exception(
                 "Parse error: we can only do operations to variables, but " +
-                "after the %s, I found a %s (%s)." %
-                (str(tok), type(rhs).__name__, str(rhs))
+                "after '%s' I found a %s (%s)." %
+                (tok.value, type(rhs).__name__, str(rhs))
             )
         return next_tree(
             Modify(value=so_far, op=tok.value, sym=rhs.value),
             it
         )
     elif tok_type == NumberToken:
-        val = tok
-        return next_tree(Number(val.value), it)
+        negate: bool = type(so_far) == Negate
+        return next_tree(Number(tok.value, negate=negate), it)
     elif tok_type == SymbolToken:
         if so_far is None:
             sym = tok
