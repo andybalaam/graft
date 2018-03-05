@@ -4,6 +4,7 @@ from graftlib.lex import (
     FunctionToken,
     NumberToken,
     OperatorToken,
+    SeparatorToken,
     SymbolToken,
     lex,
 )
@@ -79,5 +80,16 @@ def test_continuation_is_lexed():
             OperatorToken("+"),
             SymbolToken("d"),
             FunctionToken("S"),
+        ]
+    )
+
+
+def test_semicolon_is_lexed_separately():
+    assert (
+        do_lex("/;ab") ==
+        [
+            OperatorToken("/"),
+            SeparatorToken(),
+            SymbolToken("ab"),
         ]
     )

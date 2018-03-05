@@ -4,6 +4,7 @@ from graftlib.lex import (
     FunctionToken,
     NumberToken,
     OperatorToken,
+    SeparatorToken,
     SymbolToken,
 )
 from graftlib.peekable import Peekable
@@ -137,6 +138,8 @@ def next_tree_for_token(so_far, tok, it):
         return next_tree_num(so_far, tok, it)
     elif tok_type == SymbolToken:
         return next_tree_sym(so_far, tok, it)
+    elif tok_type == SeparatorToken:
+        return next_tree(None, it)
     else:
         raise Exception(
             "Parse error: the token %s is an unknown type (%s)" %

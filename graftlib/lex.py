@@ -31,6 +31,11 @@ class OperatorToken:
 
 
 @attr.s
+class SeparatorToken:
+    pass
+
+
+@attr.s
 class SymbolToken:
     value: str = attr.ib()
 
@@ -52,6 +57,7 @@ continuation: Pattern = re.compile("~")
 digit: Pattern = re.compile("[0-9.]")
 function: Pattern = re.compile(":")
 operator: Pattern = re.compile("[-+/=]")
+separator: Pattern = re.compile(";")
 symbol_letter: Pattern = re.compile("[_a-zA-Z]")
 
 
@@ -64,6 +70,8 @@ def next_token(c: str, it: Iterable[str]):
         return OperatorToken(collect(c, it, operator))
     elif continuation.match(c):
         return ContinuationToken()
+    elif separator.match(c):
+        return SeparatorToken()
     else:
         return SymbolToken(collect(c, it, symbol_letter))
 

@@ -126,3 +126,13 @@ def test_continuation_extends_previous_item_into_next():
             FunctionCall("S"),
         ]
     )
+
+
+def test_semicolon_to_separate_statements():
+    assert (
+        do_parse("s;s") ==
+        [
+            Symbol("s"),
+            Symbol("s"),
+        ]
+    )
