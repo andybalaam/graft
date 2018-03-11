@@ -143,7 +143,12 @@ def sit_waiting(world: World, api_base_url: str) -> int:
             if notifs:
                 _run_and_toot_first(world, mastodon, notifs)
         except Exception as e:
-            world.stderr.write("{}\n\n".format(str(e)))
+            world.stderr.write(
+                "{datetime} {error}\n\n".format(
+                    datetime=datetime.now(tz=timezone.utc).isoformat(),
+                    error=str(e),
+                )
+            )
         time.sleep(60)
 
     return 0
