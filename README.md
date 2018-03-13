@@ -23,7 +23,7 @@ Thick, rough, red circles:
 Spinning box:
 
 ```bash
-./graft --frames=30 '100=s:J90+d:S90+d:S90+d:S90+d15+d'
+./graft '100=s:J90+d:S90+d:S90+d:S90+d15+d'
 ```
 
 ![](images/rotating-square.gif)
