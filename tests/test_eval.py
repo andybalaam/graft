@@ -8,7 +8,7 @@ from graftlib.eval_ import (
 )
 from graftlib.lex import lex
 from graftlib.parse import parse
-from graftlib.round_ import round_line
+from graftlib.round_ import round_float, round_line, round_pt
 
 
 def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
@@ -16,12 +16,25 @@ def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
         yield round_line(ln)
 
 
+def round_state(state: State):
+    return State(
+        pos=round_pt(state.pos),
+        dir_=round_float(state.dir_),
+        step=round_float(state.step),
+        red=round_float(state.red),
+        green=round_float(state.green),
+        blue=round_float(state.blue),
+        alpha=round_float(state.alpha),
+        size=round_float(state.size),
+    )
+
+
 def round_debug(lines: Iterable[Tuple[Optional[Line], State]]) -> (
         Iterable[Tuple[Optional[Line], State]]):
     for (ln, state) in lines:
         yield (
-            None if ln is None else round_line(ln.start),
-            state
+            None if ln is None else round_line(ln),
+            round_state(state)
         )
 
 
@@ -102,6 +115,30 @@ def test_multiplying_a_variable():
 
 def test_turn_right_and_move():
     assert do_eval("90+d25=s:S") == [Line(Pt(0, 0), Pt(25, 0))]
+
+
+def test_turn_right_and_jump():
+    assert (
+        do_eval_debug("90+d25=s:J:S") ==
+        [
+            (
+                None,
+                State(pos=Pt(0.0, 0.0), dir_=90.0, step=10.0),
+            ),
+            (
+                None,
+                State(pos=Pt(0.0, 0.0), dir_=90.0, step=25.0),
+            ),
+            (
+                None,
+                State(pos=Pt(25.0, 0.0), dir_=90.0, step=25.0),
+            ),
+            (
+                Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
+                State(pos=Pt(50.0, 0.0), dir_=90.0, step=25.0),
+            ),
+        ]
+    )
 
 
 def test_turn_random_and_move():

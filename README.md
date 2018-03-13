@@ -20,6 +20,14 @@ Thick, rough, red circles:
 
 ![](images/rough-circle.gif)
 
+Spinning box:
+
+```bash
+./graft --frames=30 '100=s:J90+d:S90+d:S90+d:S90+d15+d'
+```
+
+![](images/rotating-square.gif)
+
 ## Commands
 
 To turn, change the variable `d`:
@@ -76,6 +84,7 @@ When graft starts, the following default values are set:
 The following functions are pre-defined in graft:
 
 * `S` - "Step": draw a line in direction `d` of length `s`.
+* `J` - "Jump": move `s` units in direction `d`, without drawing a line.
 * `R` - "Random": return a random number between -10 and 10.
 
 ## Language reference

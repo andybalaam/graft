@@ -59,11 +59,11 @@ class State:
     pos: Pt = attr.ib()
     dir_: float = attr.ib()
     step: float = attr.ib()
-    red: float = attr.ib(0.0, init=False)
-    green: float = attr.ib(0.0, init=False)
-    blue: float = attr.ib(0.0, init=False)
-    alpha: float = attr.ib(100.0, init=False)
-    size: float = attr.ib(5.0, init=False)
+    red: float = attr.ib(0.0)
+    green: float = attr.ib(0.0)
+    blue: float = attr.ib(0.0)
+    alpha: float = attr.ib(100.0)
+    size: float = attr.ib(5.0)
 
     def _fn_step(self, _tree, _rand):
         th = _theta(self.dir_)
@@ -77,9 +77,21 @@ class State:
         color = (self.red, self.green, self.blue, self.alpha)
         return Line(old_pos, new_pos, color=color, size=self.size)
 
+    def _fn_jump(self, _tree, _rand):
+        th = _theta(self.dir_)
+        new_pos = attr.evolve(
+            self.pos,
+            x=self.pos.x + self.step * math.sin(th),
+            y=self.pos.y + self.step * math.cos(th),
+        )
+        self.pos = new_pos
+        return None
+
     def _next_function_call(self, tree, rand):
         if tree.fn == "S":
             return self._fn_step(tree, rand)
+        elif tree.fn == "J":
+            return self._fn_jump(tree, rand)
         elif tree.fn == "R":
             raise Exception(
                 "The :R (Random) function does nothing on its own.  " +
