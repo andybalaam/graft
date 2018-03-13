@@ -24,35 +24,35 @@ Thick, rough, red circles:
 
 To turn, change the variable `d`:
 
-* `+d` means turn 10 degrees clockwise
-* `45+d` means turn 45 degrees clockwise
-* `90-d` means turn 90 degrees anti-clockwise
-* `90=d` means set the angle to 90 degrees (face right)
-* `-45=d` means set the angle to minus 45 degrees (face up-left)
+* `+d` means turn 10 degrees clockwise.
+* `45+d` means turn 45 degrees clockwise.
+* `90-d` means turn 90 degrees anti-clockwise.
+* `90=d` means set the angle to 90 degrees (face right).
+* `-45=d` means set the angle to minus 45 degrees (face up-left).
 
 To step forward (drawing a line), use the command `:S`:
 
-* `:S` means step forward.  By default, this moves 10 units forward
+* `:S` means step forward.  By default, this moves 10 units forward.
 
 To change the step size, change the variable `s`:
 
-* `20=s:S` means change step size to 20, and step forward
-* `2/s:S` means halve the step size (divide by 2), and step forward
+* `20=s:S` means change step size to 20, and step forward.
+* `2/s:S` means halve the step size (divide by 2), and step forward.
 
 To change the width of the lines, change the variable `z`:
 
-* `1.5*z:S` means width by 1.5 times, and step forward
+* `1.5*z:S` means multiply width by 1.5 times, and step forward.
 
 ## Special variables
 
 Graft contains some variables with special meanings:
 
-* `d` - "direction": the angle in degrees we are facing
-* `s` - "step size": how far the next `:S` call will move us
-* `z` - "size of brush": width of brush used for drawing lines
+* `d` - "direction": the angle in degrees we are facing.
+* `s` - "step size": how far the next `:S` call will move us.
+* `z` - "size of brush": width of brush used for drawing lines.
 * `r`, `g`, `b` - "red", "green", "blue": components of the colour of the
-   brush (0-100)
-* `a` - "alpha": transparency of the brush (0=transparent, 100=solid)
+   brush (0-100).
+* `a` - "alpha": transparency of the brush (0=transparent, 100=solid).
 
 The colour and transparency values may be set to values outside the range.
 Increasing or decreasing a value smoothly will result in gradual increase and
@@ -75,8 +75,8 @@ When graft starts, the following default values are set:
 
 The following functions are pre-defined in graft:
 
-* `S` - "Step": draw a line in direction `d` of length `s`
-* `R` - "Random": return a random number
+* `S` - "Step": draw a line in direction `d` of length `s`.
+* `R` - "Random": return a random number.
 
 ## Language reference
 
@@ -127,14 +127,14 @@ decrease ::= "-" symbol
 To add, subtract, multiply or divide by a number, write the number, then
 the operation `+`, `-`, `*`, or `/` respectively, then the symbol.  Example:
 
-* `-4.5*d` - multiply `d` by -4.5
+* `-4.5*d` - multiply `d` by -4.5.
 
 To provide a variable value, or the return value of a function, as the
 input for an operator, write the variable name of call the function, then
 suffix it with `~`.  Examples:
 
-* `s~+d` - add the value of `s` to `d` (leaving `s` unchanged)
-* `:R~/s` - divide `s` by the return value from the function `R`
+* `s~+d` - add the value of `s` to `d` (leaving `s` unchanged).
+* `:R~/s` - divide `s` by the return value from the function `R`.
 
 ```
 modify ::= input operator symbol
