@@ -76,7 +76,7 @@ When graft starts, the following default values are set:
 The following functions are pre-defined in graft:
 
 * `S` - "Step": draw a line in direction `d` of length `s`.
-* `R` - "Random": return a random number.
+* `R` - "Random": return a random number between -10 and 10.
 
 ## Language reference
 
