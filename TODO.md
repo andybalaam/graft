@@ -1,5 +1,7 @@
 # Graft TODO
 
+### Make the size right for Mastodon previews
+
 ### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y
 ```
 assert do_eval("20=x15=y:D") == [Dot(Pt(20, 15))]
