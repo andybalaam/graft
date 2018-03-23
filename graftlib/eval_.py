@@ -3,7 +3,7 @@ import math
 import operator
 
 import attr
-from graftlib.parse import FunctionCall, Modify, Number
+from graftlib.parse import FunctionCall, FunctionDef, Modify, Number, Symbol
 
 
 @attr.s(cmp=True, frozen=True)
@@ -65,7 +65,7 @@ class State:
     alpha: float = attr.ib(100.0)
     size: float = attr.ib(5.0)
 
-    def _fn_step(self, _tree, _rand):
+    def _fn_step(self, _rand):
         th = _theta(self.dir_)
         old_pos = attr.evolve(self.pos)
         new_pos = attr.evolve(
@@ -77,7 +77,7 @@ class State:
         color = (self.red, self.green, self.blue, self.alpha)
         return Line(old_pos, new_pos, color=color, size=self.size)
 
-    def _fn_jump(self, _tree, _rand):
+    def _fn_jump(self, _rand):
         th = _theta(self.dir_)
         new_pos = attr.evolve(
             self.pos,
@@ -87,20 +87,37 @@ class State:
         self.pos = new_pos
         return None
 
-    def _next_function_call(self, tree, rand):
-        fn = tree.fn.value
-        if fn == "S":
-            return self._fn_step(tree, rand)
-        elif fn == "J":
-            return self._fn_jump(tree, rand)
-        elif fn == "R":
+    def _next_function_call_symbol(self, fn_name, rand):
+        if fn_name == "S":
+            return [self._fn_step(rand)]
+        elif fn_name == "J":
+            return [self._fn_jump(rand)]
+        elif fn_name == "R":
             raise Exception(
                 "The :R (Random) function does nothing on its own.  " +
                 "You must use its value for something by writing " +
                 "e.g '~+d' after it."
             )
         else:
-            raise Exception("Unknown function %s" % tree.fn)
+            raise Exception("Unknown function %s" % fn_name)
+
+    def _next_function_call_userdefined(self, fn, rand):
+        ret = []
+        for ln in fn.body:
+            ret += self.next(ln, rand)
+        return ret
+
+    def _next_function_call_once(self, tree, rand): #-> List(Line)
+        if type(tree.fn) == Symbol:
+            return self._next_function_call_symbol(tree.fn.value, rand)
+        elif type(tree.fn) == FunctionDef:
+            return self._next_function_call_userdefined(tree.fn, rand)
+
+    def _next_function_call(self, tree, rand):
+        ret = []
+        for _i in range(tree.repeat):
+            ret += self._next_function_call_once(tree, rand)
+        return ret
 
     def _next_modify(self, tree, rand):
         val = _eval_value(tree.value, rand)
@@ -126,11 +143,14 @@ class State:
             )
         return None
 
-    def next(self, tree, rand):  #: Tree
+    def next(self, tree, rand):  #: List(Tree)
         if type(tree) == FunctionCall:
             return self._next_function_call(tree, rand)
         elif type(tree) == Modify:
-            return self._next_modify(tree, rand)
+            return [self._next_modify(tree, rand)]
+        elif type(tree) == FunctionDef:
+            raise Exception(
+                "You defined a function but didn't call it: " + str(tree))
         else:
             raise Exception("Unknown tree type: " + str(tree))
 
@@ -143,8 +163,9 @@ def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
     while n is None or i < n:
         i += 1
         for tree in trees_list:
-            command = state.next(tree, rand)
-            yield (command, attr.evolve(state))
+            commands = state.next(tree, rand)
+            for command in commands:
+                yield (command, attr.evolve(state))
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]

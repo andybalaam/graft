@@ -172,6 +172,28 @@ def test_draw_in_different_size():
     )
 
 
+def test_repeating_commands():
+    assert (
+        do_eval("3:S") ==
+        [
+            Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+            Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
+            Line(Pt(0.0, 20.0), Pt(0.0, 30.0)),
+        ]
+    )
+
+
+def test_repeating_multiple_commands():
+    assert (
+        do_eval("3:{:S90+d}") ==
+        [
+            Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+            Line(Pt(0.0, 10.0), Pt(10.0, 10.0)),
+            Line(Pt(10.0, 10.0), Pt(10.0, 0.0)),
+        ]
+    )
+
+
 # def test_semicolon_to_separate_statements():
 #     assert do_eval("s;s:S") == [Line(Pt(0, 0), Pt(0, 10))]
 #

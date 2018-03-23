@@ -1,10 +1,5 @@
 # Graft TODO
 
-### Repeat command
-```
-assert do_eval("2{:S}") == [...]
-```
-
 ### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y
 ```
 assert do_eval("20=x15=y:D") == [Dot(Pt(20, 15))]
@@ -12,7 +7,7 @@ assert do_eval("20=x15=y:D") == [Dot(Pt(20, 15))]
 assert do_eval("20=x15=y:L") == [Line(Pt(0, 0), Pt(20, 15))]
 ```
 
-### Variables
+### Variables, passing symbols to operators
 ```
 assert do_eval("180=_a_a+d:S") == [Line(Pt(0, 0), Pt(0, -10))]
 ```
@@ -56,4 +51,6 @@ assert (
     ]
 )
 
-### Defining your own macros/functions
+### Passing arguments to functions
+### Local variables
+### Macros
