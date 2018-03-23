@@ -51,6 +51,12 @@ To change the width of the lines, change the variable `z`:
 
 * `1.5*z:S` means multiply width by 1.5 times, and step forward.
 
+To do something several times, write a number, then the function to call,
+either using a function name, or making a little function then and there:
+
+* `2:S` means step twice.
+* `36:{+d:S}` means turn then step 36 times.
+
 ## Special variables
 
 Graft contains some variables with special meanings:
@@ -122,7 +128,8 @@ To set a variable value, write the required value, then "=", then the variable
 name:
 
 ```
-assignment ::= number "=" symbol
+assignment ::= input "=" symbol
+input = number | functiondef | (symbol | functioncall) "~"
 ```
 
 To modify a variable value by 10, write the "+" or "-" operator with no
@@ -148,15 +155,15 @@ suffix it with `~`.  Examples:
 ```
 modify ::= input operator symbol
 operator ::= "+" | "-" | "*" | "/"
-input = number | (symbol | functioncall) "~"
 ```
 
 ### Running functions
 
-To run a function, write `:` and then its name:
+To run a function, write how many times to run it (optional), then `:` and
+then its name:
 
 ```
-functioncall ::= ":" symbol
+functioncall ::= [number] ":" symbol
 ```
 
 ### Combining statements
@@ -169,6 +176,14 @@ with `;`:
 program ::= statement+
 statement ::= expression [";"]
 expression ::= functioncall | modify | increase | decrease | assignment
+```
+
+### Defining functions
+
+To describe a function, write "{", then the commands, then "}":
+
+```
+functiondef ::= "{" program "}"
 ```
 
 ## Mastodon bot

@@ -1,10 +1,12 @@
 from typing import Iterable
 from graftlib.lex import (
     ContinuationToken,
-    FunctionToken,
+    EndFunctionDefToken,
+    FunctionCallToken,
     NumberToken,
     OperatorToken,
     SeparatorToken,
+    StartFunctionDefToken,
     SymbolToken,
     lex,
 )
@@ -36,8 +38,22 @@ def test_negative_sign_is_lexed_as_operator_number():
 
 
 def test_functions_are_lexed():
-    assert do_lex(":S3") == [FunctionToken("S"), NumberToken("3")]
-    assert do_lex("3:S") == [NumberToken("3"), FunctionToken("S")]
+    assert (
+        do_lex(":S3") ==
+        [
+            FunctionCallToken(),
+            SymbolToken("S"),
+            NumberToken("3"),
+        ]
+    )
+    assert (
+        do_lex("3:S") ==
+        [
+            NumberToken("3"),
+            FunctionCallToken(),
+            SymbolToken("S"),
+        ]
+    )
 
 
 def test_operators_are_lexed():
@@ -59,11 +75,26 @@ def test_decimals_are_lexed():
     assert do_lex("1.1d") == [NumberToken("1.1"), SymbolToken("d")]
 
 
+def test_braces_are_lexed():
+    assert do_lex("{") == [StartFunctionDefToken()]
+    assert (
+        do_lex("34{:S}") ==
+        [
+            NumberToken("34"),
+            StartFunctionDefToken(),
+            FunctionCallToken(),
+            SymbolToken("S"),
+            EndFunctionDefToken(),
+        ]
+    )
+
+
 def test_function_call_then_add_is_lexed():
     assert (
         do_lex(":S95+_ab_c") ==
         [
-            FunctionToken("S"),
+            FunctionCallToken(),
+            SymbolToken("S"),
             NumberToken("95"),
             OperatorToken("+"),
             SymbolToken("_ab_c"),
@@ -75,11 +106,13 @@ def test_continuation_is_lexed():
     assert (
         do_lex(":R~+d:S") ==
         [
-            FunctionToken("R"),
+            FunctionCallToken(),
+            SymbolToken("R"),
             ContinuationToken(),
             OperatorToken("+"),
             SymbolToken("d"),
-            FunctionToken("S"),
+            FunctionCallToken(),
+            SymbolToken("S"),
         ]
     )
 

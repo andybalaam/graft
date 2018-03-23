@@ -16,8 +16,13 @@ class ContinuationToken:
 
 
 @attr.s
-class FunctionToken:
-    value: str = attr.ib()
+class EndFunctionDefToken:
+    pass
+
+
+@attr.s
+class FunctionCallToken:
+    pass
 
 
 @attr.s
@@ -32,6 +37,11 @@ class OperatorToken:
 
 @attr.s
 class SeparatorToken:
+    pass
+
+
+@attr.s
+class StartFunctionDefToken:
     pass
 
 
@@ -53,25 +63,31 @@ def collect(c: str, it: Iterator[str], regex: Pattern) -> str:
     return ret
 
 
-continuation: Pattern = re.compile("~")
+tilda: Pattern = re.compile("~")
+close_brace: Pattern = re.compile("}")
 digit: Pattern = re.compile("[0-9.]")
-function: Pattern = re.compile(":")
+colon: Pattern = re.compile(":")
+open_brace: Pattern = re.compile("{")
 operator: Pattern = re.compile("[-+/=]")
-separator: Pattern = re.compile(";")
+semicolon: Pattern = re.compile(";")
 symbol_letter: Pattern = re.compile("[_a-zA-Z]")
 
 
 def next_token(c: str, it: Iterable[str]):
     if digit.match(c):
         return NumberToken(collect(c, it, digit))
-    elif function.match(c):
-        return FunctionToken(collect("", it, symbol_letter))
+    elif colon.match(c):
+        return FunctionCallToken()
     elif operator.match(c):
         return OperatorToken(collect(c, it, operator))
-    elif continuation.match(c):
+    elif tilda.match(c):
         return ContinuationToken()
-    elif separator.match(c):
+    elif semicolon.match(c):
         return SeparatorToken()
+    elif open_brace.match(c):
+        return StartFunctionDefToken()
+    elif close_brace.match(c):
+        return EndFunctionDefToken()
     else:
         return SymbolToken(collect(c, it, symbol_letter))
 

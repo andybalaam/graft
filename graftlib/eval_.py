@@ -30,7 +30,7 @@ def _eval_value(tree, rand):
     if tree_type == Number:
         return float(tree.value) * (-1.0 if tree.negate else 1.0)
     elif tree_type == FunctionCall:
-        if tree.fn == "R":
+        if tree.fn.value == "R":
             return float(rand(-10, 10))
     else:
         raise Exception(
@@ -88,11 +88,12 @@ class State:
         return None
 
     def _next_function_call(self, tree, rand):
-        if tree.fn == "S":
+        fn = tree.fn.value
+        if fn == "S":
             return self._fn_step(tree, rand)
-        elif tree.fn == "J":
+        elif fn == "J":
             return self._fn_jump(tree, rand)
-        elif tree.fn == "R":
+        elif fn == "R":
             raise Exception(
                 "The :R (Random) function does nothing on its own.  " +
                 "You must use its value for something by writing " +

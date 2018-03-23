@@ -2,7 +2,7 @@
 
 ### Repeat command
 ```
-assert do_eval("{:S},2:L") == [...]
+assert do_eval("2{:S}") == [...]
 ```
 
 ### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y
