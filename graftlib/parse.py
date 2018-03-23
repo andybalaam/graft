@@ -16,11 +16,7 @@ import attr
 @attr.s
 class FunctionCall:
     fn = attr.ib()
-
-    # args: Tree - e.g. Number("3")
-    #                or Tuple(Number("3"), Number("6"))?
-    # (or None for no args)
-    args: Optional = attr.ib(None)
+    repeat: Optional = attr.ib(default=1)
 
 
 @attr.s
@@ -75,7 +71,27 @@ class Parser:
 
     def next_tree_fn(self, so_far, tok):
         fn = self.greedy().next_tree()
-        return self.next_or_single(FunctionCall(fn, so_far))
+        if so_far is None:
+            repeat = 1
+        elif type(so_far) == Number:
+            try:
+                repeat = int(so_far.value)
+            except ValueError:
+                raise Exception(
+                    (
+                        "Parse error: repeat argument before function " +
+                        "call (%s) must be an integer, but it was %s."
+                    ) % (tok.value, str(so_far))
+                )
+        else:
+            raise Exception(
+                (
+                    "Parse error: repeat argument before function call (%s) " +
+                    "must be a number, but it was %s, which is a %s."
+                ) % (tok.value, type(so_far), str(so_far))
+            )
+
+        return self.next_or_single(FunctionCall(fn, repeat))
 
     def next_tree_op(self, so_far, tok):
         try:
@@ -114,7 +130,6 @@ class Parser:
                     "Parse error: I don't know how to deal with a %s " +
                     "('%s') before a number (%s)."
                 ) % (type(so_far), str(so_far), tok.value)
-
             )
         return self.next_or_single(Number(tok.value))
 

@@ -184,62 +184,53 @@ def test_nonempty_function_def():
     )
 
 
-# def test_nonempty_function_def_repeated():
-#     assert (
-#         do_parse("3:{+d:S}") ==
-#         [
-#             FunctionDef(),
-#         ]
-#     )
-#
-#
-# def test_repeated_call_function():
-#     assert (
-#         do_parse("3:S") ==
-#         [
-#             FunctionCall(3, Symbol("S")),
-#         ]
-#     )
-#
-#
-# def test_repeated_call_function_def():
-#     assert (
-#         do_parse("3:{+d:S}") ==
-#         [
-#             FunctionCall(
-#                 3,
-#                 FunctionDef(
-#                     [
-#                         Modify(
-#                             sym="d",
-#                             op="+",
-#                             value=Number("10"),
-#                         ),
-#                         FunctionCall(3, Symbol("S")),
-#                     ]
-#                 ),
-#             ),
-#         ]
-#     )
-#
-#
-# def test_function_def_assigned():
-#     assert (
-#         do_parse("{+d:S}=x") ==
-#         [
-#             Modify(
-#                 sym="x",
-#                 op="=",
-#                 value=FunctionDef(
-#                         [
-#                             Modify(
-#                                 sym="d",
-#                                 op="+",
-#                                 value=Number("10"),
-#                             ),
-#                             FunctionCall(3, Symbol("S")),
-#                         ]
-#                     ),
-#             ),
-#         ]
-#     )
+def test_repeated_call_function():
+    assert (
+        do_parse("3:S") ==
+        [
+            FunctionCall(fn=Symbol("S"), repeat=3),
+        ]
+    )
+
+
+def test_nonempty_function_def_repeated():
+    assert (
+        do_parse("3:{+d:S}") ==
+        [
+            FunctionCall(
+                fn=FunctionDef(
+                    [
+                        Modify(
+                            sym="d",
+                            op="+",
+                            value=Number("10"),
+                        ),
+                        FunctionCall(Symbol("S")),
+                    ]
+                ),
+                repeat=3,
+            ),
+        ]
+    )
+
+
+def test_function_def_assigned():
+    assert (
+        do_parse("{+d:S}=x") ==
+        [
+            Modify(
+                sym="x",
+                op="=",
+                value=FunctionDef(
+                        [
+                            Modify(
+                                sym="d",
+                                op="+",
+                                value=Number("10"),
+                            ),
+                            FunctionCall(Symbol("S")),
+                        ]
+                    ),
+            ),
+        ]
+    )
