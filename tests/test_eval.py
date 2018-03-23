@@ -1,3 +1,4 @@
+import itertools
 from typing import Iterable, Optional, Tuple
 from graftlib.eval_ import (
     Line,
@@ -38,17 +39,23 @@ def round_debug(lines: Iterable[Tuple[Optional[Line], State]]) -> (
         )
 
 
-def do_eval(chars: Iterable[str], n: int = 1, rand=None):
+def do_eval(chars: Iterable[str], n: int, rand=None):
     return list(round_lines(eval_(parse(lex(chars)), n, rand)))
 
 
-def do_eval_debug(chars: Iterable[str], n: int = 1, rand=None):
-    return list(round_debug(eval_debug(parse(lex(chars)), n, rand)))
+def do_eval_debug(chars: Iterable[str], n: int, rand=None):
+    return list(
+        itertools.islice(
+            round_debug(eval_debug(parse(lex(chars)), n, rand)),
+            0,
+            n
+        )
+    )
 
 
 def test_calling_s_moves_forward():
     assert (
-        do_eval(":S:S") ==
+        do_eval(":S:S", 2) ==
         [
             Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
             Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
@@ -57,55 +64,55 @@ def test_calling_s_moves_forward():
 
 
 def test_incrementing_a_variable_adds_ten():
-    assert do_eval("+d") == []
+    assert do_eval("+d", 100) == []  # Does terminate even though no lines
 
     assert (
-        do_eval_debug("+d") ==
+        do_eval_debug("+d", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=10.0, step=10.0))]
     )
 
 
 def test_subtracting_a_variable_removes_ten():
-    assert do_eval("-d") == []
+    assert do_eval("-d", 1) == []
 
     assert (
-        do_eval_debug("-d") ==
+        do_eval_debug("-d", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=-10.0, step=10.0))]
     )
 
 
 def test_subtracting():
     assert (
-        do_eval_debug("2-d") ==
+        do_eval_debug("2-d", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=-2.0, step=10.0))]
     )
     assert (
-        do_eval_debug("-2-d") ==
+        do_eval_debug("-2-d", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0))]
     )
 
 
 def test_dividing():
     assert (
-        do_eval_debug("2/s") ==
+        do_eval_debug("2/s", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=0.0, step=5.0))]
     )
     assert (
-        do_eval_debug("-2/s") ==
+        do_eval_debug("-2/s", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=0.0, step=-5.0))]
     )
 
 
 def test_adding_a_negative_subtracts():
     assert (
-        do_eval_debug("-2+d") ==
+        do_eval_debug("-2+d", 1) ==
         [(None, State(pos=Pt(0.0, 0.0), dir_=-2.0, step=10.0))]
     )
 
 
 def test_multiplying_a_variable():
     assert (
-        do_eval_debug("2=d3.1d") ==
+        do_eval_debug("2=d3.1d", 2) ==
         [
             (None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0)),
             (None, State(pos=Pt(0.0, 0.0), dir_=6.2, step=10.0)),
@@ -114,12 +121,12 @@ def test_multiplying_a_variable():
 
 
 def test_turn_right_and_move():
-    assert do_eval("90+d25=s:S") == [Line(Pt(0, 0), Pt(25, 0))]
+    assert do_eval("90+d25=s:S", 1) == [Line(Pt(0, 0), Pt(25, 0))]
 
 
 def test_turn_right_and_jump():
     assert (
-        do_eval_debug("90+d25=s:J:S") ==
+        do_eval_debug("90+d25=s:J:S", 4) ==
         [
             (
                 None,
@@ -144,12 +151,12 @@ def test_turn_right_and_jump():
 def test_turn_random_and_move():
     def r(_a, _b):
         return 90
-    assert do_eval(":R~+d:S", rand=r) == [Line(Pt(0, 0), Pt(10, 0))]
+    assert do_eval(":R~+d:S", n=1, rand=r) == [Line(Pt(0, 0), Pt(10, 0))]
 
 
 def test_draw_in_different_colour():
     assert (
-        do_eval("0.9=r0.5=g0.1=b0.5=a:S0.1=a:S") ==
+        do_eval("0.9=r0.5=g0.1=b0.5=a:S0.1=a:S", 2) ==
         [
             Line(Pt(0.0, 0.0), Pt(0, 10.0), color=(0.9, 0.5, 0.1, 0.5)),
             Line(Pt(0.0, 10.0), Pt(0, 20.0), color=(0.9, 0.5, 0.1, 0.1)),
@@ -159,7 +166,7 @@ def test_draw_in_different_colour():
 
 def test_draw_in_different_size():
     assert (
-        do_eval("20=z:S5=r:S") ==
+        do_eval("20=z:S5=r:S", 2) ==
         [
             Line(Pt(0.0, 0.0), Pt(0, 10.0), size=20.0),
             Line(
@@ -174,7 +181,7 @@ def test_draw_in_different_size():
 
 def test_repeating_commands():
     assert (
-        do_eval("3:S") ==
+        do_eval("3:S", 3) ==
         [
             Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
             Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
@@ -185,7 +192,7 @@ def test_repeating_commands():
 
 def test_repeating_multiple_commands():
     assert (
-        do_eval("3:{:S90+d}") ==
+        do_eval("3:{:S90+d}", 3) ==
         [
             Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
             Line(Pt(0.0, 10.0), Pt(10.0, 10.0)),

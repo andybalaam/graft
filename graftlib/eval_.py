@@ -157,15 +157,23 @@ class State:
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
-    trees_list = list(trees)
+    program = list(trees)
     state = State(pos=Pt(0.0, 0.0), dir_=0.0, step=10.0)
+    non_frames = 0
     i = 0
     while n is None or i < n:
-        i += 1
-        for tree in trees_list:
-            commands = state.next(tree, rand)
+        for statement in program:
+            commands = state.next(statement, rand)
             for command in commands:
                 yield (command, attr.evolve(state))
+                if command is None:
+                    non_frames += 1
+                if command is not None or non_frames > 10:
+                    # Count how many frames (we add one after 10 blanks)
+                    i += 1
+                    non_frames = 0
+                if n is not None and i >= n:
+                    raise StopIteration()
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
