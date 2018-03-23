@@ -28,7 +28,7 @@ def _theta(dir_: float) -> float:
 def _eval_value(tree, rand):
     tree_type = type(tree)
     if tree_type == Number:
-        return float(tree.value) * (-1.0 if tree.negate else 1.0)
+        return float(tree.value) * (-1.0 if tree.negative else 1.0)
     elif tree_type == FunctionCall:
         if tree.fn.value == "R":
             return float(rand(-10, 10))
@@ -107,7 +107,7 @@ class State:
             ret += self.next(ln, rand)
         return ret
 
-    def _next_function_call_once(self, tree, rand): #-> List(Line)
+    def _next_function_call_once(self, tree, rand):  # -> List(Line)
         if type(tree.fn) == Symbol:
             return self._next_function_call_symbol(tree.fn.value, rand)
         elif type(tree.fn) == FunctionDef:

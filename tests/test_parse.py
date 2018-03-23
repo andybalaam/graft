@@ -79,7 +79,7 @@ def test_number_being_divided_is_parsed():
 
 
 def test_negative_number_is_parsed():
-    assert do_parse("-3") == [Number("3", negate=True)]
+    assert do_parse("-3") == [Number("3", negative=True)]
 
 
 def test_plus_not_allowed_before_number():
@@ -96,7 +96,7 @@ def test_negative_number_in_middle_of_other_expressions_is_parsed():
             Modify(
                 sym="d",
                 op="+",
-                value=Number("3", negate=True)
+                value=Number("3", negative=True)
             )
         ]
     )
@@ -222,15 +222,15 @@ def test_function_def_assigned():
                 sym="x",
                 op="=",
                 value=FunctionDef(
-                        [
-                            Modify(
-                                sym="d",
-                                op="+",
-                                value=Number("10"),
-                            ),
-                            FunctionCall(Symbol("S")),
-                        ]
-                    ),
+                    [
+                        Modify(
+                            sym="d",
+                            op="+",
+                            value=Number("10"),
+                        ),
+                        FunctionCall(Symbol("S")),
+                    ]
+                ),
             ),
         ]
     )

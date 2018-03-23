@@ -33,7 +33,10 @@ class IncompleteTree:
 @attr.s
 class Number:
     value: str = attr.ib()
-    negate: bool = attr.ib(default=False)
+    negative: bool = attr.ib(default=False)
+
+    def negate(self):
+        self.negative = not self.negative
 
 
 @attr.s
@@ -98,8 +101,8 @@ class Parser:
             if so_far is None:
                 if tok.value == "-":
                     if type(self.it.peek()) == NumberToken:
-                        ret = self.greedy().next_tree()
-                        ret.negate = not ret.negate
+                        ret: Number = self.greedy().next_tree()
+                        ret.negate()
                         return self.next_or_single(ret)
 
             rhs = self.next_tree()
@@ -156,7 +159,7 @@ class Parser:
                     )
                 )
 
-    def next_tree_fndef(self, so_far, tok):
+    def next_tree_fndef(self, _so_far, _tok):
         body = [n for n in _parse_peekable(self.it, EndFunctionDefToken)]
         return self.next_or_single(FunctionDef(body))
 
