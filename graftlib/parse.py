@@ -14,13 +14,6 @@ import attr
 
 
 @attr.s
-class ParseState:
-    it: Peekable = attr.ib()
-    end_tok_type = attr.ib()
-    single_item: bool = attr.ib()
-
-
-@attr.s
 class FunctionCall:
     fn = attr.ib()
 
@@ -65,157 +58,156 @@ def swallow_continuations(tok, it: Peekable):
     return tok
 
 
-def next_or_single(value, state: ParseState):
-    if state.single_item:
-        return value
-    else:
-        return next_tree(value, state)
+@attr.s
+class Parser:
+    it: Peekable = attr.ib()
+    end_tok_type = attr.ib()
+    single_item: bool = attr.ib()
 
+    def greedy(self):
+        return Parser(self.it, self.end_tok_type, True)
 
-def next_tree_fn(so_far, tok, state: ParseState):
-    fn = next_tree(None, ParseState(state.it, state.end_tok_type, True))
-    return next_or_single(FunctionCall(fn, so_far), state)
-
-
-def next_tree_op(so_far, tok, state: ParseState):
-    try:
-        if so_far is None:
-            if tok.value == "-":
-                if type(state.it.peek()) == NumberToken:
-                    ret = next_tree(
-                        None,
-                        ParseState(
-                            Peekable(iter([next(state.it)])),
-                            state.end_tok_type,
-                            state.single_item,
-                        )
-                    )
-                    ret.negate = not ret.negate
-                    return next_or_single(ret, state)
-
-        rhs = next_tree(None, state)
-    except StopIteration:
-        raise Exception(
-            (
-                "Parse error: I don't know how to handle an "
-                "operator (%s) at the end of an expression - it should " +
-                "be followed by a number or symbol."
-            ) % tok.value
-        )
-
-    if type(rhs) != Symbol:
-        raise Exception(
-            "Parse error: we can only do operations to variables, but " +
-            "after '%s' I found a %s (%s)." %
-            (tok.value, type(rhs).__name__, str(rhs))
-        )
-    return next_or_single(
-        Modify(value=so_far, op=tok.value, sym=rhs.value), state
-    )
-
-
-def next_tree_num(so_far, tok, state: ParseState):
-    if so_far is not None:
-        raise Exception(
-            (
-                "Parse error: I don't know how to deal with a %s " +
-                "('%s') before a number (%s)."
-            ) % (type(so_far), str(so_far), tok.value)
-
-        )
-    return next_or_single(Number(tok.value), state)
-
-
-def next_tree_sym(so_far, tok, state: ParseState):
-    if so_far is None:
-        sym = tok
-        return next_or_single(Symbol(sym.value), state)
-    else:
-        if type(so_far) == Number:
-            return next_or_single(
-                Modify(value=so_far, op="", sym=tok.value), state
-            )
+    def next_or_single(self, value):
+        if self.single_item:
+            return value
         else:
+            return self.continuing_tree(value)
+
+    def next_tree_fn(self, so_far, tok):
+        fn = self.greedy().next_tree()
+        return self.next_or_single(FunctionCall(fn, so_far))
+
+    def next_tree_op(self, so_far, tok):
+        try:
+            if so_far is None:
+                if tok.value == "-":
+                    if type(self.it.peek()) == NumberToken:
+                        ret = self.greedy().next_tree()
+                        ret.negate = not ret.negate
+                        return self.next_or_single(ret)
+
+            rhs = self.next_tree()
+        except StopIteration:
             raise Exception(
                 (
-                    "Parse error: don't know what to do with " +
-                    "'{so_far}' before the symbol {tok}.  You can " +
-                    "have a number before a symbol, " +
-                    "or an operator like +, but not a {type_so_far}."
-                ).format(
-                    so_far=so_far,
-                    tok=tok.value,
-                    type_so_far=type(so_far).__name__,
-                )
+                    "Parse error: I don't know how to handle an "
+                    "operator (%s) at the end of an expression - it should " +
+                    "be followed by a number or symbol."
+                ) % tok.value
             )
 
+        if type(rhs) != Symbol:
+            raise Exception(
+                "Parse error: we can only do operations to variables, but " +
+                "after '%s' I found a %s (%s)." %
+                (tok.value, type(rhs).__name__, str(rhs))
+            )
 
-def next_tree_fndef(so_far, tok, state: ParseState):
-    body = [n for n in parse_peekable(state.it, EndFunctionDefToken)]
-    return next_or_single(FunctionDef(body), state)
-
-
-def next_tree_for_token(so_far, tok, state: ParseState):
-    # We have decided at this point that any so_far we do have
-    # is OK to pass on to the next person, so we get rid of
-    # ~s, which just tell us to do exactly that.
-    tok = swallow_continuations(tok, state.it)
-
-    tok_type = type(tok)
-    if tok_type == FunctionCallToken:
-        return next_tree_fn(so_far, tok, state)
-    elif tok_type == OperatorToken:
-        return next_tree_op(so_far, tok, state)
-    elif tok_type == NumberToken:
-        return next_tree_num(so_far, tok, state)
-    elif tok_type == SymbolToken:
-        return next_tree_sym(so_far, tok, state)
-    elif tok_type == SeparatorToken:
-        return next_or_single(None, state)
-    elif tok_type == StartFunctionDefToken:
-        return next_tree_fndef(so_far, tok, state)
-    else:
-        raise Exception(
-            "Parse error: the token %s is an unknown type (%s)" %
-            (str(tok), tok_type.__name__)
+        return self.next_or_single(
+            Modify(value=so_far, op=tok.value, sym=rhs.value)
         )
 
+    def next_tree_num(self, so_far, tok):
+        if so_far is not None:
+            raise Exception(
+                (
+                    "Parse error: I don't know how to deal with a %s " +
+                    "('%s') before a number (%s)."
+                ) % (type(so_far), str(so_far), tok.value)
 
-def next_tree(so_far, state: ParseState):
+            )
+        return self.next_or_single(Number(tok.value))
 
-    # If we've hit the end of the stream, return what we have so far,
-    # but if we have nothing so far, we can allow the StopIteration to
-    # leak out when we try to get the next token.
-    if so_far is not None:
-        try:
-            state.it.peek()
-        except StopIteration:
-            return so_far
-
-    # Symbols and function calls signal the end of the
-    # statement, unless they are followed by a ~.
-    # Just peek and see whether the next token is a ~,
-    # and if not, return immediately.
-    if type(so_far) in (FunctionCall, Modify, Symbol):
-        if type(state.it.peek()) != ContinuationToken:
-            return so_far
-
-    nx = next(state.it)
-
-    if type(nx) == state.end_tok_type:
+    def next_tree_sym(self, so_far, tok):
         if so_far is None:
-            raise StopIteration()
+            sym = tok
+            return self.next_or_single(Symbol(sym.value))
         else:
-            return so_far
+            if type(so_far) == Number:
+                return self.next_or_single(
+                    Modify(value=so_far, op="", sym=tok.value)
+                )
+            else:
+                raise Exception(
+                    (
+                        "Parse error: don't know what to do with " +
+                        "'{so_far}' before the symbol {tok}.  You can " +
+                        "have a number before a symbol, " +
+                        "or an operator like +, but not a {type_so_far}."
+                    ).format(
+                        so_far=so_far,
+                        tok=tok.value,
+                        type_so_far=type(so_far).__name__,
+                    )
+                )
 
-    return next_tree_for_token(so_far, nx, state)
+    def next_tree_fndef(self, so_far, tok):
+        body = [n for n in _parse_peekable(self.it, EndFunctionDefToken)]
+        return self.next_or_single(FunctionDef(body))
+
+    def next_tree_for_token(self, so_far, tok):
+        # We have decided at this point that any so_far we do have
+        # is OK to pass on to the next person, so we get rid of
+        # ~s, which just tell us to do exactly that.
+        tok = swallow_continuations(tok, self.it)
+
+        tok_type = type(tok)
+        if tok_type == FunctionCallToken:
+            return self.next_tree_fn(so_far, tok)
+        elif tok_type == OperatorToken:
+            return self.next_tree_op(so_far, tok)
+        elif tok_type == NumberToken:
+            return self.next_tree_num(so_far, tok)
+        elif tok_type == SymbolToken:
+            return self.next_tree_sym(so_far, tok)
+        elif tok_type == SeparatorToken:
+            return self.next_or_single(None)
+        elif tok_type == StartFunctionDefToken:
+            return self.next_tree_fndef(so_far, tok)
+        else:
+            raise Exception(
+                "Parse error: the token %s is an unknown type (%s)" %
+                (str(tok), tok_type.__name__)
+            )
+
+    def continuing_tree(self, so_far):
+
+        # If we've hit the end of the stream, return what we have so far,
+        # but if we have nothing so far, we can allow the StopIteration to
+        # leak out when we try to get the next token.
+        if so_far is not None:
+            try:
+                self.it.peek()
+            except StopIteration:
+                return so_far
+
+        # Symbols and function calls signal the end of the
+        # statement, unless they are followed by a ~.
+        # Just peek and see whether the next token is a ~,
+        # and if not, return immediately.
+        if type(so_far) in (FunctionCall, Modify, Symbol):
+            if type(self.it.peek()) != ContinuationToken:
+                return so_far
+
+        nx = next(self.it)
+
+        if type(nx) == self.end_tok_type:
+            if so_far is None:
+                raise StopIteration()
+            else:
+                return so_far
+
+        return self.next_tree_for_token(so_far, nx)
+
+    def next_tree(self):
+        return self.continuing_tree(None)
 
 
 #: Iterable[Token]
 def parse(tokens):
-    return parse_peekable(Peekable(iter(tokens)), None)
+    return _parse_peekable(Peekable(iter(tokens)), None)
 
 
-def parse_peekable(it: Peekable, end_tok_type):
+def _parse_peekable(it: Peekable, end_tok_type):
     while True:
-        yield next_tree(None, ParseState(it, end_tok_type, False))
+        yield Parser(it, end_tok_type, False).next_tree()
