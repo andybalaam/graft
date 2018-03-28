@@ -1,6 +1,6 @@
 # Graft TODO
 
-### Make the size right for Mastodon previews
+### Make the size right for Mastodon previews: 227x127
 
 ### Co-ordinate built-ins, :D to write a Dot, :J to jump, :L for a line to x,y
 ```

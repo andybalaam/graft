@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 from argparse import ArgumentParser
 
 from graftlib.animation import Animation
@@ -29,6 +29,7 @@ def main_gif(
         frames: Optional[int],
         filename: str,
         world: World,
+        image_size: Tuple[int, int],
 ) -> int:
     if frames is None:
         world.stderr.write(
@@ -37,11 +38,11 @@ def main_gif(
         )
         return 3
 
-    return GifUi(animation, filename, world).run()
+    return GifUi(animation, filename, world, image_size).run()
 
 
-def main_gtk3(animation) -> int:
-    return Gtk3Ui(animation).run()
+def main_gtk3(animation: Animation, image_size: Tuple[int, int]) -> int:
+    return Gtk3Ui(animation, image_size).run()
 
 
 def make_animation(program: str, frames: Optional[int], rand):
@@ -80,6 +81,18 @@ def main(world: World) -> int:
         ),
     )
     argparser.add_argument(
+        '--width',
+        default=200,
+        type=int,
+        help="The width in pixels of the animation.",
+    )
+    argparser.add_argument(
+        '--height',
+        default=200,
+        type=int,
+        help="The height in pixels of the animation.",
+    )
+    argparser.add_argument(
         'program',
         help="The actual graft program to run, e.g. '+d:S' to draw a circle."
     )
@@ -88,8 +101,9 @@ def main(world: World) -> int:
 
     frames = None if args.frames < 0 else args.frames
     animation = make_animation(args.program, frames, world.random.uniform)
+    image_size = (args.width, args.height)
 
     if args.gif:
-        return main_gif(animation, frames, args.gif, world)
+        return main_gif(animation, frames, args.gif, world, image_size)
     else:
-        return main_gtk3(animation)
+        return main_gtk3(animation, image_size)

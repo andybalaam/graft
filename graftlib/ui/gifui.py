@@ -1,20 +1,24 @@
 import subprocess
 import cairo
+from typing import Tuple
 
 from graftlib.animation import Animation
 from graftlib.world import World
 from graftlib.ui.cairo_draw import cairo_draw
 
 
-image_width = 200
-image_height = 200
-
-
 class GifUi:
-    def __init__(self, animation: Animation, filename: str, world: World):
+    def __init__(
+        self,
+        animation: Animation,
+        filename: str,
+        world: World,
+        image_size: Tuple[int, int],
+    ):
         self.animation = animation
         self.filename = filename
         self.world = world
+        self.image_size = image_size
 
     def run(self):
         with self.world.fs.tmpdir() as tmpdir:
@@ -60,15 +64,15 @@ class GifUi:
 
     def _draw_frame(self, frame_number, tmpdir):
         ims = cairo.ImageSurface(
-            cairo.FORMAT_ARGB32, image_width, image_height)
+            cairo.FORMAT_ARGB32, self.image_size[0], self.image_size[1])
 
         cairo_cr = cairo.Context(ims)
 
         cairo_draw(
             self.animation,
             cairo_cr,
-            image_width,
-            image_height,
+            ims.get_width(),
+            ims.get_height(),
         )
 
         ret = "{dir_}/frame_{num:04}.png".format(dir_=tmpdir, num=frame_number)

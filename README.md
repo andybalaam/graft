@@ -10,12 +10,12 @@ Circle:
 
 ![](images/circle.gif)
 
-Thick, rough, red circles:
+Thick, rough, red circles saved to a GIF:
 
 ```bash
 # Set red to 100, set brush size to 10,
 # turn a random amount, then turn 10 degrees, then step forward
-./graft '100=r10=z:R~+d+d:S'
+./graft '100=r10=z:R~+d+d:S' --frames=100 --gif=cir.gif --width=100 --height=75
 ```
 
 ![](images/rough-circle.gif)
@@ -184,6 +184,29 @@ To describe a function, write "{", then the commands, then "}":
 
 ```
 functiondef ::= "{" program "}"
+```
+
+## Command line arguments
+
+```bash
+$ ./graft --help
+usage: graft [-h] [--frames NUMBER_OF_FRAMES] [--gif GIF_FILENAME]
+             [--width WIDTH] [--height HEIGHT]
+             program
+
+positional arguments:
+  program               The actual graft program to run, e.g. '+d:S' to draw a
+                        circle.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --frames NUMBER_OF_FRAMES
+                        How many frames of the animation to draw, or -1 to
+                        play forever.
+  --gif GIF_FILENAME    Make an animated GIF instead of displaying on screen.
+                        (Requires --frames=n where n > 0.)
+  --width WIDTH         The width in pixels of the animation.
+  --height HEIGHT       The height in pixels of the animation.
 ```
 
 ## Mastodon bot

@@ -3,7 +3,7 @@ import gi
 gi.require_version('Gtk', '3.0')  # nopep8
 from gi.repository import Gtk, GObject
 
-from typing import Optional
+from typing import Optional, Tuple
 
 from graftlib.animation import Animation
 from graftlib.ui.cairo_draw import cairo_draw
@@ -13,10 +13,10 @@ ms_per_frame = 50
 
 
 class Gtk3Ui:
-    def __init__(self, animation: Animation):
+    def __init__(self, animation: Animation, image_size: Tuple[int, int]):
         self.win = Gtk.Window(resizable=True)
         self.canvas = Gtk.DrawingArea()
-        self.canvas.set_size_request(300, 300)
+        self.canvas.set_size_request(*image_size)
         self.win.add(self.canvas)
         self.win.connect("delete-event", Gtk.main_quit)
         self.canvas.connect("draw", self.on_draw, None)
