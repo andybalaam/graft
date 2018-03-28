@@ -26,7 +26,14 @@ def _make_gif(world, program):
     gif_file = os.path.join("bot-gifs", "gif-{}.gif".format(
         datetime.now(tz=timezone.utc).isoformat()))
 
-    argv = ["./graft", "--gif", gif_file, "--frames", "100", program]
+    argv = [
+        "./graft",
+        "--gif", gif_file,
+        "--frames", "200",
+        "--width", "227",
+        "--height", "127",
+        program
+    ]
     world.stdout.write(" ".join(argv) + "\n")
 
     lib_world = World(
