@@ -148,25 +148,7 @@ class State:
     def _next_modify(self, tree, rand):
         val = _eval_value(tree.value, rand)
         op = _operator_fn(tree.op)
-
-        if tree.sym == "d":
-            self.env["d"] = op(self.env["d"], val)
-        elif tree.sym == "s":
-            self.env["s"] = op(self.env["s"], val)
-        elif tree.sym == "r":
-            self.env["r"] = op(self.env["r"], val)
-        elif tree.sym == "g":
-            self.env["g"] = op(self.env["g"], val)
-        elif tree.sym == "b":
-            self.env["b"] = op(self.env["b"], val)
-        elif tree.sym == "a":
-            self.env["a"] = op(self.env["a"], val)
-        elif tree.sym == "z":
-            self.env["z"] = op(self.env["z"], val)
-        else:
-            raise Exception(
-                "No support for custom variables yet: " + tree.sym
-            )
+        self.env[tree.sym] = op(self.env[tree.sym], val)
         return None
 
     def next(self, tree, rand):  #: List(Tree)

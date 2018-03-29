@@ -17,19 +17,16 @@ def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
         yield round_line(ln)
 
 
+def round_if_float(v):
+    if type(v) == float:
+        return round_float(v)
+    else:
+        return v
+
+
 def round_state(state: State):
     return State(
-        env={
-            "x": round_float(state.env["x"]),
-            "y": round_float(state.env["y"]),
-            "d": round_float(state.env["d"]),
-            "s": round_float(state.env["s"]),
-            "r": round_float(state.env["r"]),
-            "g": round_float(state.env["g"]),
-            "b": round_float(state.env["b"]),
-            "a": round_float(state.env["a"]),
-            "z": round_float(state.env["z"]),
-        }
+        env={k: round_if_float(v) for k, v in state.env.items()}
     )
 
 
