@@ -21,20 +21,6 @@ class Line():
     size: float = attr.ib(default=5.0)
 
 
-def _eval_value(tree, rand):
-    tree_type = type(tree)
-    if tree_type == Number:
-        return float(tree.value) * (-1.0 if tree.negative else 1.0)
-    elif tree_type == FunctionCall:
-        if tree.fn.value == "R":
-            return float(rand(-10, 10))
-    else:
-        raise Exception(
-            "I don't know how to evaluate a value like %s." %
-            str(tree)
-        )
-
-
 def _operator_fn(opstr: str):
     if opstr == "=":
         return lambda x, y: y
@@ -48,6 +34,11 @@ def _operator_fn(opstr: str):
         return operator.truediv
     else:
         raise Exception("Unknown operator '%s'." % opstr)
+
+
+@attr.s
+class BuiltInFn:
+    fn = attr.ib()
 
 
 def zero():
@@ -69,6 +60,9 @@ def new_env() -> Dict[str, object]:
             "b": 0.0,    # blue  0-100 (and 0 to -100)
             "a": 100.0,  # alpha 0-100 (and 0 to -100)
             "z": 5.0,    # brush size
+            "S": BuiltInFn(State._fn_step),
+            "J": BuiltInFn(State._fn_jump),
+            "R": BuiltInFn(State._fn_random),
         }
     )
 
@@ -126,19 +120,21 @@ class State:
         self._fn_step(_rand)
         return None
 
+    def _fn_random(self, rand):
+        return float(rand(-10, 10))
+
     def _next_function_call_symbol(self, fn_name, rand):
-        if fn_name == "S":
-            return [self._fn_step(rand)]
-        elif fn_name == "J":
-            return [self._fn_jump(rand)]
-        elif fn_name == "R":
-            raise Exception(
-                "The :R (Random) function does nothing on its own.  " +
-                "You must use its value for something by writing " +
-                "e.g '~+d' after it."
-            )
-        else:
+
+        if fn_name not in self.env:
             raise Exception("Unknown function %s" % fn_name)
+
+        fnwrap = self.env[fn_name]
+        if type(fnwrap) == BuiltInFn:
+            return fnwrap.fn.__get__(self)(rand)
+        else:
+            raise Exception(
+                "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
+            )
 
     def _next_function_call_userdefined(self, fn, rand):
         ret = []
@@ -148,7 +144,7 @@ class State:
 
     def _next_function_call_once(self, tree, rand):  # -> List(Line)
         if type(tree.fn) == Symbol:
-            return self._next_function_call_symbol(tree.fn.value, rand)
+            return [self._next_function_call_symbol(tree.fn.value, rand)]
         elif type(tree.fn) == FunctionDef:
             return self._next_function_call_userdefined(tree.fn, rand)
 
@@ -158,9 +154,21 @@ class State:
             ret += self._next_function_call_once(tree, rand)
         return ret
 
+    def _eval_value(self, tree, rand):
+        tree_type = type(tree)
+        if tree_type == Number:
+            return float(tree.value) * (-1.0 if tree.negative else 1.0)
+        elif tree_type == FunctionCall:
+            return self._next_function_call(tree, rand)[0]
+        else:
+            raise Exception(
+                "I don't know how to evaluate a value like %s." %
+                str(tree)
+            )
+
     def _next_modify(self, tree, rand):
         var_name = tree.sym
-        val = _eval_value(tree.value, rand)
+        val = self._eval_value(tree.value, rand)
         op = _operator_fn(tree.op)
         self.env[var_name] = op(self.env[var_name], val)
         return None
