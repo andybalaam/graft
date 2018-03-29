@@ -21,17 +21,18 @@ class Line():
     size: float = attr.ib(default=5.0)
 
 
+_ops = {
+    "=": lambda x, y: y,
+    "+": operator.add,
+    "-": operator.sub,
+    "": operator.mul,
+    "/": operator.truediv,
+}
+
+
 def _operator_fn(opstr: str):
-    if opstr == "=":
-        return lambda x, y: y
-    elif opstr == "+":
-        return operator.add
-    elif opstr == "-":
-        return operator.sub
-    elif opstr == "":
-        return operator.mul
-    elif opstr == "/":
-        return operator.truediv
+    if opstr in _ops:
+        return _ops[opstr]
     else:
         raise Exception("Unknown operator '%s'." % opstr)
 
