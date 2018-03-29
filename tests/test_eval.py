@@ -201,16 +201,16 @@ def test_repeating_multiple_commands():
     )
 
 
-# def test_semicolon_to_separate_statements():
-#     assert do_eval("s;s:S") == [Line(Pt(0, 0), Pt(0, 10))]
-#
-#
-# def test_pass_symbol_to_operator():
-#     assert do_eval("90=s;s~+d:S") == [Line(Pt(0, 0), Pt(10, 0))]
-#
-#
-# def test_define_custom_variable():
-#     assert do_eval("180=_a;_a~+d:S") == [Line(Pt(0, 0), Pt(0, -10))]
+def test_semicolon_to_separate_statements():
+    assert do_eval("s;s:S", 1) == [Line(Pt(0, 0), Pt(0, 10))]
+
+
+def test_pass_symbol_to_operator():
+    assert do_eval("90=s;s~+d:S", 1) == [Line(Pt(0, 0), Pt(90, 0))]
+
+
+def test_define_custom_variable():
+    assert do_eval("180=aa;aa~+d:S", 1) == [Line(Pt(0, 0), Pt(0, -10))]
 
 
 def test_move_in_a_circle():

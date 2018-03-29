@@ -160,6 +160,8 @@ class State:
             return float(tree.value) * (-1.0 if tree.negative else 1.0)
         elif tree_type == FunctionCall:
             return self._next_function_call(tree, rand)[0]
+        elif tree_type == Symbol:
+            return self.env[tree.value]
         else:
             raise Exception(
                 "I don't know how to evaluate a value like %s." %
@@ -177,7 +179,10 @@ class State:
         if type(tree) == FunctionCall:
             return self._next_function_call(tree, rand)
         elif type(tree) == Modify:
-            return [self._next_modify(tree, rand)]
+            self._next_modify(tree, rand)
+            return [None]
+        elif type(tree) == Symbol:
+            return [None]
         elif type(tree) == FunctionDef:
             raise Exception(
                 "You defined a function but didn't call it: " + str(tree))
