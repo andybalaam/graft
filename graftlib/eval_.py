@@ -1,4 +1,5 @@
-from typing import Iterable, Optional, Tuple
+from collections import defaultdict
+from typing import Dict, Iterable, Optional, Tuple
 import math
 import operator
 
@@ -54,37 +55,62 @@ def _operator_fn(opstr: str):
         raise Exception("Unknown operator '%s'." % opstr)
 
 
+def zero():
+    return 0.0
+
+
+def new_env() -> Dict[str, object]:
+    """Create a dict of default variable values."""
+
+    return defaultdict(
+        zero,
+        {
+            "x": 0.0,    # x coord
+            "y": 0.0,    # y coord
+            "d": 0.0,    # direction in degrees
+            "s": 10.0,   # step size
+            "r": 0.0,    # red   0-100 (and 0 to -100)
+            "g": 0.0,    # green 0-100 (and 0 to -100)
+            "b": 0.0,    # blue  0-100 (and 0 to -100)
+            "a": 100.0,  # alpha 0-100 (and 0 to -100)
+            "z": 5.0,    # brush size
+        }
+    )
+
+
+def dict2env(inp: Dict[str, object]) -> Dict[str, object]:
+    ret = new_env()
+    ret.update(inp)
+    return ret
+
+
 @attr.s
 class State:
-    pos: Pt = attr.ib()
-    dir_: float = attr.ib()
-    step: float = attr.ib()
-    red: float = attr.ib(0.0)
-    green: float = attr.ib(0.0)
-    blue: float = attr.ib(0.0)
-    alpha: float = attr.ib(100.0)
-    size: float = attr.ib(5.0)
+    env: Dict[str, object] = attr.ib(
+        default=attr.Factory(new_env),
+        convert=dict2env
+    )
 
     def _fn_step(self, _rand):
-        th = _theta(self.dir_)
-        old_pos = attr.evolve(self.pos)
-        new_pos = attr.evolve(
-            self.pos,
-            x=self.pos.x + self.step * math.sin(th),
-            y=self.pos.y + self.step * math.cos(th),
+        th = _theta(self.env["d"])
+        old_pos = Pt(self.env["x"], self.env["y"])
+        new_pos = Pt(
+            self.env["x"] + self.env["s"] * math.sin(th),
+            self.env["y"] + self.env["s"] * math.cos(th),
         )
-        self.pos = new_pos
-        color = (self.red, self.green, self.blue, self.alpha)
-        return Line(old_pos, new_pos, color=color, size=self.size)
+        self.env["x"] = new_pos.x
+        self.env["y"] = new_pos.y
+        color = (self.env["r"], self.env["g"], self.env["b"], self.env["a"])
+        return Line(old_pos, new_pos, color=color, size=self.env["z"])
 
     def _fn_jump(self, _rand):
-        th = _theta(self.dir_)
-        new_pos = attr.evolve(
-            self.pos,
-            x=self.pos.x + self.step * math.sin(th),
-            y=self.pos.y + self.step * math.cos(th),
+        th = _theta(self.env["d"])
+        new_pos = Pt(
+            self.env["x"] + self.env["s"] * math.sin(th),
+            self.env["y"] + self.env["s"] * math.cos(th),
         )
-        self.pos = new_pos
+        self.env["x"] = new_pos.x
+        self.env["y"] = new_pos.y
         return None
 
     def _next_function_call_symbol(self, fn_name, rand):
@@ -124,19 +150,19 @@ class State:
         op = _operator_fn(tree.op)
 
         if tree.sym == "d":
-            self.dir_ = op(self.dir_, val)
+            self.env["d"] = op(self.env["d"], val)
         elif tree.sym == "s":
-            self.step = op(self.step, val)
+            self.env["s"] = op(self.env["s"], val)
         elif tree.sym == "r":
-            self.red = op(self.red, val)
+            self.env["r"] = op(self.env["r"], val)
         elif tree.sym == "g":
-            self.green = op(self.green, val)
+            self.env["g"] = op(self.env["g"], val)
         elif tree.sym == "b":
-            self.blue = op(self.blue, val)
+            self.env["b"] = op(self.env["b"], val)
         elif tree.sym == "a":
-            self.alpha = op(self.alpha, val)
+            self.env["a"] = op(self.env["a"], val)
         elif tree.sym == "z":
-            self.size = op(self.size, val)
+            self.env["z"] = op(self.env["z"], val)
         else:
             raise Exception(
                 "No support for custom variables yet: " + tree.sym
@@ -158,7 +184,7 @@ class State:
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
     program = list(trees)
-    state = State(pos=Pt(0.0, 0.0), dir_=0.0, step=10.0)
+    state = State()
     non_frames = 0
     i = 0
     while n is None or i < n:

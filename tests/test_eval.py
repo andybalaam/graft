@@ -9,7 +9,7 @@ from graftlib.eval_ import (
 )
 from graftlib.lex import lex
 from graftlib.parse import parse
-from graftlib.round_ import round_float, round_line, round_pt
+from graftlib.round_ import round_float, round_line
 
 
 def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
@@ -19,14 +19,17 @@ def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
 
 def round_state(state: State):
     return State(
-        pos=round_pt(state.pos),
-        dir_=round_float(state.dir_),
-        step=round_float(state.step),
-        red=round_float(state.red),
-        green=round_float(state.green),
-        blue=round_float(state.blue),
-        alpha=round_float(state.alpha),
-        size=round_float(state.size),
+        env={
+            "x": round_float(state.env["x"]),
+            "y": round_float(state.env["y"]),
+            "d": round_float(state.env["d"]),
+            "s": round_float(state.env["s"]),
+            "r": round_float(state.env["r"]),
+            "g": round_float(state.env["g"]),
+            "b": round_float(state.env["b"]),
+            "a": round_float(state.env["a"]),
+            "z": round_float(state.env["z"]),
+        }
     )
 
 
@@ -68,7 +71,7 @@ def test_incrementing_a_variable_adds_ten():
 
     assert (
         do_eval_debug("+d", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=10.0, step=10.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": 10.0, "s": 10.0}))]
     )
 
 
@@ -77,36 +80,36 @@ def test_subtracting_a_variable_removes_ten():
 
     assert (
         do_eval_debug("-d", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=-10.0, step=10.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": -10.0, "s": 10.0}))]
     )
 
 
 def test_subtracting():
     assert (
         do_eval_debug("2-d", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=-2.0, step=10.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": -2.0, "s": 10.0}))]
     )
     assert (
         do_eval_debug("-2-d", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": 2.0, "s": 10.0}))]
     )
 
 
 def test_dividing():
     assert (
         do_eval_debug("2/s", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=0.0, step=5.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": 0.0, "s": 5.0}))]
     )
     assert (
         do_eval_debug("-2/s", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=0.0, step=-5.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": 0.0, "s": -5.0}))]
     )
 
 
 def test_adding_a_negative_subtracts():
     assert (
         do_eval_debug("-2+d", 1) ==
-        [(None, State(pos=Pt(0.0, 0.0), dir_=-2.0, step=10.0))]
+        [(None, State(env={"x": 0.0, "y": 0.0, "d": -2.0, "s": 10.0}))]
     )
 
 
@@ -114,8 +117,8 @@ def test_multiplying_a_variable():
     assert (
         do_eval_debug("2=d3.1d", 2) ==
         [
-            (None, State(pos=Pt(0.0, 0.0), dir_=2.0, step=10.0)),
-            (None, State(pos=Pt(0.0, 0.0), dir_=6.2, step=10.0)),
+            (None, State(env={"x": 0.0, "y": 0.0, "d": 2.0, "s": 10.0})),
+            (None, State(env={"x": 0.0, "y": 0.0, "d": 6.2, "s": 10.0})),
         ]
     )
 
@@ -130,19 +133,19 @@ def test_turn_right_and_jump():
         [
             (
                 None,
-                State(pos=Pt(0.0, 0.0), dir_=90.0, step=10.0),
+                State(env={"x": 0.0, "y": 0.0, "d": 90.0, "s": 10.0}),
             ),
             (
                 None,
-                State(pos=Pt(0.0, 0.0), dir_=90.0, step=25.0),
+                State(env={"x": 0.0, "y": 0.0, "d": 90.0, "s": 25.0}),
             ),
             (
                 None,
-                State(pos=Pt(25.0, 0.0), dir_=90.0, step=25.0),
+                State(env={"x": 25.0, "y": 0.0, "d": 90.0, "s": 25.0}),
             ),
             (
                 Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
-                State(pos=Pt(50.0, 0.0), dir_=90.0, step=25.0),
+                State(env={"x": 50.0, "y": 0.0, "d": 90.0, "s": 25.0}),
             ),
         ]
     )
