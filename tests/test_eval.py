@@ -213,6 +213,10 @@ def test_define_custom_variable():
     assert do_eval("180=aa;aa~+d:S", 1) == [Line(Pt(0, 0), Pt(0, -10))]
 
 
+def test_multiply_by_variable():
+    assert do_eval("2=aa;aa~s:S", 1) == [Line(Pt(0, 0), Pt(0, 20))]
+
+
 def test_move_in_a_circle():
     assert (
         do_eval(":S+d", 36) ==

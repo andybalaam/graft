@@ -78,6 +78,15 @@ def test_number_being_divided_is_parsed():
     )
 
 
+def test_multiplying_by_variable_is_parsed():
+    assert (
+        do_parse("aa~s") ==
+        [
+            Modify(sym="s", op="", value=Symbol("aa"))
+        ]
+    )
+
+
 def test_negative_number_is_parsed():
     assert do_parse("-3") == [Number("3", negative=True)]
 

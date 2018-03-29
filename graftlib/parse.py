@@ -141,7 +141,7 @@ class Parser:
             sym = tok
             return self.next_or_single(Symbol(sym.value))
         else:
-            if type(so_far) == Number:
+            if type(so_far) in (Number, Symbol):
                 return self.next_or_single(
                     Modify(value=so_far, op="", sym=tok.value)
                 )
@@ -150,7 +150,7 @@ class Parser:
                     (
                         "Parse error: don't know what to do with " +
                         "'{so_far}' before the symbol {tok}.  You can " +
-                        "have a number before a symbol, " +
+                        "have a number (or symbol then ~) before a symbol, " +
                         "or an operator like +, but not a {type_so_far}."
                     ).format(
                         so_far=so_far,
