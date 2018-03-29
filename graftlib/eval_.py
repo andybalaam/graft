@@ -21,11 +21,6 @@ class Line():
     size: float = attr.ib(default=5.0)
 
 
-def _theta(dir_: float) -> float:
-    """Angle in hundreds of a circle to Angle in radians"""
-    return 2 * math.pi * (dir_ / 360.0)
-
-
 def _eval_value(tree, rand):
     tree_type = type(tree)
     if tree_type == Number:
@@ -91,26 +86,44 @@ class State:
         convert=dict2env
     )
 
+    def _theta(self) -> float:
+        """Angle we are facing in radians"""
+        return 2 * math.pi * (self.env["d"] / 360.0)
+
+    def pos(self) -> Pt:
+        return Pt(self.env["x"], self.env["y"])
+
+    def set_pos(self, pos: Pt):
+        self.env["x"] = pos.x
+        self.env["y"] = pos.y
+
+    def step(self) -> float:
+        return self.env["s"]
+
+    def color(self) -> Tuple[float, float, float, float]:
+        return (self.env["r"], self.env["g"], self.env["b"], self.env["a"])
+
+    def brush_size(self) -> float:
+        return self.env["z"]
+
     def _fn_step(self, _rand):
-        th = _theta(self.env["d"])
-        old_pos = Pt(self.env["x"], self.env["y"])
+        th = self._theta()
+        s = self.step()
+        old_pos = self.pos()
         new_pos = Pt(
-            self.env["x"] + self.env["s"] * math.sin(th),
-            self.env["y"] + self.env["s"] * math.cos(th),
+            old_pos.x + s * math.sin(th),
+            old_pos.y + s * math.cos(th),
         )
-        self.env["x"] = new_pos.x
-        self.env["y"] = new_pos.y
-        color = (self.env["r"], self.env["g"], self.env["b"], self.env["a"])
-        return Line(old_pos, new_pos, color=color, size=self.env["z"])
+        self.set_pos(new_pos)
+        return Line(
+            old_pos,
+            new_pos,
+            color=self.color(),
+            size=self.brush_size()
+        )
 
     def _fn_jump(self, _rand):
-        th = _theta(self.env["d"])
-        new_pos = Pt(
-            self.env["x"] + self.env["s"] * math.sin(th),
-            self.env["y"] + self.env["s"] * math.cos(th),
-        )
-        self.env["x"] = new_pos.x
-        self.env["y"] = new_pos.y
+        self._fn_step(_rand)
         return None
 
     def _next_function_call_symbol(self, fn_name, rand):
@@ -146,9 +159,10 @@ class State:
         return ret
 
     def _next_modify(self, tree, rand):
+        var_name = tree.sym
         val = _eval_value(tree.value, rand)
         op = _operator_fn(tree.op)
-        self.env[tree.sym] = op(self.env[tree.sym], val)
+        self.env[var_name] = op(self.env[var_name], val)
         return None
 
     def next(self, tree, rand):  #: List(Tree)
