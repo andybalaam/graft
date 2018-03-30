@@ -1,11 +1,29 @@
 # Graft TODO
 
+## Unnamed label
+assert (
+    do_eval("90=d.90+d:S", 2) ==
+    [
+        [Line(Pt(0, 0), Pt(0, -10.0))],
+        [Line(Pt(0, -10), Pt(-10.0, -10.0))],
+    ]
+)
+
+## Forking
+assert (
+    do_eval(":F~=_f;_f=d10d.+d:S", 1) ==
+    [
+        [Line(Pt(0, 0), Pt(0, 10.0)), Line(Pt(0, 0), Pr(10, 0))],
+    ]
+)
+
 ## Later
 
 * Line and character numbers in lex/parse/eval errors
 * Original code you typed in lex/parse/eval errors
-* Command line control of number of frames, max lines etc.
+* Command line control of max lines etc.
 * Use Generic types in lots of places including Peekable
+* Make GIF generate with interesting first image
 
 ## To define
 
@@ -31,13 +49,6 @@ assert (
     ]
 )
 
-### Forking
-assert (
-    do_eval(:F^=_f._f==0~:I90+d90-d:S) ==
-    [
-        [Line(Pt(0, 0), Pt(10, 0)), Line(Pt(0, 0), Pr(-10, 0))],
-    ]
-)
 
 ### Passing arguments to functions
 ### Local variables
