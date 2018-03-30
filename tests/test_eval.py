@@ -1,6 +1,7 @@
 import itertools
-from typing import Iterable, Optional, Tuple
+from typing import Iterable, Optional, Tuple, Union
 from graftlib.eval_ import (
+    Dot,
     Line,
     Pt,
     State,
@@ -9,12 +10,13 @@ from graftlib.eval_ import (
 )
 from graftlib.lex import lex
 from graftlib.parse import parse
-from graftlib.round_ import round_float, round_line
+from graftlib.round_ import round_float, round_stroke
 
 
-def round_lines(lines: Iterable[Line]) -> Iterable[Line]:
-    for ln in lines:
-        yield round_line(ln)
+def round_strokes(strokes: Iterable[Union[Dot, Line]]) -> (
+        Iterable[Union[Dot, Line]]):
+    for st in strokes:
+        yield round_stroke(st)
 
 
 def round_if_float(v):
@@ -30,17 +32,17 @@ def round_state(state: State):
     )
 
 
-def round_debug(lines: Iterable[Tuple[Optional[Line], State]]) -> (
-        Iterable[Tuple[Optional[Line], State]]):
-    for (ln, state) in lines:
+def round_debug(strokes: Iterable[Tuple[Optional[Line], State]]) -> (
+        Iterable[Tuple[Optional[Union[Dot, Line]], State]]):
+    for (stroke, state) in strokes:
         yield (
-            None if ln is None else round_line(ln),
+            None if stroke is None else round_stroke(stroke),
             round_state(state)
         )
 
 
 def do_eval(chars: Iterable[str], n: int, rand=None):
-    return list(round_lines(eval_(parse(lex(chars)), n, rand)))
+    return list(round_strokes(eval_(parse(lex(chars)), n, rand)))
 
 
 def do_eval_debug(chars: Iterable[str], n: int, rand=None):
@@ -64,7 +66,7 @@ def test_calling_s_moves_forward():
 
 
 def test_incrementing_a_variable_adds_ten():
-    assert do_eval("+d", 100) == []  # Does terminate even though no lines
+    assert do_eval("+d", 100) == []  # Does terminate even though no strokes
 
     assert (
         do_eval_debug("+d", 1) ==
@@ -259,3 +261,8 @@ def test_move_in_a_circle():
             Line(start=Pt(x=1.7, y=-9.8), end=Pt(x=-0.0, y=-0.0))
         ]
     )
+
+
+def test_draw_a_dot():
+    assert do_eval(":D", 1) == [Dot(Pt(0.0, 0.0))]
+    assert do_eval("20=x15=y:D", 1) == [Dot(Pt(20.0, 15.0))]

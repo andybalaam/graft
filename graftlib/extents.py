@@ -1,7 +1,8 @@
 import itertools
 import attr
 
-from graftlib.eval_ import Pt
+from graftlib.strokeoptimiser import Elided
+from graftlib.eval_ import Line, Pt
 
 
 @attr.s
@@ -20,11 +21,19 @@ class Extents:
         self._y_min = 1_000_000.0
         self._y_max = -1_000_000.0
 
+    def add_cmd(self, cmd):
+        if type(cmd) == Elided:
+            return self.add_cmd(cmd.item)
+        if type(cmd) == Line:
+            self.add(cmd.start)
+            self.add(cmd.end)
+        else:  # Dot
+            self.add(cmd.pos)
+
     def train_on(self, commands, lookahead_steps):
         taken = list(itertools.islice(commands, lookahead_steps))
         for cmd in taken:
-            self.add(cmd.start)
-            self.add(cmd.end)
+            self.add_cmd(cmd)
         return itertools.chain(taken, commands)
 
     def centre(self):

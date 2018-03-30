@@ -21,6 +21,13 @@ class Line():
     size: float = attr.ib(default=5.0)
 
 
+@attr.s(cmp=True, frozen=True)
+class Dot():
+    pos: Pt = attr.ib()
+    color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
+    size: float = attr.ib(default=5.0)
+
+
 _ops = {
     "=": lambda x, y: y,
     "+": operator.add,
@@ -64,6 +71,7 @@ def new_env() -> Dict[str, object]:
             "S": BuiltInFn(State._fn_step),
             "J": BuiltInFn(State._fn_jump),
             "R": BuiltInFn(State._fn_random),
+            "D": BuiltInFn(State._fn_dot),
         }
     )
 
@@ -116,6 +124,9 @@ class State:
             color=self.color(),
             size=self.brush_size()
         )
+
+    def _fn_dot(self, _rand):
+        return Dot(self.pos(), self.color(), self.brush_size())
 
     def _fn_jump(self, _rand):
         self._fn_step(_rand)

@@ -1,6 +1,6 @@
-from typing import Tuple
+from typing import Tuple, Union
 
-from graftlib.eval_ import Line, Pt
+from graftlib.eval_ import Dot, Line, Pt
 
 
 def round_float(x: float) -> float:
@@ -24,10 +24,25 @@ def _modulo_color(rgba: Tuple[float, float, float, float]) -> (
     return tuple(_modulo_100(x) for x in rgba)
 
 
-def round_line(line: Line) -> Line:
+def _round_line(line: Line) -> Line:
     return Line(
         round_pt(line.start),
         round_pt(line.end),
         color=_modulo_color(line.color),
         size=_modulo_100(line.size),
     )
+
+
+def _round_dot(dot: Dot) -> Line:
+    return Dot(
+        round_pt(dot.pos),
+        color=_modulo_color(dot.color),
+        size=_modulo_100(dot.size),
+    )
+
+
+def round_stroke(item: Union[Line, Dot]):
+    if type(item) == Line:
+        return _round_line(item)
+    else:
+        return _round_dot(item)

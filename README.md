@@ -90,6 +90,7 @@ When graft starts, the following default values are set:
 The following functions are pre-defined in graft:
 
 * `S` - "Step": draw a line in direction `d` of length `s`.
+* `D` - "Dot": draw a dot at x, y
 * `J` - "Jump": move `s` units in direction `d`, without drawing a line.
 * `R` - "Random": return a random number between -10 and 10.
 

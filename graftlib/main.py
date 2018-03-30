@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from graftlib.animation import Animation
 from graftlib.eval_ import eval_  # , eval_debug
 from graftlib.lex import lex
-from graftlib.lineoptimiser import LineOptimiser
+from graftlib.strokeoptimiser import StrokeOptimiser
 from graftlib.parse import parse
 from graftlib.world import World
 from graftlib.ui.gtk3ui import Gtk3Ui
@@ -16,8 +16,8 @@ from graftlib.ui.gifui import GifUi
 lookahead_steps = 100
 
 
-# How many lines we allowed before we start deleting old ones.
-max_lines = 500
+# How many strokes we are allowed before we start deleting old ones.
+max_strokes = 500
 
 
 # Size of the dot indicating where we are.
@@ -48,12 +48,12 @@ def main_gtk3(animation: Animation, image_size: Tuple[int, int]) -> int:
 def make_animation(program: str, frames: Optional[int], rand):
     """
     Given a program, return an iterator that lexes, parses,
-    evaluates and optimises it, yielding actual lines to draw on
+    evaluates and optimises it, yielding actual strokes to draw on
     the screen, limited to the number of frames supplied, and using
     the random number generator supplied.
     """
-    opt = LineOptimiser(eval_(parse(lex(program)), frames, rand))
-    return Animation(opt, opt, lookahead_steps, max_lines, dot_size)
+    opt = StrokeOptimiser(eval_(parse(lex(program)), frames, rand))
+    return Animation(opt, opt, lookahead_steps, max_strokes, dot_size)
 
 
 def main(world: World) -> int:
