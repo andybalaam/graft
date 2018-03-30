@@ -1,16 +1,5 @@
 # Graft TODO
 
-### :G to go to x, y, :L for a line to x,y
-```
-# :L to draw a line to x, y
-assert do_eval("20=x15=y:L") == [Line(Pt(0, 0), Pt(20, 15))]
-```
-
-### Variables, passing symbols to operators
-```
-assert do_eval("180=_a_a+d:S") == [Line(Pt(0, 0), Pt(0, -10))]
-```
-
 ## Later
 
 * Line and character numbers in lex/parse/eval errors

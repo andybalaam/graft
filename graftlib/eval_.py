@@ -72,6 +72,7 @@ def new_env() -> Dict[str, object]:
             "J": BuiltInFn(State._fn_jump),
             "R": BuiltInFn(State._fn_random),
             "D": BuiltInFn(State._fn_dot),
+            "L": BuiltInFn(State._fn_line_to),
         }
     )
 
@@ -93,10 +94,15 @@ class State:
         """Angle we are facing in radians"""
         return 2 * math.pi * (self.env["d"] / 360.0)
 
+    def prev_pos(self) -> Pt:
+        return Pt(self.prev_x, self.prev_y)
+
     def pos(self) -> Pt:
         return Pt(self.env["x"], self.env["y"])
 
     def set_pos(self, pos: Pt):
+        self.prev_x = self.env["x"]
+        self.prev_y = self.env["y"]
         self.env["x"] = pos.x
         self.env["y"] = pos.y
 
@@ -127,6 +133,14 @@ class State:
 
     def _fn_dot(self, _rand):
         return Dot(self.pos(), self.color(), self.brush_size())
+
+    def _fn_line_to(self, _rand):
+        return Line(
+            self.prev_pos(),
+            self.pos(),
+            color=self.color(),
+            size=self.brush_size(),
+        )
 
     def _fn_jump(self, _rand):
         self._fn_step(_rand)
@@ -184,6 +198,13 @@ class State:
         var_name = tree.sym
         val = self._eval_value(tree.value, rand)
         op = _operator_fn(tree.op)
+
+        # x and y are magic variables that remember their previous values
+        if var_name == "x":
+            self.prev_x = self.env["x"]
+        elif var_name == "y":
+            self.prev_y = self.env["y"]
+
         self.env[var_name] = op(self.env[var_name], val)
         return None
 

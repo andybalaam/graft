@@ -266,3 +266,10 @@ def test_move_in_a_circle():
 def test_draw_a_dot():
     assert do_eval(":D", 1) == [Dot(Pt(0.0, 0.0))]
     assert do_eval("20=x15=y:D", 1) == [Dot(Pt(20.0, 15.0))]
+
+
+def test_go_then_line():
+    assert (
+        do_eval("10=x15=y20=x16=y:L", 1) ==
+        [Line(Pt(10.0, 15.0), Pt(20.0, 16.0))]
+    )
