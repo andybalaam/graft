@@ -35,7 +35,7 @@ def draw_line(cairo_cr, line: Line, scale):
     cairo_cr.stroke()
 
 
-def draw_dot(cairo_cr, dot: Dot, scale):
+def draw_dot(cairo_cr, dot: Dot):
     cairo_cr.set_line_width(0)
     cairo_cr.set_source_rgba(*divide_by_100(dot.color))
     # Minus signs on y coords because we are reversing the y axis.
@@ -60,7 +60,7 @@ def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
         if type(stroke) == Line:
             draw_line(cairo_cr, stroke, scale)
         else:  # Dot
-            draw_dot(cairo_cr, stroke, scale)
+            draw_dot(cairo_cr, stroke)
 
     cairo_cr.arc(
         animation.pos.x,

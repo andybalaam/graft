@@ -68,11 +68,11 @@ def new_env() -> Dict[str, object]:
             "b": 0.0,    # blue  0-100 (and 0 to -100)
             "a": 100.0,  # alpha 0-100 (and 0 to -100)
             "z": 5.0,    # brush size
-            "S": BuiltInFn(State._fn_step),
-            "J": BuiltInFn(State._fn_jump),
-            "R": BuiltInFn(State._fn_random),
-            "D": BuiltInFn(State._fn_dot),
-            "L": BuiltInFn(State._fn_line_to),
+            "S": BuiltInFn(State.fn_step),
+            "J": BuiltInFn(State.fn_jump),
+            "R": BuiltInFn(State.fn_random),
+            "D": BuiltInFn(State.fn_dot),
+            "L": BuiltInFn(State.fn_line_to),
         }
     )
 
@@ -89,6 +89,8 @@ class State:
         default=attr.Factory(new_env),
         convert=dict2env
     )
+    prev_x: float = attr.ib(default=0, init=False)
+    prev_y: float = attr.ib(default=0, init=False)
 
     def _theta(self) -> float:
         """Angle we are facing in radians"""
@@ -115,7 +117,7 @@ class State:
     def brush_size(self) -> float:
         return self.env["z"]
 
-    def _fn_step(self, _rand):
+    def fn_step(self, _rand):
         th = self._theta()
         s = self.step()
         old_pos = self.pos()
@@ -131,10 +133,10 @@ class State:
             size=self.brush_size()
         )
 
-    def _fn_dot(self, _rand):
+    def fn_dot(self, _rand):
         return Dot(self.pos(), self.color(), self.brush_size())
 
-    def _fn_line_to(self, _rand):
+    def fn_line_to(self, _rand):
         return Line(
             self.prev_pos(),
             self.pos(),
@@ -142,11 +144,11 @@ class State:
             size=self.brush_size(),
         )
 
-    def _fn_jump(self, _rand):
-        self._fn_step(_rand)
+    def fn_jump(self, _rand):
+        self.fn_step(_rand)
         return None
 
-    def _fn_random(self, rand):
+    def fn_random(self, rand):
         return float(rand(-10, 10))
 
     def _next_function_call_symbol(self, fn_name, rand):

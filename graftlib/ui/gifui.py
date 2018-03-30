@@ -1,6 +1,6 @@
 import subprocess
-import cairo
 from typing import Tuple
+import cairo
 
 from graftlib.animation import Animation
 from graftlib.world import World
@@ -9,11 +9,11 @@ from graftlib.ui.cairo_draw import cairo_draw
 
 class GifUi:
     def __init__(
-        self,
-        animation: Animation,
-        filename: str,
-        world: World,
-        image_size: Tuple[int, int],
+            self,
+            animation: Animation,
+            filename: str,
+            world: World,
+            image_size: Tuple[int, int],
     ):
         self.animation = animation
         self.filename = filename
