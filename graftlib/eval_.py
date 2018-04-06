@@ -272,8 +272,8 @@ class Evaluator:
 
 
 class RunningProgram:
-    def __init__(self, program: Iterable, rand):
-        self.program: List = list(program)
+    def __init__(self, program: List, rand):
+        self.program: List = program
         self.state: State = State()
         self.evaluator = Evaluator(self.state, rand)
         """
@@ -292,6 +292,26 @@ class RunningProgram:
         statement = self.program[self.pc]
         self.pc += 1
         return self.evaluator.statement(statement, self.set_label)
+
+
+class MultipleRunningPrograms:
+    def __init__(self, program: List, rand):
+        # programs is a list of (RunningProgram, queue)
+        # where queue is a list of commands already returned by that program,
+        # waiting to be returned.
+        self.programs = [(RunningProgram(program, rand), [])]
+
+    def next(self):
+        # Ensure each queue has at least 1 thing in it
+        for prog, queue in self.programs:
+            if len(queue) == 0:
+                queue.extend(prog.next())
+
+        ret = []
+        for prog, queue in self.programs:
+            ret.append((queue.pop(0), attr.evolve(prog.state)))
+
+        return ret
 
 
 @attr.s
@@ -322,12 +342,10 @@ class FramesCounter:
 
 
 def _run_program(program: Iterable, rand) -> Iterable:
-    prog = RunningProgram(program, rand)
+    progs = MultipleRunningPrograms(list(program), rand)
     while True:
         # Run a line of code, and get back the animation frame(s) that result
-        commands = prog.next()
-        for command in commands:
-            yield [(command, attr.evolve(prog.state))]
+        yield progs.next()
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
@@ -345,6 +363,7 @@ def eval_(program: Iterable, n: Optional[int], rand) -> Iterable:
     """
 
     for cmds_states in eval_debug(program, n, rand):
+        print(cmds_states)
         commands = [x[0] for x in cmds_states]
         if any(commands):
             yield commands
