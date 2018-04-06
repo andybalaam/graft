@@ -327,7 +327,7 @@ def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
         # Run a line of code, and get back the animation frame(s) that result
         commands = prog.next()
         for command in commands:
-            yield (command, attr.evolve(prog.state))
+            yield [(command, attr.evolve(prog.state))]
             frames_counter.next_frame(command)
 
 
@@ -337,10 +337,7 @@ def eval_(program: Iterable, n: Optional[int], rand) -> Iterable:
     Run the supplied program n times, or for ever if n is None.
     """
 
-    return filter(
-        lambda x: x is not None,
-        map(
-            lambda x: x[0],
-            eval_debug(program, n, rand),
-        ),
-    )
+    for cmds_states in eval_debug(program, n, rand):
+        commands = [x[0] for x in cmds_states]
+        if any(commands):
+            yield commands
