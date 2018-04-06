@@ -169,7 +169,7 @@ class Parser:
         body = [n for n in _parse_peekable(self.it, EndFunctionDefToken)]
         return self.next_or_single(FunctionDef(body))
 
-    def next_tree_label(self, so_far, tok):
+    def next_tree_label(self, _so_far, _tok):
         return Label()
 
     def next_tree_for_token(self, so_far, tok):

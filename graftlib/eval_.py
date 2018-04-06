@@ -84,7 +84,7 @@ class State:
     prev_x: float = attr.ib(default=0, init=False)
     prev_y: float = attr.ib(default=0, init=False)
 
-    def _theta(self) -> float:
+    def theta(self) -> float:
         """Angle we are facing in radians"""
         return 2 * math.pi * (self.env["d"] / 360.0)
 
@@ -130,7 +130,7 @@ class Functions:
     rand = attr.ib()
 
     def step(self):
-        th = self.state._theta()
+        th = self.state.theta()
         s = self.state.step()
         old_pos = self.state.pos()
         new_pos = Pt(
@@ -165,7 +165,7 @@ class Functions:
         return None
 
     def random(self):
-        return float(self.rand(-10, 10))
+        return float(self.rand.__call__(-10, 10))
 
 
 _ops = {
@@ -334,8 +334,8 @@ def _run_program(program: Iterable, rand) -> Iterable:
 def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
     frames_counter = FramesCounter(n)
     for parallel_commands in _run_program(program, rand):
-            yield parallel_commands
-            frames_counter.next_frame(parallel_commands)
+        yield parallel_commands
+        frames_counter.next_frame(parallel_commands)
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
