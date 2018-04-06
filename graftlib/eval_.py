@@ -270,7 +270,7 @@ def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
     prog = RunningProgram(program, rand)
     non_frames = 0
     i = 0
-    while n is None or i < n:
+    while True:
         commands = prog.next()
         for command in commands:
             yield (command, attr.evolve(prog.state))
