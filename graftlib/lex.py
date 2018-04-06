@@ -26,6 +26,11 @@ class FunctionCallToken:
 
 
 @attr.s
+class LabelToken:
+    pass
+
+
+@attr.s
 class NumberToken:
     value: str = attr.ib()
 
@@ -64,6 +69,7 @@ def collect(c: str, it: Iterator[str], regex: Pattern) -> str:
 
 
 tilda: Pattern = re.compile("~")
+caret: Pattern = re.compile(r"\^")
 close_brace: Pattern = re.compile("}")
 digit: Pattern = re.compile("[0-9.]")
 colon: Pattern = re.compile(":")
@@ -76,6 +82,8 @@ symbol_letter: Pattern = re.compile("[_a-zA-Z]")
 def next_token(c: str, it: Iterable[str]):
     if digit.match(c):
         return NumberToken(collect(c, it, digit))
+    elif caret.match(c):
+        return LabelToken()
     elif colon.match(c):
         return FunctionCallToken()
     elif operator.match(c):

@@ -273,3 +273,23 @@ def test_go_then_line():
         do_eval("10=x15=y20=x16=y:L", 1) ==
         [Line(Pt(10.0, 15.0), Pt(20.0, 16.0))]
     )
+
+
+def test_repeat_starts_at_beginning_if_no_label():
+    assert (
+        do_eval("90=d90+d:S", 2) ==
+        [
+            Line(Pt(0, 0), Pt(0, -10.0)),
+            Line(Pt(0, -10), Pt(0, -20.0)),
+        ]
+    )
+
+
+def test_repeat_starts_at_label_if_present():
+    assert (
+        do_eval("90=d^90+d:S", 2) ==
+        [
+            Line(Pt(0, 0), Pt(0, -10.0)),
+            Line(Pt(0, -10), Pt(-10.0, -10.0)),
+        ]
+    )

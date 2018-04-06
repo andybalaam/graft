@@ -3,6 +3,7 @@ from graftlib.lex import (
     ContinuationToken,
     EndFunctionDefToken,
     FunctionCallToken,
+    LabelToken,
     NumberToken,
     OperatorToken,
     SeparatorToken,
@@ -37,6 +38,11 @@ class Number:
 
     def negate(self):
         self.negative = not self.negative
+
+
+@attr.s
+class Label:
+    pass
 
 
 @attr.s
@@ -163,6 +169,9 @@ class Parser:
         body = [n for n in _parse_peekable(self.it, EndFunctionDefToken)]
         return self.next_or_single(FunctionDef(body))
 
+    def next_tree_label(self, so_far, tok):
+        return Label()
+
     def next_tree_for_token(self, so_far, tok):
         # We have decided at this point that any so_far we do have
         # is OK to pass on to the next person, so we get rid of
@@ -182,6 +191,8 @@ class Parser:
             return self.next_or_single(None)
         elif tok_type == StartFunctionDefToken:
             return self.next_tree_fndef(so_far, tok)
+        elif tok_type == LabelToken:
+            return self.next_tree_label(so_far, tok)
         else:
             raise Exception(
                 "Parse error: the token %s is an unknown type (%s)" %

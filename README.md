@@ -57,6 +57,14 @@ either using a function name, or making a little function then and there:
 * `2:S` means step twice.
 * `36:{+d:S}` means turn then step 36 times.
 
+By default, the whole of your program repeats over and over.  To repeat only
+the last section (meaning the first section only runs once), add a label with
+`^`:
+
+* `1=s^+d1+s:S` means start with a step size of 1, and increase it (and the
+  angle), then step, every time.  (Without the `^` the value of `s` would be
+  reset back to 1 every time.)
+
 ## Special variables
 
 Graft contains some variables with special meanings:
@@ -167,6 +175,15 @@ then its name:
 functioncall ::= [number] ":" symbol
 ```
 
+### Labels
+
+To set the label (where in the program we will jump back to when we hit the
+end), write "^":
+
+```
+label ::= "^"
+```
+
 ### Combining statements
 
 To run multiple statements, write them next to each other.  If an expression
@@ -176,7 +193,7 @@ with `;`:
 ```
 program ::= statement+
 statement ::= expression [";"]
-expression ::= functioncall | modify | increase | decrease | assignment
+expression ::= functioncall | modify | increase | decrease | assignment | label
 ```
 
 ### Defining functions

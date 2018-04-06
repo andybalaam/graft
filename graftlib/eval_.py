@@ -1,10 +1,17 @@
 from collections import defaultdict
-from typing import Dict, Iterable, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 import math
 import operator
 
 import attr
-from graftlib.parse import FunctionCall, FunctionDef, Modify, Number, Symbol
+from graftlib.parse import (
+    FunctionCall,
+    FunctionDef,
+    Label,
+    Modify,
+    Number,
+    Symbol,
+)
 
 
 @attr.s(cmp=True, frozen=True)
@@ -89,6 +96,7 @@ class State:
         default=attr.Factory(new_env),
         convert=dict2env
     )
+
     prev_x: float = attr.ib(default=0, init=False)
     prev_y: float = attr.ib(default=0, init=False)
 
@@ -167,7 +175,7 @@ class State:
     def _next_function_call_userdefined(self, fn, rand):
         ret = []
         for ln in fn.body:
-            ret += self.next(ln, rand)
+            ret += self._next_tree(ln, rand, None)
         return ret
 
     def _next_function_call_once(self, tree, rand):  # -> List(Line)
@@ -210,7 +218,7 @@ class State:
         self.env[var_name] = op(self.env[var_name], val)
         return None
 
-    def next(self, tree, rand):  #: List(Tree)
+    def _next_tree(self, tree, rand, set_label):
         if type(tree) == FunctionCall:
             return self._next_function_call(tree, rand)
         elif type(tree) == Modify:
@@ -221,29 +229,59 @@ class State:
         elif type(tree) == FunctionDef:
             raise Exception(
                 "You defined a function but didn't call it: " + str(tree))
+        elif type(tree) == Label:
+            if set_label is not None:
+                set_label()
+            else:
+                raise Exception(
+                    "You cannot (yet?) define labels inside functions.")
+            return [None]
         else:
             raise Exception("Unknown tree type: " + str(tree))
 
 
+@attr.s
+class RunningProgram:
+    program: List = attr.ib(convert=list)
+    rand = attr.ib()
+
+    """
+    pc = program counter - the next instruction from program to run
+    label = the value to reset program counter to when we finish the program
+    """
+    pc: int = attr.ib(default=0, init=False)
+    label: int = attr.ib(default=0, init=False)
+
+    state: State = attr.ib(default=attr.Factory(State))
+
+    def set_label(self):
+        self.label = self.pc
+
+    def next(self) -> List:
+        if self.pc >= len(self.program):
+            self.pc = self.label
+        tree = self.program[self.pc]
+        self.pc += 1
+        return self.state._next_tree(tree, self.rand, self.set_label)
+
+
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
-    program = list(trees)
-    state = State()
+    prog = RunningProgram(trees, rand)
     non_frames = 0
     i = 0
     while n is None or i < n:
-        for statement in program:
-            commands = state.next(statement, rand)
-            for command in commands:
-                yield (command, attr.evolve(state))
-                if command is None:
-                    non_frames += 1
-                if command is not None or non_frames > 10:
-                    # Count how many frames (we add one after 10 blanks)
-                    i += 1
-                    non_frames = 0
-                if n is not None and i >= n:
-                    raise StopIteration()
+        commands = prog.next()
+        for command in commands:
+            yield (command, attr.evolve(prog.state))
+            if command is None:
+                non_frames += 1
+            if command is not None or non_frames > 10:
+                # Count how many frames (we add one after 10 blanks)
+                i += 1
+                non_frames = 0
+            if n is not None and i >= n:
+                raise StopIteration()
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]

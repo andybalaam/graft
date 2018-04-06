@@ -3,6 +3,7 @@ from graftlib.lex import (
     ContinuationToken,
     EndFunctionDefToken,
     FunctionCallToken,
+    LabelToken,
     NumberToken,
     OperatorToken,
     SeparatorToken,
@@ -19,6 +20,10 @@ def do_lex(chars: Iterable[str]):
 def test_symbol_is_lexed():
     assert do_lex("d") == [SymbolToken("d")]
     assert do_lex("_d") == [SymbolToken("_d")]
+
+
+def test_label_is_lexed():
+    assert do_lex("^") == [LabelToken()]
 
 
 def test_number_and_symbol_are_lexed_separately():

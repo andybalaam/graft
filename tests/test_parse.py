@@ -3,6 +3,7 @@ from graftlib.lex import lex
 from graftlib.parse import (
     FunctionCall,
     FunctionDef,
+    Label,
     Modify,
     Number,
     Symbol,
@@ -161,6 +162,42 @@ def test_semicolon_to_separate_statements():
         do_parse("s;s") ==
         [
             Symbol("s"),
+            Symbol("s"),
+        ]
+    )
+
+
+def test_MIGHT_BE_WRONG_semicolon_ends_unterminated_statement():
+    assert (
+        do_parse("3;s") ==
+        [
+            # Maybe we should return Number even though it's useless?
+            # Or maybe we should throw if a value is thrown away?
+            # Number("3"),
+            Symbol("s"),
+        ]
+    )
+
+
+def test_label_separates_statements():
+    assert (
+        do_parse("s^s") ==
+        [
+            Symbol("s"),
+            Label(),
+            Symbol("s"),
+        ]
+    )
+
+
+def test_MIGHT_BE_WRONG_label_ends_unterminated_statement():
+    assert (
+        do_parse("3^s") ==
+        [
+            # Maybe we should return Number even though it's useless?
+            # Or maybe we should throw if a value is thrown away?
+            # Number("3"),
+            Label(),
             Symbol("s"),
         ]
     )
