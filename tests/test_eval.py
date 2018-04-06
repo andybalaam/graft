@@ -295,3 +295,12 @@ def test_repeat_starts_at_label_if_present():
             [Line(Pt(0, -10), Pt(-10.0, -10.0))],
         ]
     )
+
+
+def test_fork_draws_lines_in_parallel():
+    assert (
+        do_eval(":F:S", 1) ==
+        [
+            [Line(Pt(0, 0), Pt(0, 10.0)), Line(Pt(0, 0), Pt(0, 10.0))],
+        ]
+    )

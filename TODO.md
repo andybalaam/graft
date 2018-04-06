@@ -1,12 +1,16 @@
 # Graft TODO
 
 ## Forking
-assert (
-    do_eval(":F~=_f;_f=d10d.+d:S", 1) ==
-    [
-        [Line(Pt(0, 0), Pt(0, 10.0)), Line(Pt(0, 0), Pr(10, 0))],
-    ]
-)
+
+* Partly done: `./graft ':F:F:R~=r10r^:R~+d+d:S'` kind of works
+* Ensure each line has a dot at the head
+* Fix problem with 2:F
+* Allow "None" for some strokes
+* Prevent forkbombs from killing us - this was enough:
+  `:F:F:F:F:F:F:F:F:F:F:F:F:F:F:F`, as was any :F within the loop
+* Figure out the "stuck wiggly" behaviour of e.g. i`./graft ':F:R~+d+d:S'
+  --frames=40`
+
 
 ## Later
 

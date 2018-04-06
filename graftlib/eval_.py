@@ -14,6 +14,9 @@ from graftlib.parse import (
 )
 
 
+max_parallel = 100
+
+
 @attr.s(cmp=True, frozen=True)
 class Pt:
     x: float = attr.ib()
@@ -59,11 +62,12 @@ def new_env() -> Dict[str, object]:
             "b": 0.0,    # blue  0-100 (and 0 to -100)
             "a": 100.0,  # alpha 0-100 (and 0 to -100)
             "z": 5.0,    # brush size
-            "S": BuiltInFn(Functions.step),
-            "J": BuiltInFn(Functions.jump),
-            "R": BuiltInFn(Functions.random),
             "D": BuiltInFn(Functions.dot),
+            "F": BuiltInFn(Functions.fork),
+            "J": BuiltInFn(Functions.jump),
             "L": BuiltInFn(Functions.line_to),
+            "R": BuiltInFn(Functions.random),
+            "S": BuiltInFn(Functions.step),
         }
     )
 
@@ -128,6 +132,7 @@ class State:
 class Functions:
     state: State = attr.ib()
     rand = attr.ib()
+    fork_callback = attr.ib()
 
     def step(self):
         th = self.state.theta()
@@ -167,6 +172,9 @@ class Functions:
     def random(self):
         return float(self.rand.__call__(-10, 10))
 
+    def fork(self):
+        self.fork_callback.__call__()
+
 
 _ops = {
     "=": lambda x, y: y,
@@ -185,10 +193,10 @@ def _operator_fn(opstr: str):
 
 
 class Evaluator:
-    def __init__(self, state, rand):
+    def __init__(self, state, rand, fork_callback):
         self.rand = rand
         self.state: State = state
-        self.functions: Functions = Functions(state, rand)
+        self.functions: Functions = Functions(state, rand, fork_callback)
 
     def _function_call_symbol(self, fn_name):
         if not self.state.has_variable(fn_name):
@@ -272,16 +280,30 @@ class Evaluator:
 
 
 class RunningProgram:
-    def __init__(self, program: List, rand):
+    def __init__(
+        self,
+        program: List,
+        rand,
+        fork_callback,
+        state=None,
+        evaluator=None,
+        pc=None,
+        label=None,
+    ):
         self.program: List = program
-        self.state: State = State()
-        self.evaluator = Evaluator(self.state, rand)
+        self.rand = rand
+        self.fork_callback = fork_callback
+        self.state: State = state if state else State()
+        self.evaluator = (
+            evaluator if evaluator else Evaluator(self.state, rand, self.fork)
+        )
+
         """
         pc = program counter - the next instruction from program to run
         label = the value to reset pc to when we finish the program
         """
-        self.pc = 0
-        self.label = 0
+        self.pc = pc if pc is not None else 0
+        self.label = label if label is not None else 0
 
     def set_label(self):
         self.label = self.pc
@@ -293,16 +315,35 @@ class RunningProgram:
         self.pc += 1
         return self.evaluator.statement(statement, self.set_label)
 
+    def fork(self):
+
+        new_state = attr.evolve(self.state)
+        new_evaluator = Evaluator(new_state, self.rand, self.fork)
+
+        self.fork_callback.__call__(
+            RunningProgram(
+                list(self.program),
+                self.rand,
+                self.fork,
+                new_state,
+                new_evaluator,
+                self.pc,
+                self.label,
+            )
+        )
+
 
 class MultipleRunningPrograms:
     def __init__(self, program: List, rand):
         # programs is a list of (RunningProgram, queue)
         # where queue is a list of commands already returned by that program,
         # waiting to be returned.
-        self.programs = [(RunningProgram(program, rand), [])]
+        self.programs = [(RunningProgram(program, rand, self.fork), [])]
+        self.new_programs = []
 
     def next(self):
         # Ensure each queue has at least 1 thing in it
+
         for prog, queue in self.programs:
             if len(queue) == 0:
                 queue.extend(prog.next())
@@ -311,7 +352,15 @@ class MultipleRunningPrograms:
         for prog, queue in self.programs:
             ret.append((queue.pop(0), attr.evolve(prog.state)))
 
+        self.programs.extend(self.new_programs)
+        self.new_programs = []
+        if len(self.programs) > max_parallel:
+            self.programs = self.programs[len(self.programs) - max_parallel:]
+
         return ret
+
+    def fork(self, cloned_running_program: RunningProgram):
+        self.new_programs.append((cloned_running_program, []))
 
 
 @attr.s
@@ -363,7 +412,6 @@ def eval_(program: Iterable, n: Optional[int], rand) -> Iterable:
     """
 
     for cmds_states in eval_debug(program, n, rand):
-        print(cmds_states)
         commands = [x[0] for x in cmds_states]
         if any(commands):
             yield commands

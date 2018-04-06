@@ -22,8 +22,13 @@ class Extents:
         self._y_max = -1_000_000.0
 
     def add_cmd(self, cmd):
+        if cmd is None:
+            return
+
         if type(cmd) == Elided:
-            return self.add_cmd(cmd.item)
+            self.add_cmd(cmd.item)
+            return
+
         if type(cmd) == Line:
             self.add(cmd.start)
             self.add(cmd.end)
@@ -32,8 +37,9 @@ class Extents:
 
     def train_on(self, commands, lookahead_steps):
         taken = list(itertools.islice(commands, lookahead_steps))
-        for cmd in taken:
-            self.add_cmd(cmd)
+        for parallel_cmds in taken:
+            for cmd in parallel_cmds:
+                self.add_cmd(cmd)
         return itertools.chain(taken, commands)
 
     def centre(self):

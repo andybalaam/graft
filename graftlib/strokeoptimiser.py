@@ -1,4 +1,4 @@
-from typing import Iterator, Set, Union
+from typing import Iterator, List, Set, Union
 import attr
 
 from graftlib.eval_ import Dot, Line
@@ -28,8 +28,14 @@ class StrokeOptimiser:
     def __iter__(self):
         return self
 
-    def __next__(self) -> Union[Line, Elided]:
-        st = round_stroke(next(self.strokes))
+    def __next__(self) -> List[Union[Line, Elided]]:
+        parallel_strokes = next(self.strokes)
+        return [self._elide_if_seen(stroke) for stroke in parallel_strokes]
+
+    def _elide_if_seen(self, stroke):
+        if stroke is None:
+            return stroke
+        st = round_stroke(stroke)
         if st in self.seen_strokes:
             return Elided(st)
         else:

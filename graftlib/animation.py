@@ -37,20 +37,23 @@ class Animation:
 
     def step(self):
         try:
-            command = next(self.commands)
-            if type(command) == Line:
-                self.pos = command.end
-                self.strokes.append(command)
-            elif type(command) == Dot:
-                self.pos = command.pos
-                self.strokes.append(command)
-            elif type(command) == Elided:
-                if type(command.item) == Line:
-                    self.pos = command.item.end
-                else:  # Dot
-                    self.pos = command.item.pos
-            else:
-                raise Exception("Unknown command: " + str(command))
+            parallel_commands = next(self.commands)
+            for command in parallel_commands:
+                if command is None:
+                    continue
+                if type(command) == Line:
+                    self.pos = command.end
+                    self.strokes.append(command)
+                elif type(command) == Dot:
+                    self.pos = command.pos
+                    self.strokes.append(command)
+                elif type(command) == Elided:
+                    if type(command.item) == Line:
+                        self.pos = command.item.end
+                    else:  # Dot
+                        self.pos = command.item.pos
+                else:
+                    raise Exception("Unknown command: " + str(command))
             self._prune()
             return True
         except StopIteration:

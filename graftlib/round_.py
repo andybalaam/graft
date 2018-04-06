@@ -42,7 +42,9 @@ def _round_dot(dot: Dot) -> Line:
 
 
 def round_stroke(item: Union[Line, Dot]):
-    if type(item) == Line:
+    if item is None:
+        return None
+    elif type(item) == Line:
         return _round_line(item)
     else:
         return _round_dot(item)
