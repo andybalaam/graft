@@ -300,17 +300,19 @@ class FramesCounter:
     non_frames: int = attr.ib(default=0, init=False)
     count: int = attr.ib(default=0, init=False)
 
-    def next_frame(self, command):
+    def next_frame(self, parallel_commands):
         """
         Raise StopIteration if we have done enough frames already
         """
 
+        is_real_frame = any(x[0] for x in parallel_commands)
+
         # Keep track of how many blank frames we have seen
-        if command is None:
+        if not is_real_frame:
             self.non_frames += 1
 
         # If we get a normal frame, or have seen 10 blank, increase the count
-        if command is not None or self.non_frames > 10:
+        if is_real_frame or self.non_frames > 10:
             self.count += 1
             self.non_frames = 0
 
@@ -319,16 +321,21 @@ class FramesCounter:
             raise StopIteration()
 
 
-#: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
+def _run_program(program: Iterable, rand) -> Iterable:
     prog = RunningProgram(program, rand)
-    frames_counter = FramesCounter(n)
     while True:
         # Run a line of code, and get back the animation frame(s) that result
         commands = prog.next()
         for command in commands:
             yield [(command, attr.evolve(prog.state))]
-            frames_counter.next_frame(command)
+
+
+#: Iterable[Tree], n -> Iterable[(Command, State)]
+def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
+    frames_counter = FramesCounter(n)
+    for parallel_commands in _run_program(program, rand):
+            yield parallel_commands
+            frames_counter.next_frame(parallel_commands)
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
