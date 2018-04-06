@@ -35,22 +35,6 @@ class Dot():
     size: float = attr.ib(default=5.0)
 
 
-_ops = {
-    "=": lambda x, y: y,
-    "+": operator.add,
-    "-": operator.sub,
-    "": operator.mul,
-    "/": operator.truediv,
-}
-
-
-def _operator_fn(opstr: str):
-    if opstr in _ops:
-        return _ops[opstr]
-    else:
-        raise Exception("Unknown operator '%s'." % opstr)
-
-
 @attr.s
 class BuiltInFn:
     fn = attr.ib()
@@ -184,13 +168,29 @@ class Functions:
         return float(self.rand(-10, 10))
 
 
+_ops = {
+    "=": lambda x, y: y,
+    "+": operator.add,
+    "-": operator.sub,
+    "": operator.mul,
+    "/": operator.truediv,
+}
+
+
+def _operator_fn(opstr: str):
+    if opstr in _ops:
+        return _ops[opstr]
+    else:
+        raise Exception("Unknown operator '%s'." % opstr)
+
+
 class Evaluator:
     def __init__(self, state, rand):
         self.rand = rand
         self.state: State = state
         self.functions: Functions = Functions(state, rand)
 
-    def _next_function_call_symbol(self, fn_name):
+    def _function_call_symbol(self, fn_name):
         if not self.state.has_variable(fn_name):
             raise Exception("Unknown function %s" % fn_name)
 
@@ -202,42 +202,44 @@ class Evaluator:
                 "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
             )
 
-    def _next_function_call_userdefined(self, fn):
+    def _function_call_userdefined(self, fn_def: FunctionDef) -> List:
         ret = []
-        for ln in fn.body:
-            ret += self._next_tree(ln, None)
+        for stmt in fn_def.body:
+            ret += self.statement(stmt, None)
         return ret
 
-    def _next_function_call_once(self, tree) -> List:
-        if type(tree.fn) == Symbol:
-            return [self._next_function_call_symbol(tree.fn.value)]
-        elif type(tree.fn) == FunctionDef:
-            return self._next_function_call_userdefined(tree.fn)
+    def _function_call_once(self, function_call_stmt: FunctionCall) -> List:
+        fn = function_call_stmt.fn
+        if type(fn) == Symbol:
+            return [self._function_call_symbol(fn.value)]
+        elif type(fn) == FunctionDef:
+            return self._function_call_userdefined(fn)
 
-    def _next_function_call(self, tree):
+    def _function_call(self, function_call_stmt: FunctionCall) -> List:
         ret = []
-        for _i in range(tree.repeat):
-            ret += self._next_function_call_once(tree)
+        for _i in range(function_call_stmt.repeat):
+            ret += self._function_call_once(function_call_stmt)
         return ret
 
-    def _eval_value(self, tree):
-        tree_type = type(tree)
-        if tree_type == Number:
-            return float(tree.value) * (-1.0 if tree.negative else 1.0)
-        elif tree_type == FunctionCall:
-            return self._next_function_call(tree)[0]
-        elif tree_type == Symbol:
-            return self.state.get_variable(tree.value)
+    def _value(self, value_expr):
+        type_ = type(value_expr)
+        if type_ == Number:
+            neg = -1.0 if value_expr.negative else 1.0
+            return float(value_expr.value) * neg
+        elif type_ == FunctionCall:
+            return self._function_call(value_expr)[0]
+        elif type_ == Symbol:
+            return self.state.get_variable(value_expr.value)
         else:
             raise Exception(
                 "I don't know how to evaluate a value like %s." %
-                str(tree)
+                str(value_expr)
             )
 
-    def _next_modify(self, tree):
-        var_name = tree.sym
-        val = self._eval_value(tree.value)
-        op = _operator_fn(tree.op)
+    def _modify(self, modify_stmt: Modify):
+        var_name = modify_stmt.sym
+        val = self._value(modify_stmt.value)
+        op = _operator_fn(modify_stmt.op)
 
         self.state.set_variable(
             var_name,
@@ -246,26 +248,27 @@ class Evaluator:
 
         return None
 
-    def _next_tree(self, tree, set_label):
-        if type(tree) == FunctionCall:
-            return self._next_function_call(tree)
-        elif type(tree) == Modify:
-            self._next_modify(tree)
+    def statement(self, statement, set_label):
+        stmt_type = type(statement)
+        if stmt_type == FunctionCall:
+            return self._function_call(statement)
+        elif stmt_type == Modify:
+            self._modify(statement)
             return [None]
-        elif type(tree) == Symbol:
+        elif stmt_type == Symbol:
             return [None]
-        elif type(tree) == FunctionDef:
-            raise Exception(
-                "You defined a function but didn't call it: " + str(tree))
-        elif type(tree) == Label:
+        elif stmt_type == Label:
             if set_label is not None:
                 set_label()
+                return [None]
             else:
                 raise Exception(
                     "You cannot (yet?) define labels inside functions.")
-            return [None]
+        elif stmt_type == FunctionDef:
+            raise Exception(
+                "You defined a function but didn't call it: " + str(statement))
         else:
-            raise Exception("Unknown tree type: " + str(tree))
+            raise Exception("Unknown statement type: " + str(statement))
 
 
 class RunningProgram:
@@ -288,7 +291,7 @@ class RunningProgram:
             self.pc = self.label
         statement = self.program[self.pc]
         self.pc += 1
-        return self.evaluator._next_tree(statement, self.set_label)
+        return self.evaluator.statement(statement, self.set_label)
 
 
 @attr.s
