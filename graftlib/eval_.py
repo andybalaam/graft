@@ -240,19 +240,17 @@ class State:
             raise Exception("Unknown tree type: " + str(tree))
 
 
-@attr.s
 class RunningProgram:
-    program: List = attr.ib(convert=list)
-    rand = attr.ib()
-
-    """
-    pc = program counter - the next instruction from program to run
-    label = the value to reset program counter to when we finish the program
-    """
-    pc: int = attr.ib(default=0, init=False)
-    label: int = attr.ib(default=0, init=False)
-
-    state: State = attr.ib(default=attr.Factory(State))
+    def __init__(self, program: Iterable, rand):
+        self.program: List = list(program)
+        self.rand = rand
+        self.state = State()
+        """
+        pc = program counter - the next instruction from program to run
+        label = the value to reset pc to when we finish the program
+        """
+        self.pc = 0
+        self.label = 0
 
     def set_label(self):
         self.label = self.pc
