@@ -260,9 +260,9 @@ class RunningProgram:
     def next(self) -> List:
         if self.pc >= len(self.program):
             self.pc = self.label
-        tree = self.program[self.pc]
+        statement = self.program[self.pc]
         self.pc += 1
-        return self.state._next_tree(tree, self.rand, self.set_label)
+        return self.state._next_tree(statement, self.rand, self.set_label)
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
