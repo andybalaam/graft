@@ -75,11 +75,11 @@ def new_env() -> Dict[str, object]:
             "b": 0.0,    # blue  0-100 (and 0 to -100)
             "a": 100.0,  # alpha 0-100 (and 0 to -100)
             "z": 5.0,    # brush size
-            "S": BuiltInFn(State.fn_step),
-            "J": BuiltInFn(State.fn_jump),
-            "R": BuiltInFn(State.fn_random),
-            "D": BuiltInFn(State.fn_dot),
-            "L": BuiltInFn(State.fn_line_to),
+            "S": BuiltInFn(Functions.step),
+            "J": BuiltInFn(Functions.jump),
+            "R": BuiltInFn(Functions.random),
+            "D": BuiltInFn(Functions.dot),
+            "L": BuiltInFn(Functions.line_to),
         }
     )
 
@@ -125,104 +125,132 @@ class State:
     def brush_size(self) -> float:
         return self.env["z"]
 
-    def fn_step(self, _rand):
-        th = self._theta()
-        s = self.step()
-        old_pos = self.pos()
+    def set_variable(self, name, value):
+        # x and y are magic variables that remember their previous values
+        if name == "x":
+            self.prev_x = self.env["x"]
+        elif name == "y":
+            self.prev_y = self.env["y"]
+        self.env[name] = value
+
+    def get_variable(self, name):
+        return self.env[name]
+
+    def has_variable(self, name):
+        return name in self.env
+
+
+@attr.s
+class Functions:
+    state: State = attr.ib()
+    rand = attr.ib()
+
+    def step(self):
+        th = self.state._theta()
+        s = self.state.step()
+        old_pos = self.state.pos()
         new_pos = Pt(
             old_pos.x + s * math.sin(th),
             old_pos.y + s * math.cos(th),
         )
-        self.set_pos(new_pos)
+        self.state.set_pos(new_pos)
         return Line(
             old_pos,
             new_pos,
-            color=self.color(),
-            size=self.brush_size()
+            color=self.state.color(),
+            size=self.state.brush_size()
         )
 
-    def fn_dot(self, _rand):
-        return Dot(self.pos(), self.color(), self.brush_size())
+    def dot(self):
+        return Dot(
+            self.state.pos(),
+            self.state.color(),
+            self.state.brush_size()
+        )
 
-    def fn_line_to(self, _rand):
+    def line_to(self):
         return Line(
-            self.prev_pos(),
-            self.pos(),
-            color=self.color(),
-            size=self.brush_size(),
+            self.state.prev_pos(),
+            self.state.pos(),
+            color=self.state.color(),
+            size=self.state.brush_size(),
         )
 
-    def fn_jump(self, _rand):
-        self.fn_step(_rand)
+    def jump(self):
+        self.step()
         return None
 
-    def fn_random(self, rand):
-        return float(rand(-10, 10))
+    def random(self):
+        return float(self.rand(-10, 10))
 
-    def _next_function_call_symbol(self, fn_name, rand):
 
-        if fn_name not in self.env:
+class Evaluator:
+    def __init__(self, state, rand):
+        self.rand = rand
+        self.state: State = state
+        self.functions: Functions = Functions(state, rand)
+
+    def _next_function_call_symbol(self, fn_name):
+        if not self.state.has_variable(fn_name):
             raise Exception("Unknown function %s" % fn_name)
 
-        fnwrap = self.env[fn_name]
+        fnwrap = self.state.get_variable(fn_name)
         if type(fnwrap) == BuiltInFn:
-            return fnwrap.fn.__get__(self)(rand)
+            return fnwrap.fn.__get__(self.functions)()
         else:
             raise Exception(
                 "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
             )
 
-    def _next_function_call_userdefined(self, fn, rand):
+    def _next_function_call_userdefined(self, fn):
         ret = []
         for ln in fn.body:
-            ret += self._next_tree(ln, rand, None)
+            ret += self._next_tree(ln, None)
         return ret
 
-    def _next_function_call_once(self, tree, rand):  # -> List(Line)
+    def _next_function_call_once(self, tree) -> List:
         if type(tree.fn) == Symbol:
-            return [self._next_function_call_symbol(tree.fn.value, rand)]
+            return [self._next_function_call_symbol(tree.fn.value)]
         elif type(tree.fn) == FunctionDef:
-            return self._next_function_call_userdefined(tree.fn, rand)
+            return self._next_function_call_userdefined(tree.fn)
 
-    def _next_function_call(self, tree, rand):
+    def _next_function_call(self, tree):
         ret = []
         for _i in range(tree.repeat):
-            ret += self._next_function_call_once(tree, rand)
+            ret += self._next_function_call_once(tree)
         return ret
 
-    def _eval_value(self, tree, rand):
+    def _eval_value(self, tree):
         tree_type = type(tree)
         if tree_type == Number:
             return float(tree.value) * (-1.0 if tree.negative else 1.0)
         elif tree_type == FunctionCall:
-            return self._next_function_call(tree, rand)[0]
+            return self._next_function_call(tree)[0]
         elif tree_type == Symbol:
-            return self.env[tree.value]
+            return self.state.get_variable(tree.value)
         else:
             raise Exception(
                 "I don't know how to evaluate a value like %s." %
                 str(tree)
             )
 
-    def _next_modify(self, tree, rand):
+    def _next_modify(self, tree):
         var_name = tree.sym
-        val = self._eval_value(tree.value, rand)
+        val = self._eval_value(tree.value)
         op = _operator_fn(tree.op)
 
-        # x and y are magic variables that remember their previous values
-        if var_name == "x":
-            self.prev_x = self.env["x"]
-        elif var_name == "y":
-            self.prev_y = self.env["y"]
+        self.state.set_variable(
+            var_name,
+            op(self.state.get_variable(var_name), val)
+        )
 
-        self.env[var_name] = op(self.env[var_name], val)
         return None
 
-    def _next_tree(self, tree, rand, set_label):
+    def _next_tree(self, tree, set_label):
         if type(tree) == FunctionCall:
-            return self._next_function_call(tree, rand)
+            return self._next_function_call(tree)
         elif type(tree) == Modify:
-            self._next_modify(tree, rand)
+            self._next_modify(tree)
             return [None]
         elif type(tree) == Symbol:
             return [None]
@@ -243,8 +271,8 @@ class State:
 class RunningProgram:
     def __init__(self, program: Iterable, rand):
         self.program: List = list(program)
-        self.rand = rand
-        self.state = State()
+        self.state: State = State()
+        self.evaluator = Evaluator(self.state, rand)
         """
         pc = program counter - the next instruction from program to run
         label = the value to reset pc to when we finish the program
@@ -260,7 +288,7 @@ class RunningProgram:
             self.pc = self.label
         statement = self.program[self.pc]
         self.pc += 1
-        return self.state._next_tree(statement, self.rand, self.set_label)
+        return self.evaluator._next_tree(statement, self.set_label)
 
 
 @attr.s
