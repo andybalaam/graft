@@ -265,23 +265,41 @@ class RunningProgram:
         return self.state._next_tree(statement, self.rand, self.set_label)
 
 
+@attr.s
+class FramesCounter:
+    max_count: int = attr.ib()
+    non_frames: int = attr.ib(default=0, init=False)
+    count: int = attr.ib(default=0, init=False)
+
+    def next_frame(self, command):
+        """
+        Raise StopIteration if we have done enough frames already
+        """
+
+        # Keep track of how many blank frames we have seen
+        if command is None:
+            self.non_frames += 1
+
+        # If we get a normal frame, or have seen 10 blank, increase the count
+        if command is not None or self.non_frames > 10:
+            self.count += 1
+            self.non_frames = 0
+
+        # If we have gone over the max, raise a StopIteration
+        if self.max_count is not None and self.count >= self.max_count:
+            raise StopIteration()
+
+
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
     prog = RunningProgram(program, rand)
-    non_frames = 0
-    i = 0
+    frames_counter = FramesCounter(n)
     while True:
+        # Run a line of code, and get back the animation frame(s) that result
         commands = prog.next()
         for command in commands:
             yield (command, attr.evolve(prog.state))
-            if command is None:
-                non_frames += 1
-            if command is not None or non_frames > 10:
-                # Count how many frames (we add one after 10 blanks)
-                i += 1
-                non_frames = 0
-            if n is not None and i >= n:
-                raise StopIteration()
+            frames_counter.next_frame(command)
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
