@@ -266,8 +266,8 @@ class RunningProgram:
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
-    prog = RunningProgram(trees, rand)
+def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
+    prog = RunningProgram(program, rand)
     non_frames = 0
     i = 0
     while n is None or i < n:
@@ -285,7 +285,7 @@ def eval_debug(trees: Iterable, n: Optional[int], rand) -> Iterable:
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_(trees: Iterable, n: Optional[int], rand) -> Iterable:
+def eval_(program: Iterable, n: Optional[int], rand) -> Iterable:
     """
     Run the supplied program n times, or for ever if n is None.
     """
@@ -294,6 +294,6 @@ def eval_(trees: Iterable, n: Optional[int], rand) -> Iterable:
         lambda x: x is not None,
         map(
             lambda x: x[0],
-            eval_debug(trees, n, rand),
+            eval_debug(program, n, rand),
         ),
     )
