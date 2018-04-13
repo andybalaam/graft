@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from typing import Iterable, List, Union
 import typing
 
 from graftlib.eval_ import Dot, Pt, Line
@@ -13,7 +13,7 @@ List = typing.List  # Silence pylint
 class Animation:
     def __init__(
             self,
-            commands: Iterable,
+            commands: Iterable[List[Union[Dot, Line, Elided]]],
             delete_listener,
             lookahead_steps,
             max_strokes,

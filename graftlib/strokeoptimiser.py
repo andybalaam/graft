@@ -19,7 +19,7 @@ class StrokeOptimiser:
     stroke, we emit an Elided instead.
     """
 
-    strokes: Iterator = attr.ib()
+    strokes: List[Union[Dot, Line]] = attr.ib()
 
     seen_strokes: Set[Union[Dot, Line]] = (
         attr.ib(attr.Factory(set), init=False)
@@ -28,11 +28,11 @@ class StrokeOptimiser:
     def __iter__(self):
         return self
 
-    def __next__(self) -> List[Union[Line, Elided]]:
-        parallel_strokes = next(self.strokes)
+    def __next__(self) -> List[Union[Dot, Line, Elided]]:
+        parallel_strokes: List[Union[Dot, Line]] = next(self.strokes)
         return [self._elide_if_seen(stroke) for stroke in parallel_strokes]
 
-    def _elide_if_seen(self, stroke):
+    def _elide_if_seen(self, stroke: Union[Dot, Line]):
         if stroke is None:
             return stroke
         st = round_stroke(stroke)

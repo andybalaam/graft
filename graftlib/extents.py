@@ -1,8 +1,9 @@
+from typing import Iterable, List, Set, Union
 import itertools
 import attr
 
 from graftlib.strokeoptimiser import Elided
-from graftlib.eval_ import Line, Pt
+from graftlib.eval_ import Dot, Line, Pt
 
 
 @attr.s
@@ -35,7 +36,11 @@ class Extents:
         else:  # Dot
             self.add(cmd.pos)
 
-    def train_on(self, commands, lookahead_steps):
+    def train_on(
+        self,
+        commands: Iterable[List[Union[Dot, Line, Elided]]],
+        lookahead_steps,
+    ):
         taken = list(itertools.islice(commands, lookahead_steps))
         for parallel_cmds in taken:
             for cmd in parallel_cmds:
