@@ -158,6 +158,10 @@ def test_turn_random_and_move():
     assert do_eval(":R~+d:S", n=1, rand=r) == [[Line(Pt(0, 0), Pt(10, 0))]]
 
 
+def test_bare_number_does_nothing():
+    assert do_eval("3", n=1) == []
+
+
 def test_bare_random_does_nothing():
     def r(_a, _b):
         return 90

@@ -271,6 +271,8 @@ class Evaluator:
             return [None]
         elif stmt_type == Symbol:
             return [None]
+        elif stmt_type == Number:
+            return [None]
         elif stmt_type == Label:
             if set_label is not None:
                 set_label()

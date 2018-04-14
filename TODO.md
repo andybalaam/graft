@@ -14,6 +14,7 @@
 
 ## Later
 
+* Warning when you throw away a value?
 * Line and character numbers in lex/parse/eval errors
 * Original code you typed in lex/parse/eval errors
 * Make GIF generate with interesting first image
