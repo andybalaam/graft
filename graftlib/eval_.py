@@ -340,6 +340,10 @@ class RunningProgram:
         )
 
 
+def empty(queue: List) -> bool:
+    return len(queue) == 0
+
+
 class MultipleRunningPrograms:
     def __init__(self, program: List, rand, max_parallel: int):
         # programs is a list of (RunningProgram, queue)
@@ -353,7 +357,7 @@ class MultipleRunningPrograms:
         # Ensure each queue has at least 1 thing in it
 
         for prog, queue in self.programs:
-            if len(queue) == 0:
+            if empty(queue):
                 queue.extend(prog.next())
 
         ret = []
