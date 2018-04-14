@@ -25,20 +25,20 @@ def test_colours_are_modulod_to_within_minus_100_100():
 
 
 def test_distinct_strokes_are_preserved():
-    bef = [[n(p(0.12, 0.56), p(0.5, 0.91)), n(p(2.31, 1.4), p(0.5, 0.91))]]
-    aft = [[n(p(0.1, 0.6), p(0.5, 0.9)), n(p(2.3, 1.4), p(0.5, 0.9))]]
+    bef = [[n(p(0.12, 0.56), p(0.5, 0.91))], [n(p(2.31, 1.4), p(0.5, 0.91))]]
+    aft = [[n(p(0.1, 0.6), p(0.5, 0.9))], [n(p(2.3, 1.4), p(0.5, 0.9))]]
     assert opt(bef) == aft
 
 
 def test_strokes_identical_after_rounding_are_elided():
-    bef = [[n(p(0.12, 0.56), p(0.5, 0.91)), n(p(0.09, 0.61), p(0.46, 0.91))]]
-    aft = [[n(p(0.1, 0.6), p(0.5, 0.9)), e(n(p(0.1, 0.6), p(0.5, 0.9)))]]
+    bef = [[n(p(0.12, 0.56), p(0.5, 0.91))], [n(p(0.09, 0.61), p(0.46, 0.91))]]
+    aft = [[n(p(0.1, 0.6), p(0.5, 0.9))], [e(n(p(0.1, 0.6), p(0.5, 0.9)))]]
     assert opt(bef) == aft
 
 
 def test_dots_identical_after_rounding_are_elided():
-    bef = [[d(p(0.12, 0.56)), d(p(0.09, 0.61))]]
-    aft = [[d(p(0.1, 0.6)), e(d(p(0.1, 0.6)))]]
+    bef = [[d(p(0.12, 0.56))], [d(p(0.09, 0.61))]]
+    aft = [[d(p(0.1, 0.6))], [e(d(p(0.1, 0.6)))]]
     assert opt(bef) == aft
 
 
@@ -120,3 +120,37 @@ def test_strokes_that_were_removed_from_optimiser_do_not_cause_elision():
             [e(n(p(3, 3), p(3, 3)))],  # Elided because it was never deleted.
         ]
     )
+
+
+def test_distinct_parallel_strokes_are_preserved():
+    bef = [[n(p(0.12, 0.56), p(0.5, 0.91)), n(p(2.31, 1.4), p(0.5, 0.91))]]
+    aft = [[n(p(0.1, 0.6), p(0.5, 0.9)), n(p(2.3, 1.4), p(0.5, 0.9))]]
+    assert opt(bef) == aft
+
+
+def test_parallel_strokes_identical_after_rounding_are_elided():
+    bef = [[n(p(0.12, 0.56), p(0.5, 0.91)), n(p(0.09, 0.61), p(0.46, 0.91))]]
+    aft = [[n(p(0.1, 0.6), p(0.5, 0.9)), e(n(p(0.1, 0.6), p(0.5, 0.9)))]]
+    assert opt(bef) == aft
+
+
+def test_parallel_dots_identical_after_rounding_are_elided():
+    bef = [[d(p(0.12, 0.56)), d(p(0.09, 0.61))]]
+    aft = [[d(p(0.1, 0.6)), e(d(p(0.1, 0.6)))]]
+    assert opt(bef) == aft
+
+
+def test_identical_strokes_from_different_parallel_streams_are_elided():
+    a = n(p(0.1, 0.6), p(0.5, 0.9))
+    x = n(p(0, 0), p(1, 1))
+    y = n(p(2, 2), p(3, 3))
+
+    bef = [
+        [a, x],
+        [y, a]
+    ]
+    aft = [
+        [a, x],
+        [y, e(a)]
+    ]
+    assert opt(bef) == aft
