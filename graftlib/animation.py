@@ -7,9 +7,6 @@ from graftlib.extents import Extents
 from graftlib.windowanimator import WindowAnimator
 
 
-List = typing.List  # Silence pylint
-
-
 class Animation:
     def __init__(
             self,

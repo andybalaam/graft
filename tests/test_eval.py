@@ -43,14 +43,14 @@ def round_debug(strokes: Iterable[List[Tuple[Optional[Line], State]]]) -> (
         ]
 
 
-def do_eval(chars: Iterable[str], n: int, rand=None):
-    return list(round_strokes(eval_(parse(lex(chars)), n, rand)))
+def do_eval(chars: Iterable[str], n: int, rand=None, max_parallel=10):
+    return list(round_strokes(eval_(parse(lex(chars)), n, rand, max_parallel)))
 
 
-def do_eval_debug(chars: Iterable[str], n: int, rand=None):
+def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_parallel=10):
     return list(
         itertools.islice(
-            round_debug(eval_debug(parse(lex(chars)), n, rand)),
+            round_debug(eval_debug(parse(lex(chars)), n, rand, max_parallel)),
             0,
             n
         )
@@ -307,11 +307,7 @@ def test_fork_draws_lines_in_parallel():
 
 
 def test_fork_increments_the_f_variable():
-    expected_state_0 = State()
-    expected_state_1 = State()
-    expected_state_1.set_variable("f", 1)
     result = do_eval_debug(":F0+d", 2)  # Fork, then add zero to d
-    print(result)
 
     assert len(result) == 2
     assert len(result[1]) == 2
@@ -319,3 +315,12 @@ def test_fork_increments_the_f_variable():
     state_1 = result[1][1][1]
     assert state_0.get_variable("f") == 0
     assert state_1.get_variable("f") == 1
+
+
+def test_forking_at_fork_limit_continues_moving():
+    result = do_eval_debug(":F:S", n=4, rand=None, max_parallel=1)
+    # There is only one fork because max_parallel==1
+    assert len(result[1]) == 1
+
+    # The fork ID increased, so we are seeing the new fork
+    assert result[1][0][1].get_variable("f") == 1

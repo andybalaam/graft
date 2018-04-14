@@ -14,9 +14,6 @@ from graftlib.parse import (
 )
 
 
-max_parallel = 100
-
-
 @attr.s(cmp=True, frozen=True)
 class Pt:
     x: float = attr.ib()
@@ -289,14 +286,14 @@ class Evaluator:
 
 class RunningProgram:
     def __init__(
-        self,
-        program: List,
-        rand,
-        fork_callback,
-        state=None,
-        evaluator=None,
-        pc=None,
-        label=None,
+            self,
+            program: List,
+            rand,
+            fork_callback,
+            state=None,
+            evaluator=None,
+            pc=None,
+            label=None,
     ):
         self.program: List = program
         self.rand = rand
@@ -343,11 +340,12 @@ class RunningProgram:
 
 
 class MultipleRunningPrograms:
-    def __init__(self, program: List, rand):
+    def __init__(self, program: List, rand, max_parallel: int):
         # programs is a list of (RunningProgram, queue)
         # where queue is a list of commands already returned by that program,
         # waiting to be returned.
         self.programs = [(RunningProgram(program, rand, self.fork), [])]
+        self.max_parallel = max_parallel
         self.new_programs = []
 
     def next(self):
@@ -363,8 +361,10 @@ class MultipleRunningPrograms:
 
         self.programs.extend(self.new_programs)
         self.new_programs = []
-        if len(self.programs) > max_parallel:
-            self.programs = self.programs[len(self.programs) - max_parallel:]
+        if len(self.programs) > self.max_parallel:
+            self.programs = self.programs[
+                len(self.programs) - self.max_parallel:
+            ]
 
         return ret
 
@@ -399,28 +399,33 @@ class FramesCounter:
             raise StopIteration()
 
 
-def _run_program(program: Iterable, rand) -> Iterable:
-    progs = MultipleRunningPrograms(list(program), rand)
+def _run_program(program: Iterable, rand, max_parallel) -> Iterable:
+    progs = MultipleRunningPrograms(list(program), rand, max_parallel)
     while True:
         # Run a line of code, and get back the animation frame(s) that result
         yield progs.next()
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_debug(program: Iterable, n: Optional[int], rand) -> Iterable:
+def eval_debug(
+        program: Iterable,
+        n: Optional[int],
+        rand,
+        max_parallel
+) -> Iterable:
     frames_counter = FramesCounter(n)
-    for parallel_commands in _run_program(program, rand):
+    for parallel_commands in _run_program(program, rand, max_parallel):
         yield parallel_commands
         frames_counter.next_frame(parallel_commands)
 
 
 #: Iterable[Tree], n -> Iterable[(Command, State)]
-def eval_(program: Iterable, n: Optional[int], rand) -> Iterable:
+def eval_(program: Iterable, n: Optional[int], rand, max_parallel) -> Iterable:
     """
     Run the supplied program n times, or for ever if n is None.
     """
 
-    for cmds_states in eval_debug(program, n, rand):
+    for cmds_states in eval_debug(program, n, rand, max_parallel):
         commands = [x[0] for x in cmds_states]
         if any(commands):
             yield commands

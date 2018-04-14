@@ -45,14 +45,16 @@ def main_gtk3(animation: Animation, image_size: Tuple[int, int]) -> int:
     return Gtk3Ui(animation, image_size).run()
 
 
-def make_animation(program: str, frames: Optional[int], rand):
+def make_animation(program: str, frames: Optional[int], rand, max_parallel):
     """
     Given a program, return an iterator that lexes, parses,
     evaluates and optimises it, yielding actual strokes to draw on
     the screen, limited to the number of frames supplied, and using
     the random number generator supplied.
     """
-    opt = StrokeOptimiser(eval_(parse(lex(program)), frames, rand))
+    opt = StrokeOptimiser(
+        eval_(parse(lex(program)), frames, rand, max_parallel)
+    )
     return Animation(opt, opt, lookahead_steps, max_strokes, dot_size)
 
 
@@ -100,7 +102,15 @@ def main(world: World) -> int:
     args = argparser.parse_args(world.argv[1:])
 
     frames = None if args.frames < 0 else args.frames
-    animation = make_animation(args.program, frames, world.random.uniform)
+
+    max_parallel = 100
+
+    animation = make_animation(
+        args.program,
+        frames,
+        world.random.uniform,
+        max_parallel
+    )
     image_size = (args.width, args.height)
 
     if args.gif:

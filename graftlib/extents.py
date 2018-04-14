@@ -1,4 +1,4 @@
-from typing import Iterable, List, Set, Union
+from typing import Iterable, List, Union
 import itertools
 import attr
 
@@ -37,9 +37,9 @@ class Extents:
             self.add(cmd.pos)
 
     def train_on(
-        self,
-        commands: Iterable[List[Union[Dot, Line, Elided]]],
-        lookahead_steps,
+            self,
+            commands: Iterable[List[Union[Dot, Line, Elided]]],
+            lookahead_steps,
     ):
         taken = list(itertools.islice(commands, lookahead_steps))
         for parallel_cmds in taken:

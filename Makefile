@@ -15,7 +15,7 @@ setup:
 
 
 test:
-	pytest-3 -vv
+	pytest-3 --pep8 -vv
 
 
 test-full:
