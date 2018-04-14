@@ -53,6 +53,7 @@ def new_env() -> Dict[str, object]:
     return defaultdict(
         zero,
         {
+            "f": 0,      # Fork ID
             "x": 0.0,    # x coord
             "y": 0.0,    # y coord
             "d": 0.0,    # direction in degrees
@@ -112,6 +113,13 @@ class State:
 
     def brush_size(self) -> float:
         return self.env["z"]
+
+    def inc_fork_id(self):
+        try:
+            current_id = int(self.env["f"])
+        except ValueError:
+            current_id = 0
+        self.env["f"] = current_id + 1
 
     def set_variable(self, name, value):
         # x and y are magic variables that remember their previous values
@@ -318,6 +326,7 @@ class RunningProgram:
     def fork(self):
 
         new_state = attr.evolve(self.state)
+        new_state.inc_fork_id()
         new_evaluator = Evaluator(new_state, self.rand, self.fork)
 
         self.fork_callback.__call__(

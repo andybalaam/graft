@@ -304,3 +304,18 @@ def test_fork_draws_lines_in_parallel():
             [Line(Pt(0, 0), Pt(0, 10.0)), Line(Pt(0, 0), Pt(0, 10.0))],
         ]
     )
+
+
+def test_fork_increments_the_f_variable():
+    expected_state_0 = State()
+    expected_state_1 = State()
+    expected_state_1.set_variable("f", 1)
+    result = do_eval_debug(":F0+d", 2)  # Fork, then add zero to d
+    print(result)
+
+    assert len(result) == 2
+    assert len(result[1]) == 2
+    state_0 = result[1][0][1]
+    state_1 = result[1][1][1]
+    assert state_0.get_variable("f") == 0
+    assert state_1.get_variable("f") == 1
