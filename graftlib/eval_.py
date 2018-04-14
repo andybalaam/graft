@@ -176,6 +176,7 @@ class Functions:
 
     def random(self):
         return float(self.rand.__call__(-10, 10))
+        # TODO: return Number
 
     def fork(self):
         self.fork_callback.__call__()
