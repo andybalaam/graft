@@ -30,7 +30,6 @@ class StrokeOptimiser:
 
     def __next__(self) -> List[Union[Dot, Line, Elided]]:
         parallel_strokes: List[Union[Dot, Line]] = next(self.strokes)
-        print("Xx " + str(parallel_strokes))
         return [self._elide_if_seen(stroke) for stroke in parallel_strokes]
 
     def _elide_if_seen(self, stroke: Union[Dot, Line]):

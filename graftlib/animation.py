@@ -1,5 +1,4 @@
 from typing import Iterable, List, Union
-import typing
 
 from graftlib.eval_ import Dot, Pt, Line
 from graftlib.strokeoptimiser import Elided
