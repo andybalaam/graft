@@ -158,6 +158,12 @@ def test_turn_random_and_move():
     assert do_eval(":R~+d:S", n=1, rand=r) == [[Line(Pt(0, 0), Pt(10, 0))]]
 
 
+def test_bare_random_does_nothing():
+    def r(_a, _b):
+        return 90
+    assert do_eval(":R", n=1, rand=r) == []
+
+
 def test_draw_in_different_colour():
     assert (
         do_eval("0.9=r0.5=g0.1=b0.5=a:S0.1=a:S", 2) ==

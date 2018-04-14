@@ -285,6 +285,15 @@ class Evaluator:
             raise Exception("Unknown statement type: " + str(statement))
 
 
+def strip_non_strokes(maybe_strokes):
+    def sns(maybe_stroke):
+        if type(maybe_stroke) in (Line, Dot):
+            return maybe_stroke
+        else:
+            return None
+    return [sns(item) for item in maybe_strokes]
+
+
 class RunningProgram:
     def __init__(
             self,
@@ -319,7 +328,9 @@ class RunningProgram:
             self.pc = self.label
         statement = self.program[self.pc]
         self.pc += 1
-        return self.evaluator.statement(statement, self.set_label)
+        return strip_non_strokes(
+            self.evaluator.statement(statement, self.set_label)
+        )
 
     def fork(self):
 
