@@ -316,21 +316,39 @@ def test_fork_draws_lines_in_parallel():
     )
 
 
-def test_fork_increments_the_f_variable():
-    result = do_eval_debug(":F0+d", 2)  # Fork, then add zero to d
+def fork_ids(debug_time_step):
+    return [
+        state.get_variable("f") for _, state in debug_time_step
+    ]
 
+
+def test_fork_increments_the_fork_id():
+    result = do_eval_debug(":F+d:F+d", 4)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [0, 1]
+    assert fork_ids(result[2]) == [0, 1]
+    assert fork_ids(result[3]) == [0, 1, 2, 3]
+    assert len(result) == 4
+
+
+def test_forking_at_fork_limit_increases_fork_id():
+    result = do_eval_debug(":F+d:F+d", n=4, rand=None, max_parallel=2)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [0, 1]
+    assert fork_ids(result[2]) == [0, 1]
+    assert fork_ids(result[3]) == [2, 3]  # More forks, but old ones are gone
+    assert len(result) == 4
+
+
+def test_fork_repeated_creates_multiple_forks():
+    result = do_eval_debug("5:F+d", n=2)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [0, 1, 2, 3, 4, 5]
     assert len(result) == 2
-    assert len(result[1]) == 2
-    state_0 = result[1][0][1]
-    state_1 = result[1][1][1]
-    assert state_0.get_variable("f") == 0
-    assert state_1.get_variable("f") == 1
 
 
-def test_forking_at_fork_limit_continues_moving():
-    result = do_eval_debug(":F:S", n=4, rand=None, max_parallel=1)
-    # There is only one fork because max_parallel==1
-    assert len(result[1]) == 1
-
-    # The fork ID increased, so we are seeing the new fork
-    assert result[1][0][1].get_variable("f") == 1
+def test_fork_repeated_past_fork_limit_gets_max_fork_id():
+    result = do_eval_debug("5:F+d", n=2, rand=None, max_parallel=1)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [5]
+    assert len(result) == 2

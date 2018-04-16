@@ -111,12 +111,8 @@ class State:
     def brush_size(self) -> float:
         return self.env["z"]
 
-    def inc_fork_id(self):
-        try:
-            current_id = int(self.env["f"])
-        except ValueError:
-            current_id = 0
-        self.env["f"] = current_id + 1
+    def set_fork_id(self, new_id):
+        self.env["f"] = new_id
 
     def set_variable(self, name, value):
         # x and y are magic variables that remember their previous values
@@ -337,7 +333,6 @@ class RunningProgram:
     def fork(self):
 
         new_state = attr.evolve(self.state)
-        new_state.inc_fork_id()
         new_evaluator = Evaluator(new_state, self.rand, self.fork)
 
         self.fork_callback.__call__(
@@ -365,6 +360,11 @@ class MultipleRunningPrograms:
         self.programs = [(RunningProgram(program, rand, self.fork), [])]
         self.max_parallel = max_parallel
         self.new_programs = []
+        self._fork_id_counter = 0
+
+    def next_fork_id(self):
+        self._fork_id_counter += 1
+        return self._fork_id_counter
 
     def next(self):
         # Ensure each queue has at least 1 thing in it
@@ -387,6 +387,7 @@ class MultipleRunningPrograms:
         return ret
 
     def fork(self, cloned_running_program: RunningProgram):
+        cloned_running_program.state.set_fork_id(self.next_fork_id())
         self.new_programs.append((cloned_running_program, []))
 
 
