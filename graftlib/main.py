@@ -55,7 +55,10 @@ def make_animation(program: str, frames: Optional[int], rand, max_parallel):
     opt = StrokeOptimiser(
         eval_(parse(lex(program)), frames, rand, max_parallel)
     )
-    return Animation(opt, opt, lookahead_steps, max_strokes, dot_size)
+    lookahead = (
+        lookahead_steps if frames is None else min(frames, lookahead_steps)
+    )
+    return Animation(opt, opt, lookahead, max_strokes, dot_size)
 
 
 def main(world: World) -> int:
