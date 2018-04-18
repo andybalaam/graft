@@ -440,7 +440,7 @@ def eval_debug(
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_(program: Iterable, n: Optional[int], rand, max_parallel) -> Iterable:
     """
-    Run the supplied program n times, or for ever if n is None.
+    Run the supplied program for n steps, or forever if n is None.
     """
 
     for cmds_states in eval_debug(program, n, rand, max_parallel):

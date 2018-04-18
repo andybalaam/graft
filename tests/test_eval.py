@@ -352,3 +352,7 @@ def test_fork_repeated_past_fork_limit_gets_max_fork_id():
     assert fork_ids(result[0]) == [0]
     assert fork_ids(result[1]) == [5]
     assert len(result) == 2
+
+
+def test_does_not_lock_if_no_lines_emitted():
+    do_eval("+d", n=100)
