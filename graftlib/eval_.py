@@ -374,7 +374,9 @@ class MultipleRunningPrograms:
 
         ret = []
         for prog, queue in self.programs:
-            ret.append((queue.pop(0), attr.evolve(prog.state)))
+            # Note: return a reference to state.  In eval_debug we
+            # will copy it if needed.
+            ret.append((queue.pop(0), prog.state))
 
         self.programs.extend(self.new_programs)
         self.new_programs = []
@@ -424,6 +426,12 @@ def _run_program(program: Iterable, rand, max_parallel) -> Iterable:
         yield progs.next()
 
 
+def copy_states(parallel_commands):
+    return [
+        (stroke, attr.evolve(state)) for (stroke, state) in parallel_commands
+    ]
+
+
 #: Iterable[Tree], n -> Iterable[(Command, State)]
 def eval_debug(
         program: Iterable,
@@ -433,17 +441,19 @@ def eval_debug(
 ) -> Iterable:
     frames_counter = FramesCounter(n)
     for parallel_commands in _run_program(program, rand, max_parallel):
-        yield parallel_commands
+        yield copy_states(parallel_commands)
         frames_counter.next_frame(parallel_commands)
 
 
-#: Iterable[Tree], n -> Iterable[(Command, State)]
+#: Iterable[Tree], n -> Iterable[Command]
 def eval_(program: Iterable, n: Optional[int], rand, max_parallel) -> Iterable:
     """
     Run the supplied program for n steps, or forever if n is None.
     """
 
-    for cmds_states in eval_debug(program, n, rand, max_parallel):
+    frames_counter = FramesCounter(n)
+    for cmds_states in _run_program(program, rand, max_parallel):
         commands = [x[0] for x in cmds_states]
         if any(commands):
             yield commands
+        frames_counter.next_frame(cmds_states)

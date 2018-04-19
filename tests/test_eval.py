@@ -356,3 +356,7 @@ def test_fork_repeated_past_fork_limit_gets_max_fork_id():
 
 def test_does_not_lock_if_no_lines_emitted():
     do_eval("+d", n=100)
+
+
+if __name__ == "__main__":
+    do_eval("1000:F^+d:S", n=200, rand=None, max_parallel=1000)
