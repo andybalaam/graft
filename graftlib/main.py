@@ -11,11 +11,6 @@ from graftlib.ui.gtk3ui import Gtk3Ui
 from graftlib.ui.gifui import GifUi
 
 
-# How far to run the animation initially to decide what
-# our initial zoom level should be.
-lookahead_steps = 80
-
-
 # How many strokes we are allowed before we start deleting old ones.
 max_strokes = 500
 
@@ -31,6 +26,11 @@ default_height = 200
 
 # Default number of parallel forks if not overridden by --max-forks
 default_max_forks = 100
+
+
+# How far to run the animation initially to decide what
+# our initial zoom level should be.
+default_lookahead_steps = 80
 
 
 def main_gif(
@@ -54,7 +54,13 @@ def main_gtk3(animation: Animation, image_size: Tuple[int, int]) -> int:
     return Gtk3Ui(animation, image_size).run()
 
 
-def make_animation(program: str, frames: Optional[int], rand, max_forks):
+def make_animation(
+        program: str,
+        frames: Optional[int],
+        rand,
+        max_forks: int,
+        lookahead_steps: int,
+    ):
     """
     Given a program, return an iterator that lexes, parses,
     evaluates and optimises it, yielding actual strokes to draw on
@@ -64,9 +70,8 @@ def make_animation(program: str, frames: Optional[int], rand, max_forks):
     opt = StrokeOptimiser(
         eval_(parse(lex(program)), frames, rand, max_forks)
     )
-    lookahead = (
-        lookahead_steps if frames is None else min(frames, lookahead_steps)
-    )
+    frames = lookahead_steps if frames is None else frames
+    lookahead = min(frames, lookahead_steps)
     return Animation(opt, opt, lookahead, max_strokes, dot_size)
 
 
@@ -113,6 +118,12 @@ def main(world: World) -> int:
         help="The number of forked lines that can run in parallel.",
     )
     argparser.add_argument(
+        '--lookahead-steps',
+        default=default_lookahead_steps,
+        type=int,
+        help="How many steps to use to calculate the initial zoom level.",
+    )
+    argparser.add_argument(
         'program',
         help="The actual graft program to run, e.g. '+d:S' to draw a circle."
     )
@@ -121,13 +132,12 @@ def main(world: World) -> int:
 
     frames = None if args.frames < 0 else args.frames
 
-    max_forks = 100
-
     animation = make_animation(
         args.program,
         frames,
         world.random.uniform,
-        max_forks
+        args.max_forks,
+        args.lookahead_steps,
     )
     image_size = (args.width, args.height)
 
