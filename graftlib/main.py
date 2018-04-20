@@ -13,7 +13,7 @@ from graftlib.ui.gifui import GifUi
 
 # How far to run the animation initially to decide what
 # our initial zoom level should be.
-lookahead_steps = 100
+lookahead_steps = 80
 
 
 # How many strokes we are allowed before we start deleting old ones.
