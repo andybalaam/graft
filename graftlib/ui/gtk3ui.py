@@ -40,4 +40,6 @@ class Gtk3Ui:
     def on_timeout(self, _user_data):
         more_frames = self.animation.step()
         self.canvas.queue_draw()
+        while Gtk.events_pending():
+            Gtk.main_iteration_do(True)
         return more_frames
