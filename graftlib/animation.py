@@ -16,7 +16,7 @@ class Animation:
             dot_size,
     ):
         self.strokes: List[Union[Line, Dot]] = []
-        self.pos: Pt = Pt(0.0, 0.0)
+        self.poss: List[Pt] = []
         self.extents = Extents()
         self.window_animator = WindowAnimator(lookahead_steps)
         self.commands = self.extents.train_on(commands, lookahead_steps)
@@ -34,20 +34,23 @@ class Animation:
     def step(self):
         try:
             parallel_commands = next(self.commands)
-            for command in parallel_commands:
+            if len(self.poss) < len(parallel_commands):
+                increase_by = len(parallel_commands) - len(self.poss)
+                self.poss += [Pt(0, 0) for _ in range(increase_by)]
+            for i, command in enumerate(parallel_commands):
                 if command is None:
                     continue
                 if type(command) == Line:
-                    self.pos = command.end
+                    self.poss[i] = command.end
                     self.strokes.append(command)
                 elif type(command) == Dot:
-                    self.pos = command.pos
+                    self.poss[i] = command.pos
                     self.strokes.append(command)
                 elif type(command) == Elided:
                     if type(command.item) == Line:
-                        self.pos = command.item.end
+                        self.poss[i] = command.item.end
                     else:  # Dot
-                        self.pos = command.item.pos
+                        self.poss[i] = command.item.pos
                 else:
                     raise Exception("Unknown command: " + str(command))
             self._prune()

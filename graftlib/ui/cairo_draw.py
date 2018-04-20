@@ -62,11 +62,12 @@ def cairo_draw(animation: Animation, cairo_cr, win_w, win_h):
         else:  # Dot
             draw_dot(cairo_cr, stroke)
 
-    cairo_cr.arc(
-        animation.pos.x,
-        -animation.pos.y,
-        animation.dot_size,
-        0,
-        2 * math.pi
-    )
-    cairo_cr.fill()
+    for p in animation.poss:
+        cairo_cr.arc(
+            p.x,
+            -p.y,
+            animation.dot_size,
+            0,
+            2 * math.pi
+        )
+        cairo_cr.fill()
