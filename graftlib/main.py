@@ -24,6 +24,15 @@ max_strokes = 500
 dot_size = 5
 
 
+# Default screen size in pixels if not overridden by --width, --height
+default_width = 200
+default_height = 200
+
+
+# Default number of parallel forks if not overridden by --max-forks
+default_max_forks = 100
+
+
 def main_gif(
         animation: Animation,
         frames: Optional[int],
@@ -45,7 +54,7 @@ def main_gtk3(animation: Animation, image_size: Tuple[int, int]) -> int:
     return Gtk3Ui(animation, image_size).run()
 
 
-def make_animation(program: str, frames: Optional[int], rand, max_parallel):
+def make_animation(program: str, frames: Optional[int], rand, max_forks):
     """
     Given a program, return an iterator that lexes, parses,
     evaluates and optimises it, yielding actual strokes to draw on
@@ -53,7 +62,7 @@ def make_animation(program: str, frames: Optional[int], rand, max_parallel):
     the random number generator supplied.
     """
     opt = StrokeOptimiser(
-        eval_(parse(lex(program)), frames, rand, max_parallel)
+        eval_(parse(lex(program)), frames, rand, max_forks)
     )
     lookahead = (
         lookahead_steps if frames is None else min(frames, lookahead_steps)
@@ -87,15 +96,21 @@ def main(world: World) -> int:
     )
     argparser.add_argument(
         '--width',
-        default=200,
+        default=default_width,
         type=int,
         help="The width in pixels of the animation.",
     )
     argparser.add_argument(
         '--height',
-        default=200,
+        default=default_height,
         type=int,
         help="The height in pixels of the animation.",
+    )
+    argparser.add_argument(
+        '--max-forks',
+        default=default_max_forks,
+        type=int,
+        help="The number of forked lines that can run in parallel.",
     )
     argparser.add_argument(
         'program',
@@ -106,13 +121,13 @@ def main(world: World) -> int:
 
     frames = None if args.frames < 0 else args.frames
 
-    max_parallel = 100
+    max_forks = 100
 
     animation = make_animation(
         args.program,
         frames,
         world.random.uniform,
-        max_parallel
+        max_forks
     )
     image_size = (args.width, args.height)
 

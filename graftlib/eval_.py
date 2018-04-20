@@ -352,12 +352,12 @@ def empty(queue: List) -> bool:
 
 
 class MultipleRunningPrograms:
-    def __init__(self, program: List, rand, max_parallel: int):
+    def __init__(self, program: List, rand, max_forks: int):
         # programs is a list of (RunningProgram, queue)
         # where queue is a list of commands already returned by that program,
         # waiting to be returned.
         self.programs = [(RunningProgram(program, rand, self.fork), [])]
-        self.max_parallel = max_parallel
+        self.max_forks = max_forks
         self.new_programs = []
         self._fork_id_counter = 0
 
@@ -380,9 +380,9 @@ class MultipleRunningPrograms:
 
         self.programs.extend(self.new_programs)
         self.new_programs = []
-        if len(self.programs) > self.max_parallel:
+        if len(self.programs) > self.max_forks:
             self.programs = self.programs[
-                len(self.programs) - self.max_parallel:
+                len(self.programs) - self.max_forks:
             ]
 
         return ret
@@ -419,8 +419,8 @@ class FramesCounter:
             raise StopIteration()
 
 
-def _run_program(program: Iterable, rand, max_parallel) -> Iterable:
-    progs = MultipleRunningPrograms(list(program), rand, max_parallel)
+def _run_program(program: Iterable, rand, max_forks) -> Iterable:
+    progs = MultipleRunningPrograms(list(program), rand, max_forks)
     while True:
         # Run a line of code, and get back the animation frame(s) that result
         yield progs.next()
@@ -437,22 +437,22 @@ def eval_debug(
         program: Iterable,
         n: Optional[int],
         rand,
-        max_parallel
+        max_forks
 ) -> Iterable:
     frames_counter = FramesCounter(n)
-    for parallel_commands in _run_program(program, rand, max_parallel):
+    for parallel_commands in _run_program(program, rand, max_forks):
         yield copy_states(parallel_commands)
         frames_counter.next_frame(parallel_commands)
 
 
 #: Iterable[Tree], n -> Iterable[Command]
-def eval_(program: Iterable, n: Optional[int], rand, max_parallel) -> Iterable:
+def eval_(program: Iterable, n: Optional[int], rand, max_forks) -> Iterable:
     """
     Run the supplied program for n steps, or forever if n is None.
     """
 
     frames_counter = FramesCounter(n)
-    for cmds_states in _run_program(program, rand, max_parallel):
+    for cmds_states in _run_program(program, rand, max_forks):
         commands = [x[0] for x in cmds_states]
         if any(commands):
             yield commands

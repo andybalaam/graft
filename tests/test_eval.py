@@ -43,14 +43,14 @@ def round_debug(strokes: Iterable[List[Tuple[Optional[Line], State]]]) -> (
         ]
 
 
-def do_eval(chars: Iterable[str], n: int, rand=None, max_parallel=10):
-    return list(round_strokes(eval_(parse(lex(chars)), n, rand, max_parallel)))
+def do_eval(chars: Iterable[str], n: int, rand=None, max_forks=10):
+    return list(round_strokes(eval_(parse(lex(chars)), n, rand, max_forks)))
 
 
-def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_parallel=10):
+def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_forks=10):
     return list(
         itertools.islice(
-            round_debug(eval_debug(parse(lex(chars)), n, rand, max_parallel)),
+            round_debug(eval_debug(parse(lex(chars)), n, rand, max_forks)),
             0,
             n
         )
@@ -332,7 +332,7 @@ def test_fork_increments_the_fork_id():
 
 
 def test_forking_at_fork_limit_increases_fork_id():
-    result = do_eval_debug(":F+d:F+d", n=4, rand=None, max_parallel=2)
+    result = do_eval_debug(":F+d:F+d", n=4, rand=None, max_forks=2)
     assert fork_ids(result[0]) == [0]
     assert fork_ids(result[1]) == [0, 1]
     assert fork_ids(result[2]) == [0, 1]
@@ -348,7 +348,7 @@ def test_fork_repeated_creates_multiple_forks():
 
 
 def test_fork_repeated_past_fork_limit_gets_max_fork_id():
-    result = do_eval_debug("5:F+d", n=2, rand=None, max_parallel=1)
+    result = do_eval_debug("5:F+d", n=2, rand=None, max_forks=1)
     assert fork_ids(result[0]) == [0]
     assert fork_ids(result[1]) == [5]
     assert len(result) == 2
