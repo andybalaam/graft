@@ -34,7 +34,7 @@ Flock of tiddlers:
 ./graft ':F:R~+d+d:S'
 ```
 
-![](images/worms.gif)
+![](images/tiddlers.gif)
 
 ## Commands
 
