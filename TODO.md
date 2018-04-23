@@ -1,9 +1,5 @@
 # Graft TODO
 
-## Forking
-
-* Document forking
-
 ## Later
 
 * Warning when you throw away a value?
