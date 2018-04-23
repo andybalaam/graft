@@ -28,6 +28,14 @@ Spinning box:
 
 ![](images/rotating-square.gif)
 
+Flock of tiddlers:
+
+```bash
+./graft ':F:R~+d+d:S'
+```
+
+![](images/worms.gif)
+
 ## Commands
 
 To turn, change the variable `d`:
@@ -75,6 +83,8 @@ Graft contains some variables with special meanings:
 * `r`, `g`, `b` - "red", "green", "blue": components of the colour of the
    brush (0-100).
 * `a` - "alpha": transparency of the brush (0=transparent, 100=solid).
+* `f` - "fork id": the number of the line we are currently controlling - this
+  changes when we use `:F` to "fork" into multiple lines.
 
 The colour and transparency values may be set to values outside the range.
 Increasing or decreasing a value smoothly will result in gradual increase and
@@ -99,8 +109,11 @@ The following functions are pre-defined in graft:
 
 * `S` - "Step": draw a line in direction `d` of length `s`.
 * `D` - "Dot": draw a dot at x, y
+* `L` - "Line to": draw a line from our old position to x, y
 * `J` - "Jump": move `s` units in direction `d`, without drawing a line.
 * `R` - "Random": return a random number between -10 and 10.
+* `F` - "Fork": split into 2 lines, and continue running the same program
+  in both.
 
 ## Language reference
 
@@ -204,12 +217,67 @@ To describe a function, write "{", then the commands, then "}":
 functiondef ::= "{" program "}"
 ```
 
+### Forking
+
+If you want to draw two lines simultaneously, use the `:F` command.
+
+For example, to split into 2 lines and then make each of them move randomly,
+run:
+
+```bash
+./graft ':F^:R~=d36d:S'
+```
+
+The above program means:
+
+* `:F` - split into 2 lines
+* `^` - set a label - when we reach the end we will restart here
+* `:R~=d` - set `d` to a random number between -10 and 10
+* `36d` - multiply `d` by 36
+* `:S` - draw a line in the direction (`d`) we are facing
+
+To split into more lines, put a number before `:F`.  For example:
+
+```bash
+./graft '3:F^:R~=d36d:S'
+```
+
+This program splits into 4 lines, and draws randomly as in the previous
+example.
+
+If you want to know which line is currently running, use the `f` variable.
+The first line has `f` set to 0, and each time you fork the next line has
+its version of `f` set to the next number: 1, 2 etc.
+
+For example:
+
+```bash
+./graft '17:F;f~=d20d^+d:S'
+```
+
+The above program means:
+
+* `17:F` - split into 18 lines
+* `;` - this separates the previous statement from the next one
+* `f~=d` - set `d` to the value of `f` - this is different for each line -
+  0, 1, 2, etc.
+* `20d` - multiply `d` by 20
+* `:S` - draw a line in the direction (`d`) we are facing
+
+Here's what it looks like:
+
+![](images/flower.gif)
+
+(I think the one line that lags behind is a bug - first to fix it gets a
+gold star from me!)
+
 ## Command line arguments
 
 ```bash
 $ ./graft --help
 usage: graft [-h] [--frames NUMBER_OF_FRAMES] [--gif GIF_FILENAME]
-             [--width WIDTH] [--height HEIGHT]
+             [--width WIDTH] [--height HEIGHT] [--max-forks MAX_FORKS]
+             [--lookahead-steps LOOKAHEAD_STEPS]
              program
 
 positional arguments:
@@ -225,6 +293,11 @@ optional arguments:
                         (Requires --frames=n where n > 0.)
   --width WIDTH         The width in pixels of the animation.
   --height HEIGHT       The height in pixels of the animation.
+  --max-forks MAX_FORKS
+                        The number of forked lines that can run in parallel.
+  --lookahead-steps LOOKAHEAD_STEPS
+                        How many steps to use to calculate the initial zoom
+                        level.
 ```
 
 ## Mastodon bot
