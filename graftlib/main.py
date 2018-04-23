@@ -60,7 +60,7 @@ def make_animation(
         rand,
         max_forks: int,
         lookahead_steps: int,
-    ):
+):
     """
     Given a program, return an iterator that lexes, parses,
     evaluates and optimises it, yielding actual strokes to draw on

@@ -331,16 +331,13 @@ class RunningProgram:
 
     def fork(self):
 
-        new_state = attr.evolve(self.state)
-        new_evaluator = Evaluator(new_state, self.rand, self.fork)
-
         self.fork_callback.__call__(
             RunningProgram(
                 list(self.program),
                 self.rand,
-                self.fork,
-                new_state,
-                new_evaluator,
+                self.fork_callback,
+                attr.evolve(self.state),
+                None,
                 self.pc,
                 self.label,
             )

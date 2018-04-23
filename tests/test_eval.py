@@ -360,3 +360,30 @@ def test_does_not_lock_if_no_lines_emitted():
 
 def test_does_not_lock_if_no_lines_emitted():
     do_eval("+d", n=100)
+
+
+def test_past_fork_limit_lines_still_move_you():
+    assert (
+        do_eval(":F:S", n=4, rand=None, max_forks=1) ==
+        [
+            [Line(Pt(0, 0), Pt(0, 10))],
+            [Line(Pt(0, 10), Pt(0, 20))],
+            [Line(Pt(0, 20), Pt(0, 30))],
+            [Line(Pt(0, 30), Pt(0, 40))],
+        ]
+    )
+
+
+def test_parallel_past_fork_limit_lines_still_move_you():
+    # Fork into 2 lines, then proceed forwards, forking
+    # each time.  Should essentially act as if no forking
+    # was happening.
+    assert (
+        do_eval(":F;f~=d90d^:S:F", n=4, rand=None, max_forks=2) ==
+        [
+            [Line(Pt(0, 0), Pt(0, 10)), Line(Pt(0, 0), Pt(10, 0))],
+            [Line(Pt(0, 10), Pt(0, 20)), Line(Pt(10, 0), Pt(20, 0))],
+            [Line(Pt(0, 20), Pt(0, 30)), Line(Pt(20, 0), Pt(30, 0))],
+            [Line(Pt(0, 30), Pt(0, 40)), Line(Pt(30, 0), Pt(40, 0))],
+        ]
+    )

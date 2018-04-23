@@ -2,11 +2,7 @@
 
 ## Forking
 
-* Prevent forkbombs from killing us - this was enough:
-  `:F:F:F:F:F:F:F:F:F:F:F:F:F:F:F`, as was any :F within the loop
-* Figure out the "stuck wiggly" behaviour of e.g. `./graft ':F:R~+d+d:S'
-  --frames=40`
-
+* Document forking
 
 ## Later
 
