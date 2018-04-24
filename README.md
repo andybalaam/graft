@@ -36,6 +36,24 @@ Flock of tiddlers:
 
 ![](images/tiddlers.gif)
 
+Explosion:
+
+```bash
+./graft '0=dd^11:F;f~=d30d;dd~+d10:S1+dd' --max-forks=10000 --frames=40 --lookahead-steps=40
+```
+
+![](images/explosion.gif)
+
+Windmill:
+
+```bash
+./graft --frames=20 -- '70=b90=a20=s-10=d10:{:S4+d}35:F10=s;f~=r;f~=g;f~=b20r45g75b;f~=d10d4:{:S+d}6:{20-a:S+d}^1=s+d:S'
+```
+
+!{}(images/windmill.gif)
+
+There are more examples in the [animations](animations) directory.
+
 ## Commands
 
 To turn, change the variable `d`:
