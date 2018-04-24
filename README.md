@@ -50,7 +50,7 @@ Windmill:
 ./graft --frames=20 -- '70=b90=a20=s-10=d10:{:S4+d}35:F10=s;f~=r;f~=g;f~=b20r45g75b;f~=d10d4:{:S+d}6:{20-a:S+d}^1=s+d:S'
 ```
 
-!{}(images/windmill.gif)
+![](images/windmill.gif)
 
 There are more examples in the [animations](animations) directory.
 
