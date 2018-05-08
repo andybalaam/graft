@@ -75,7 +75,7 @@ To change the step size, change the variable `s`:
 
 To change the width of the lines, change the variable `z`:
 
-* `1.5*z:S` means multiply width by 1.5 times, and step forward.
+* `1.5z:S` means multiply width by 1.5 times, and step forward.
 
 To do something several times, write a number, then the function to call,
 either using a function name, or making a little function then and there:
@@ -180,10 +180,14 @@ increase ::= "+" symbol
 decrease ::= "-" symbol
 ```
 
-To add, subtract, multiply or divide by a number, write the number, then
-the operation `+`, `-`, `*`, or `/` respectively, then the symbol.  Example:
+To add, subtract, or divide by a number, write the number, then
+the operation `+`, `-`, or `/` respectively, then the symbol.  Example:
 
-* `-4.5*d` - multiply `d` by -4.5.
+* `3.1/d` - divide `d` by 3.1.
+
+To multiply, write a number next to the symbol:
+
+* `-4.5d` - multiply `d` by -4.5.
 
 To provide a variable value, or the return value of a function, as the
 input for an operator, write the variable name of call the function, then
@@ -193,8 +197,9 @@ suffix it with `~`.  Examples:
 * `:R~/s` - divide `s` by the return value from the function `R`.
 
 ```
-modify ::= input operator symbol
-operator ::= "+" | "-" | "*" | "/"
+modify ::= multiply | input operator symbol
+multiply ::= input symbol
+operator ::= "+" | "-" | "/"
 ```
 
 ### Running functions
