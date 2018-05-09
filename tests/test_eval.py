@@ -387,3 +387,25 @@ def test_parallel_past_fork_limit_lines_still_move_you():
             [Line(Pt(0, 30), Pt(0, 40)), Line(Pt(30, 0), Pt(40, 0))],
         ]
     )
+
+
+def test_multi_fork_produces_lines_in_sync_with_each_other():
+    actuals = do_eval(
+        "20:F^:S",
+        n=21,
+        rand=None,
+        max_forks=20
+    )
+
+    def assert_line(n):
+        assert actuals[n] == [Line(Pt(0, n * 10), Pt(0, (n + 1) * 10))] * 20
+
+    assert_line(0)
+    assert_line(1)
+    assert_line(2)
+    # ...
+    assert_line(16)
+    assert_line(17)
+    assert_line(18)
+    assert_line(19)
+    assert_line(20)

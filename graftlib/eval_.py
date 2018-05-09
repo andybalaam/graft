@@ -174,7 +174,7 @@ class Functions:
         return float(self.rand.__call__(-10, 10))
 
     def fork(self):
-        self.fork_callback.__call__()
+        return self.fork_callback.__call__()
 
 
 _ops = {
@@ -282,7 +282,32 @@ class Evaluator:
             raise Exception("Unknown statement type: " + str(statement))
 
 
-def strip_non_strokes(maybe_strokes):
+SKIPPED = object()
+
+
+def consolidate_skipped(maybe_skipped):
+    """
+    If the supplied iterable contains SKIPPED,
+    filter all of them out, but emit a None
+    instead of the first one.
+
+    This allows us to return many SKIPPED
+    from fork() and get just one None out
+    at the end - this happens in the main
+    fork, and each new fork also emits just
+    one None, so they are in sync.
+    """
+    done_none = False
+    for item in maybe_skipped:
+        if item == SKIPPED:
+            if not done_none:
+                yield None
+                done_none = True
+        else:
+            yield item
+
+
+def non_strokes_to_none(maybe_strokes):
     def sns(maybe_stroke):
         if type(maybe_stroke) in (Line, Dot):
             return maybe_stroke
@@ -325,13 +350,14 @@ class RunningProgram:
             self.pc = self.label
         statement = self.program[self.pc]
         self.pc += 1
-        return strip_non_strokes(
-            self.evaluator.statement(statement, self.set_label)
+        return non_strokes_to_none(
+            consolidate_skipped(
+                self.evaluator.statement(statement, self.set_label)
+            )
         )
 
     def fork(self):
-
-        self.fork_callback.__call__(
+        return self.fork_callback.__call__(
             RunningProgram(
                 list(self.program),
                 self.rand,
@@ -387,6 +413,11 @@ class MultipleRunningPrograms:
     def fork(self, cloned_running_program: RunningProgram):
         cloned_running_program.state.set_fork_id(self.next_fork_id())
         self.new_programs.append((cloned_running_program, []))
+        # If we fork many times, we return SKIPPED many times,
+        # so the output of the main fork would be lots of
+        # SKIPPED, but we merge them all together into a
+        # single None in consolidate_skipped().
+        return SKIPPED
 
 
 @attr.s
