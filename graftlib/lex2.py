@@ -1,6 +1,67 @@
 import re
+import attr
 
 from graftlib.peekablestream import PeekableStream
+
+
+@attr.s
+class AssignmentToken:
+    pass
+
+
+@attr.s
+class EndFunctionDefToken:
+    pass
+
+
+@attr.s
+class EndParamListToken:
+    pass
+
+
+@attr.s
+class ListSeparatorToken:
+    pass
+
+
+@attr.s
+class NumberToken:
+    value: str = attr.ib()
+
+
+@attr.s
+class OperatorToken:
+    value: str = attr.ib()
+
+
+@attr.s
+class ParamListPreludeToken:
+    pass
+
+
+@attr.s
+class StartParamListToken:
+    pass
+
+
+@attr.s
+class StartFunctionDefToken:
+    pass
+
+
+@attr.s
+class StatementSeparatorToken:
+    pass
+
+
+@attr.s
+class StringToken:
+    value: str = attr.ib()
+
+
+@attr.s
+class SymbolToken:
+    value: str = attr.ib()
 
 
 def _scan(first_char, chars, allowed):
@@ -30,23 +91,37 @@ def lex(chars_iter):
         if c in " \n":
             pass  # Ignore white space
 
-        elif c in "(){},;=:":
-            yield (c, "")  # Special characters
+        elif c == "(":
+            yield StartParamListToken()
+        elif c == ")":
+            yield EndParamListToken()
+        elif c == "{":
+            yield StartFunctionDefToken()
+        elif c == "}":
+            yield EndFunctionDefToken()
+        elif c == ",":
+            yield ListSeparatorToken()
+        elif c == ";":
+            yield StatementSeparatorToken()
+        elif c == ":":
+            yield ParamListPreludeToken()
+        elif c == "=":
+            yield AssignmentToken()
 
         elif c in "+-*/":
-            yield ("operation", c)
+            yield OperatorToken(c)
 
         elif c in ("'", '"'):
-            yield ("string", _scan_string(c, chars))
+            yield StringToken(_scan_string(c, chars))
 
         elif re.match("[.0-9]", c):
-            yield ("number", _scan(c, chars, "[.0-9]"))
+            yield NumberToken(_scan(c, chars, "[.0-9]"))
 
         elif re.match("[_a-zA-Z]", c):
-            yield ("symbol", _scan(c, chars, "[_a-zA-Z0-9]"))
+            yield SymbolToken(_scan(c, chars, "[_a-zA-Z0-9]"))
 
         elif c == "\t":
-            raise Exception("Tab characters are not allowed in Cell.")
+            raise Exception("Tab characters are not allowed in Graft.")
 
         else:
             raise Exception("Unrecognised character: '" + c + "'.")
