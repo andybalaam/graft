@@ -1,3 +1,4 @@
+import pytest
 from graftlib.lex2 import (
     lex,
     AssignmentToken,
@@ -131,11 +132,11 @@ def test_Empty_quotes_produce_an_empty_string_token():
 
 
 def test_An_unfinished_string_is_an_error():
-    try:
+    with pytest.raises(
+        Exception,
+        message=r'A string ran off the end of the program.'
+    ):
         lexed('"foo')
-        fail("Should throw")
-    except Exception as e:
-        assert str(e) == "A string ran off the end of the program."
 
 
 def test_Commas_produce_comma_tokens():
@@ -202,8 +203,8 @@ def test_A_complex_example_program_lexes():
 
 
 def test_Tabs_are_an_error():
-    try:
+    with pytest.raises(
+        Exception,
+        message=r'Tab characters are not allowed in Graft.'
+    ):
         lexed("aaa\tbbb")
-        fail("Should throw")
-    except Exception as e:
-        assert str(e) == "Tab characters are not allowed in Graft."

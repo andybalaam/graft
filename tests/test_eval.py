@@ -358,10 +358,6 @@ def test_does_not_lock_if_no_lines_emitted():
     do_eval("+d", n=100)
 
 
-def test_does_not_lock_if_no_lines_emitted():
-    do_eval("+d", n=100)
-
-
 def test_past_fork_limit_lines_still_move_you():
     assert (
         do_eval(":F:S", n=4, rand=None, max_forks=1) ==

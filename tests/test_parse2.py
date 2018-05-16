@@ -1,15 +1,7 @@
+import pytest
 from graftlib.lex2 import (
     lex,
-    AssignmentToken,
-    EndFunctionDefToken,
-    EndParamListToken,
-    ListSeparatorToken,
     NumberToken,
-    OperatorToken,
-    ParamListPreludeToken,
-    StartFunctionDefToken,
-    StartParamListToken,
-    StatementSeparatorToken,
     StringToken,
     SymbolToken,
 )
@@ -34,11 +26,11 @@ def test_Number_is_parsed_as_expression():
 
 
 def test_Missing_semicolon_is_an_error():
-    try:
+    with pytest.raises(
+        Exception,
+        message=r"Hit end of file - expected ';'."
+    ):
         parsed("56")
-        fail("Should throw")
-    except Exception as e:
-        assert str(e) == "Hit end of file - expected ';'."
 
 
 def test_Sum_of_numbers_is_parsed_as_expression():
@@ -145,25 +137,19 @@ def test_Multiple_function_calls_with_various_args_get_parsed():
 
 
 def test_Assigning_to_a_number_is_an_error():
-    try:
+    with pytest.raises(
+        Exception,
+        message=r"You can't assign to anything except a symbol."
+    ):
         parsed("3 = x;")
-        fail("Should throw")
-    except Exception as e:
-        assert (
-            str(e) ==
-            "You can't assign to anything except a symbol."
-        )
 
 
 def test_Assigning_to_an_expression_is_an_error():
-    try:
+    with pytest.raises(
+        Exception,
+        message=r"You can't assign to anything except a symbol."
+    ):
         parsed("x(4) = 5;")
-        fail("Should throw")
-    except Exception as e:
-        assert (
-            str(e) ==
-            "You can't assign to anything except a symbol."
-        )
 
 
 def test_Empty_function_definition_gets_parsed():
@@ -176,14 +162,11 @@ def test_Empty_function_definition_gets_parsed():
 
 
 def test_Missing_param_definition_with_colon_is_an_error():
-    try:
+    with pytest.raises(
+        Exception,
+        message=r"':' must be followed by '(' in a function."
+    ):
         parsed("{:print(x););")
-        fail("Should throw")
-    except Exception as e:
-        assert (
-            str(e) ==
-            "':' must be followed by '(' in a function."
-        )
 
 
 def test_Multiple_commands_parse_into_multiple_expressions():
@@ -231,12 +214,9 @@ def test_Empty_function_definition_with_params_gets_parsed():
 
 
 def test_Function_params_that_are_not_symbols_is_an_error():
-    try:
-        parsed("{:(aa + 3, d)};"),
-        fail("Should throw")
-    except Exception as e:
-        assert (
-            str(e) ==
+    with pytest.raises(
+        Exception,
+        message=(
             "Only symbols are allowed in function parameter lists. " +
             "I found: " +
             "('operation', " +
@@ -244,6 +224,8 @@ def test_Function_params_that_are_not_symbols_is_an_error():
             "SymbolToken(value='aa'), " +
             "NumberToken(value='3'))."
         )
+    ):
+        parsed("{:(aa + 3, d)};"),
 
 
 def test_Function_definition_containing_commands_gets_parsed():

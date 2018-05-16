@@ -28,8 +28,8 @@ class Parser:
             return prev
         self.tokens.move_next()
         if (
-            typ in (NumberToken, StringToken, SymbolToken) and
-            prev is None
+                typ in (NumberToken, StringToken, SymbolToken) and
+                prev is None
         ):
             return self.next_expression(tok)
         elif typ == OperatorToken:
