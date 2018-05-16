@@ -23,6 +23,13 @@ class NumberTree:
 
 
 @attr.s
+class OperationTree:
+    operation: str = attr.ib()
+    symbol = attr.ib()
+    new_value = attr.ib()
+
+
+@attr.s
 class StringTree:
     value: str = attr.ib()
 
@@ -52,7 +59,7 @@ class Parser:
             return self.next_expression(SymbolTree(tok.value))
         elif typ == OperatorToken:
             nxt = self.next_expression(None)
-            return self.next_expression(("operation", tok.value, prev, nxt))
+            return self.next_expression(OperationTree(tok.value, prev, nxt))
         elif typ == StartParamListToken:
             args = self.multiple_expressions(
                 ListSeparatorToken, EndParamListToken)

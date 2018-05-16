@@ -5,6 +5,7 @@ from graftlib.lex2 import (
 from graftlib.parse2 import (
     parse,
     NumberTree,
+    OperationTree,
     StringTree,
     SymbolTree,
 )
@@ -39,7 +40,7 @@ def test_Sum_of_numbers_is_parsed_as_expression():
     assert (
         parsed("32 + 44;") ==
         [
-            ("operation", "+", NumberTree("32"), NumberTree("44"))
+            OperationTree("+", NumberTree("32"), NumberTree("44"))
         ]
     )
 
@@ -48,7 +49,7 @@ def test_Difference_of_symbol_and_number_is_parsed_as_expression():
     assert (
         parsed("foo - 44;") ==
         [
-            ("operation", "-", SymbolTree("foo"), NumberTree("44"))
+            OperationTree("-", SymbolTree("foo"), NumberTree("44"))
         ]
     )
 
@@ -57,7 +58,7 @@ def test_Multiplication_of_symbols_is_parsed_as_expression():
     assert (
         parsed("foo * bar;") ==
         [
-            ("operation", "*", SymbolTree("foo"), SymbolTree("bar"))
+            OperationTree("*", SymbolTree("foo"), SymbolTree("bar"))
         ]
     )
 
@@ -90,7 +91,7 @@ def test_Function_call_with_various_args_gets_parsed():
                 [
                     StringTree("a"),
                     NumberTree("3"),
-                    ("operation", "/", NumberTree("4"), NumberTree("12"))
+                    OperationTree("/", NumberTree("4"), NumberTree("12"))
                 ]
             )
         ]
@@ -120,8 +121,7 @@ def test_Multiple_function_calls_with_various_args_get_parsed():
                         [
                             StringTree("a"),
                             NumberTree("3"),
-                            (
-                                "operation",
+                            OperationTree(
                                 "/",
                                 NumberTree("4"),
                                 NumberTree("12")
@@ -242,8 +242,7 @@ def test_Function_definition_containing_commands_gets_parsed():
                         "call",
                         SymbolTree("print"),
                         [
-                            (
-                                "operation",
+                            OperationTree(
                                 '-',
                                 NumberTree('3'),
                                 NumberTree('4')
@@ -273,8 +272,7 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
                         "call",
                         SymbolTree("print"),
                         [
-                            (
-                                "operation",
+                            OperationTree(
                                 '-',
                                 NumberTree('3'),
                                 NumberTree('4')
