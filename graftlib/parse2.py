@@ -1,3 +1,5 @@
+import attr
+
 from graftlib.peekablestream import PeekableStream
 from graftlib.lex2 import (
     AssignmentToken,
@@ -15,6 +17,21 @@ from graftlib.lex2 import (
 )
 
 
+@attr.s
+class NumberTree:
+    value: str = attr.ib()
+
+
+@attr.s
+class StringTree:
+    value: str = attr.ib()
+
+
+@attr.s
+class SymbolTree:
+    value: str = attr.ib()
+
+
 class Parser:
     def __init__(self, tokens, stop_at):
         self.tokens = tokens
@@ -27,11 +44,12 @@ class Parser:
         if typ in self.stop_at:
             return prev
         self.tokens.move_next()
-        if (
-                typ in (NumberToken, StringToken, SymbolToken) and
-                prev is None
-        ):
-            return self.next_expression(tok)
+        if typ == NumberToken and prev is None:
+            return self.next_expression(NumberTree(tok.value))
+        elif typ == StringToken and prev is None:
+            return self.next_expression(StringTree(tok.value))
+        elif typ == SymbolToken and prev is None:
+            return self.next_expression(SymbolTree(tok.value))
         elif typ == OperatorToken:
             nxt = self.next_expression(None)
             return self.next_expression(("operation", tok.value, prev, nxt))
@@ -45,7 +63,7 @@ class Parser:
                 StatementSeparatorToken, EndFunctionDefToken)
             return self.next_expression(("function", params, body))
         elif typ == AssignmentToken:
-            if type(prev) != SymbolToken:
+            if type(prev) != SymbolTree:
                 raise Exception(
                     "You can't assign to anything except a symbol.")
             nxt = self.next_expression(None)
@@ -63,7 +81,7 @@ class Parser:
         self.tokens.move_next()
         ret = self.multiple_expressions(ListSeparatorToken, EndParamListToken)
         for param in ret:
-            if type(param) != SymbolToken:
+            if type(param) != SymbolTree:
                 raise Exception(
                     "Only symbols are allowed in function parameter lists." +
                     " I found: " + str(param) + "."

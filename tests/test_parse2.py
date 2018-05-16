@@ -1,11 +1,13 @@
 import pytest
 from graftlib.lex2 import (
     lex,
-    NumberToken,
-    StringToken,
-    SymbolToken,
 )
-from graftlib.parse2 import parse
+from graftlib.parse2 import (
+    parse,
+    NumberTree,
+    StringTree,
+    SymbolTree,
+)
 
 # --- Utils ---
 
@@ -22,7 +24,7 @@ def test_Empty_file_produces_nothing():
 
 
 def test_Number_is_parsed_as_expression():
-    assert parsed("56;") == [NumberToken("56")]
+    assert parsed("56;") == [NumberTree("56")]
 
 
 def test_Missing_semicolon_is_an_error():
@@ -37,7 +39,7 @@ def test_Sum_of_numbers_is_parsed_as_expression():
     assert (
         parsed("32 + 44;") ==
         [
-            ("operation", "+", NumberToken("32"), NumberToken("44"))
+            ("operation", "+", NumberTree("32"), NumberTree("44"))
         ]
     )
 
@@ -46,7 +48,7 @@ def test_Difference_of_symbol_and_number_is_parsed_as_expression():
     assert (
         parsed("foo - 44;") ==
         [
-            ("operation", "-", SymbolToken("foo"), NumberToken("44"))
+            ("operation", "-", SymbolTree("foo"), NumberTree("44"))
         ]
     )
 
@@ -55,7 +57,7 @@ def test_Multiplication_of_symbols_is_parsed_as_expression():
     assert (
         parsed("foo * bar;") ==
         [
-            ("operation", "*", SymbolToken("foo"), SymbolToken("bar"))
+            ("operation", "*", SymbolTree("foo"), SymbolTree("bar"))
         ]
     )
 
@@ -64,7 +66,7 @@ def test_Variable_assignment_gets_parsed():
     assert (
         parsed("x = 3;") ==
         [
-            ("assignment", SymbolToken("x"), NumberToken("3"))
+            ("assignment", SymbolTree("x"), NumberTree("3"))
         ]
     )
 
@@ -73,7 +75,7 @@ def test_Function_call_with_no_args_gets_parsed():
     assert (
         parsed("print();") ==
         [
-            ("call", SymbolToken("print"), [])
+            ("call", SymbolTree("print"), [])
         ]
     )
 
@@ -84,11 +86,11 @@ def test_Function_call_with_various_args_gets_parsed():
         [
             (
                 "call",
-                SymbolToken("print"),
+                SymbolTree("print"),
                 [
-                    StringToken("a"),
-                    NumberToken("3"),
-                    ("operation", "/", NumberToken("4"), NumberToken("12"))
+                    StringTree("a"),
+                    NumberTree("3"),
+                    ("operation", "/", NumberTree("4"), NumberTree("12"))
                 ]
             )
         ]
@@ -99,7 +101,7 @@ def test_Multiple_function_calls_with_no_args_get_parsed():
     assert (
         parsed("print()();") ==
         [
-            ("call", ("call", SymbolToken("print"), []), [])
+            ("call", ("call", SymbolTree("print"), []), [])
         ]
     )
 
@@ -114,20 +116,20 @@ def test_Multiple_function_calls_with_various_args_get_parsed():
                     "call",
                     (
                         "call",
-                        SymbolToken("print"),
+                        SymbolTree("print"),
                         [
-                            StringToken("a"),
-                            NumberToken("3"),
+                            StringTree("a"),
+                            NumberTree("3"),
                             (
                                 "operation",
                                 "/",
-                                NumberToken("4"),
-                                NumberToken("12")
+                                NumberTree("4"),
+                                NumberTree("12")
                             )
                         ]
                     ),
                     [
-                        NumberToken("512")
+                        NumberTree("512")
                     ]
                 ),
                 []
@@ -178,19 +180,19 @@ def test_Multiple_commands_parse_into_multiple_expressions():
     assert (
         parsed(program) ==
         [
-            ("assignment", SymbolToken('x'), NumberToken('3')),
+            ("assignment", SymbolTree('x'), NumberTree('3')),
             (
                 "assignment",
-                SymbolToken('func'),
+                SymbolTree('func'),
                 (
                     "function",
-                    [SymbolToken('a')],
+                    [SymbolTree('a')],
                     [
-                        ("call", SymbolToken('print'), [SymbolToken('a')])
+                        ("call", SymbolTree('print'), [SymbolTree('a')])
                     ]
                 )
             ),
-            ("call", SymbolToken('func'), [SymbolToken('x')])
+            ("call", SymbolTree('func'), [SymbolTree('x')])
         ]
     )
 
@@ -202,10 +204,10 @@ def test_Empty_function_definition_with_params_gets_parsed():
             (
                 "function",
                 [
-                    SymbolToken("aa"),
-                    SymbolToken("bb"),
-                    SymbolToken("cc"),
-                    SymbolToken("dd")
+                    SymbolTree("aa"),
+                    SymbolTree("bb"),
+                    SymbolTree("cc"),
+                    SymbolTree("dd")
                 ],
                 []
             )
@@ -221,8 +223,8 @@ def test_Function_params_that_are_not_symbols_is_an_error():
             "I found: " +
             "('operation', " +
             "'+', " +
-            "SymbolToken(value='aa'), " +
-            "NumberToken(value='3'))."
+            "SymbolTree(value='aa'), " +
+            "NumberTree(value='3'))."
         )
     ):
         parsed("{:(aa + 3, d)};"),
@@ -238,18 +240,18 @@ def test_Function_definition_containing_commands_gets_parsed():
                 [
                     (
                         "call",
-                        SymbolToken("print"),
+                        SymbolTree("print"),
                         [
                             (
                                 "operation",
                                 '-',
-                                NumberToken('3'),
-                                NumberToken('4')
+                                NumberTree('3'),
+                                NumberTree('4')
                             )
                         ]
                     ),
-                    ("assignment", SymbolToken("a"), StringToken("x")),
-                    ("call", SymbolToken("print"), [SymbolToken("a")])
+                    ("assignment", SymbolTree("a"), StringTree("x")),
+                    ("call", SymbolTree("print"), [SymbolTree("a")])
                 ]
             )
         ]
@@ -263,24 +265,24 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
             (
                 "function",
                 [
-                    SymbolToken("x"),
-                    SymbolToken("yy")
+                    SymbolTree("x"),
+                    SymbolTree("yy")
                 ],
                 [
                     (
                         "call",
-                        SymbolToken("print"),
+                        SymbolTree("print"),
                         [
                             (
                                 "operation",
                                 '-',
-                                NumberToken('3'),
-                                NumberToken('4')
+                                NumberTree('3'),
+                                NumberTree('4')
                             )
                         ]
                     ),
-                    ("assignment", SymbolToken("a"), StringToken("x")),
-                    ("call", SymbolToken("print"), [SymbolToken("a")])
+                    ("assignment", SymbolTree("a"), StringTree("x")),
+                    ("call", SymbolTree("print"), [SymbolTree("a")])
                 ]
             )
         ]
