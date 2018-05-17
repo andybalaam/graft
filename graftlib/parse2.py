@@ -23,6 +23,12 @@ class NumberTree:
 
 
 @attr.s
+class FunctionCallTree:
+    fn: str = attr.ib()
+    args = attr.ib()
+
+
+@attr.s
 class OperationTree:
     operation: str = attr.ib()
     symbol = attr.ib()
@@ -63,7 +69,7 @@ class Parser:
         elif typ == StartParamListToken:
             args = self.multiple_expressions(
                 ListSeparatorToken, EndParamListToken)
-            return self.next_expression(("call", prev, args))
+            return self.next_expression(FunctionCallTree(prev, args))
         elif typ == StartFunctionDefToken:
             params = self.parameters_list()
             body = self.multiple_expressions(

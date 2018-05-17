@@ -4,6 +4,7 @@ from graftlib.lex2 import (
 )
 from graftlib.parse2 import (
     parse,
+    FunctionCallTree,
     NumberTree,
     OperationTree,
     StringTree,
@@ -76,7 +77,7 @@ def test_Function_call_with_no_args_gets_parsed():
     assert (
         parsed("print();") ==
         [
-            ("call", SymbolTree("print"), [])
+            FunctionCallTree(SymbolTree("print"), [])
         ]
     )
 
@@ -85,8 +86,7 @@ def test_Function_call_with_various_args_gets_parsed():
     assert (
         parsed("print( 'a', 3, 4 / 12 );") ==
         [
-            (
-                "call",
+            FunctionCallTree(
                 SymbolTree("print"),
                 [
                     StringTree("a"),
@@ -102,7 +102,7 @@ def test_Multiple_function_calls_with_no_args_get_parsed():
     assert (
         parsed("print()();") ==
         [
-            ("call", ("call", SymbolTree("print"), []), [])
+            FunctionCallTree(FunctionCallTree(SymbolTree("print"), []), [])
         ]
     )
 
@@ -111,12 +111,9 @@ def test_Multiple_function_calls_with_various_args_get_parsed():
     assert (
         parsed("print( 'a', 3, 4 / 12 )(512)();") ==
         [
-            (
-                "call",
-                (
-                    "call",
-                    (
-                        "call",
+            FunctionCallTree(
+                FunctionCallTree(
+                    FunctionCallTree(
                         SymbolTree("print"),
                         [
                             StringTree("a"),
@@ -188,11 +185,12 @@ def test_Multiple_commands_parse_into_multiple_expressions():
                     "function",
                     [SymbolTree('a')],
                     [
-                        ("call", SymbolTree('print'), [SymbolTree('a')])
+                        FunctionCallTree(
+                            SymbolTree('print'), [SymbolTree('a')])
                     ]
                 )
             ),
-            ("call", SymbolTree('func'), [SymbolTree('x')])
+            FunctionCallTree(SymbolTree('func'), [SymbolTree('x')])
         ]
     )
 
@@ -238,8 +236,7 @@ def test_Function_definition_containing_commands_gets_parsed():
                 "function",
                 [],
                 [
-                    (
-                        "call",
+                    FunctionCallTree(
                         SymbolTree("print"),
                         [
                             OperationTree(
@@ -250,7 +247,7 @@ def test_Function_definition_containing_commands_gets_parsed():
                         ]
                     ),
                     ("assignment", SymbolTree("a"), StringTree("x")),
-                    ("call", SymbolTree("print"), [SymbolTree("a")])
+                    FunctionCallTree(SymbolTree("print"), [SymbolTree("a")])
                 ]
             )
         ]
@@ -268,8 +265,7 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
                     SymbolTree("yy")
                 ],
                 [
-                    (
-                        "call",
+                    FunctionCallTree(
                         SymbolTree("print"),
                         [
                             OperationTree(
@@ -280,7 +276,7 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
                         ]
                     ),
                     ("assignment", SymbolTree("a"), StringTree("x")),
-                    ("call", SymbolTree("print"), [SymbolTree("a")])
+                    FunctionCallTree(SymbolTree("print"), [SymbolTree("a")])
                 ]
             )
         ]
