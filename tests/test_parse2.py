@@ -1,9 +1,8 @@
 import pytest
-from graftlib.lex2 import (
-    lex,
-)
+from graftlib.lex2 import lex
 from graftlib.parse2 import (
     parse,
+    AssignmentTree,
     FunctionCallTree,
     NumberTree,
     OperationTree,
@@ -68,7 +67,7 @@ def test_Variable_assignment_gets_parsed():
     assert (
         parsed("x = 3;") ==
         [
-            ("assignment", SymbolTree("x"), NumberTree("3"))
+            AssignmentTree(SymbolTree("x"), NumberTree("3"))
         ]
     )
 
@@ -177,9 +176,8 @@ def test_Multiple_commands_parse_into_multiple_expressions():
     assert (
         parsed(program) ==
         [
-            ("assignment", SymbolTree('x'), NumberTree('3')),
-            (
-                "assignment",
+            AssignmentTree(SymbolTree('x'), NumberTree('3')),
+            AssignmentTree(
                 SymbolTree('func'),
                 (
                     "function",
@@ -246,7 +244,7 @@ def test_Function_definition_containing_commands_gets_parsed():
                             )
                         ]
                     ),
-                    ("assignment", SymbolTree("a"), StringTree("x")),
+                    AssignmentTree(SymbolTree("a"), StringTree("x")),
                     FunctionCallTree(SymbolTree("print"), [SymbolTree("a")])
                 ]
             )
@@ -275,7 +273,7 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
                             )
                         ]
                     ),
-                    ("assignment", SymbolTree("a"), StringTree("x")),
+                    AssignmentTree(SymbolTree("a"), StringTree("x")),
                     FunctionCallTree(SymbolTree("print"), [SymbolTree("a")])
                 ]
             )

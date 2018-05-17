@@ -18,6 +18,12 @@ from graftlib.lex2 import (
 
 
 @attr.s
+class AssignmentTree:
+    symbol = attr.ib()
+    value = attr.ib()
+
+
+@attr.s
 class NumberTree:
     value: str = attr.ib()
 
@@ -80,7 +86,7 @@ class Parser:
                 raise Exception(
                     "You can't assign to anything except a symbol.")
             nxt = self.next_expression(None)
-            return self.next_expression(("assignment", prev, nxt))
+            return self.next_expression(AssignmentTree(prev, nxt))
         else:
             raise Exception("Unexpected token: " + str(tok))
 
