@@ -1,3 +1,4 @@
+from typing import List
 import attr
 
 from graftlib.peekablestream import PeekableStream
@@ -30,8 +31,14 @@ class NumberTree:
 
 @attr.s
 class FunctionCallTree:
-    fn: str = attr.ib()
-    args = attr.ib()
+    fn = attr.ib()
+    args: List = attr.ib()
+
+
+@attr.s
+class FunctionDefTree:
+    params: List = attr.ib()
+    body: List = attr.ib()
 
 
 @attr.s
@@ -80,7 +87,7 @@ class Parser:
             params = self.parameters_list()
             body = self.multiple_expressions(
                 StatementSeparatorToken, EndFunctionDefToken)
-            return self.next_expression(("function", params, body))
+            return self.next_expression(FunctionDefTree(params, body))
         elif typ == AssignmentToken:
             if type(prev) != SymbolTree:
                 raise Exception(

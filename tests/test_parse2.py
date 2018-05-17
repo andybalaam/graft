@@ -4,6 +4,7 @@ from graftlib.parse2 import (
     parse,
     AssignmentTree,
     FunctionCallTree,
+    FunctionDefTree,
     NumberTree,
     OperationTree,
     StringTree,
@@ -154,7 +155,7 @@ def test_Empty_function_definition_gets_parsed():
     assert (
         parsed("{};") ==
         [
-            ("function", [], [])
+            FunctionDefTree([], [])
         ]
     )
 
@@ -179,8 +180,7 @@ def test_Multiple_commands_parse_into_multiple_expressions():
             AssignmentTree(SymbolTree('x'), NumberTree('3')),
             AssignmentTree(
                 SymbolTree('func'),
-                (
-                    "function",
+                FunctionDefTree(
                     [SymbolTree('a')],
                     [
                         FunctionCallTree(
@@ -197,8 +197,7 @@ def test_Empty_function_definition_with_params_gets_parsed():
     assert (
         parsed("{:(aa, bb, cc, dd)};") ==
         [
-            (
-                "function",
+            FunctionDefTree(
                 [
                     SymbolTree("aa"),
                     SymbolTree("bb"),
@@ -230,8 +229,7 @@ def test_Function_definition_containing_commands_gets_parsed():
     assert (
         parsed('{print(3-4); a = "x"; print(a);};') ==
         [
-            (
-                "function",
+            FunctionDefTree(
                 [],
                 [
                     FunctionCallTree(
@@ -256,8 +254,7 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
     assert (
         parsed('{:(x,yy)print(3-4); a = "x"; print(a);};') ==
         [
-            (
-                "function",
+            FunctionDefTree(
                 [
                     SymbolTree("x"),
                     SymbolTree("yy")
