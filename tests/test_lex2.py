@@ -66,8 +66,11 @@ def test_Items_separated_by_spaces_become_separate_tokens():
         lexed("foo bar ( ") ==
         [
             SymbolToken("foo"),
+            StatementSeparatorToken(),
             SymbolToken("bar"),
-            StartParamListToken()
+            StatementSeparatorToken(),
+            StartParamListToken(),
+            StatementSeparatorToken(),
         ]
     )
 
@@ -77,6 +80,7 @@ def test_Items_separated_by_newlines_become_separate_tokens():
         lexed("foo\nbar") ==
         [
             SymbolToken("foo"),
+            StatementSeparatorToken(),
             SymbolToken("bar")
         ]
     )
@@ -84,9 +88,10 @@ def test_Items_separated_by_newlines_become_separate_tokens():
 
 def test_Symbols_may_contain_numbers_and_underscores():
     assert (
-        lexed("foo2_bar ( ") ==
+        lexed("foo2_bar (") ==
         [
             SymbolToken("foo2_bar"),
+            StatementSeparatorToken(),
             StartParamListToken()
         ]
     )
@@ -94,9 +99,10 @@ def test_Symbols_may_contain_numbers_and_underscores():
 
 def test_Symbols_may_start_with_underscores():
     assert (
-        lexed("_foo2_bar ( ") ==
+        lexed("_foo2_bar (") ==
         [
             SymbolToken("_foo2_bar"),
+            StatementSeparatorToken(),
             StartParamListToken()
         ]
     )
@@ -147,8 +153,10 @@ def test_Equals_produces_an_equals_token():
     assert lexed("=") == [AssignmentToken()]
 
 
-def test_Semicolons_produce_semicolon_tokens():
-    assert lexed(";") == [StatementSeparatorToken()]
+def test_Spaces_produce_separator_tokens():
+    assert lexed(" ") == [StatementSeparatorToken()]
+    assert lexed("  ") == [StatementSeparatorToken()]
+    assert lexed(" \n  ") == [StatementSeparatorToken()]
 
 
 def test_Colons_produce_colon_tokens():
@@ -164,7 +172,7 @@ def test_Arithmetic_operators_produce_operation_tokens():
 
 def test_Multiple_token_types_can_be_combined():
     assert (
-        lexed('frobnicate( "Hello" + name, 4 / 5.0);') ==
+        lexed('frobnicate("Hello"+name,4/5.0) ') ==
         [
             SymbolToken("frobnicate"),
             StartParamListToken(),
@@ -176,28 +184,18 @@ def test_Multiple_token_types_can_be_combined():
             OperatorToken("/"),
             NumberToken("5.0"),
             EndParamListToken(),
-            StatementSeparatorToken()
+            StatementSeparatorToken(),
         ]
     )
 
 
 def test_A_complex_example_program_lexes():
     example = """
-        double =
-            {:(x)
-                2 * x;
-            };
-
-        num1 = 3;
-        num2 = double( num );
-
-        answer =
-            if( greater_than( num2, 5 ),
-                {"LARGE!"},
-                {"small."}
-            );
-
-        print( answer );
+        double={:(x)2*x}
+        num1=3
+        num2=double(num)
+        answer=if(greater_than(num2,5),{"LARGE!"},{"small."})
+        print(answer)
     """
     lexed(example)
 

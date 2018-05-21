@@ -64,8 +64,11 @@ class Parser:
         self.stop_at = stop_at
 
     def next_expression(self, prev):
-        self.fail_if_at_end(";")
         tok = self.tokens.next
+
+        if tok is None:
+            return prev
+
         typ = type(tok)
         if typ in self.stop_at:
             return prev
@@ -95,7 +98,7 @@ class Parser:
             nxt = self.next_expression(None)
             return self.next_expression(AssignmentTree(prev, nxt))
         else:
-            raise Exception("Unexpected token: " + str(tok))
+            raise Exception("Unexpected token: " + str(tok.code()))
 
     def parameters_list(self):
         if type(self.tokens.next) != ParamListPreludeToken:
@@ -127,13 +130,14 @@ class Parser:
                 if p is not None:
                     ret.append(p)
                 typ = type(self.tokens.next)
-                self.tokens.move_next()
                 self.fail_if_at_end(end)
+                self.tokens.move_next()
         return ret
 
     def fail_if_at_end(self, expected):
         if self.tokens.next is None:
-            raise Exception("Hit end of file - expected '%s'." % expected)
+            raise Exception(
+                "Hit end of file - expected '%s'." % (expected.code()))
 
 
 def parse(tokens_iterator):

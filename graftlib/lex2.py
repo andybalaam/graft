@@ -11,12 +11,16 @@ class AssignmentToken:
 
 @attr.s
 class EndFunctionDefToken:
-    pass
+    @staticmethod
+    def code():
+        return "}"
 
 
 @attr.s
 class EndParamListToken:
-    pass
+    @staticmethod
+    def code():
+        return ")"
 
 
 @attr.s
@@ -84,14 +88,29 @@ def _scan_string(delim, chars):
     return ret
 
 
+def is_whitespace(c):
+    if c is None:
+        return False
+    else:
+        return (c in " \n")
+
+
 def lex(chars_iter):
     chars = PeekableStream(chars_iter)
-    while chars.next is not None:
-        c = chars.move_next()
-        if c in " \n":
-            pass  # Ignore white space
 
-        elif c == "(":
+    while True:
+        if is_whitespace(chars.next):
+            chars.move_next()
+            yield StatementSeparatorToken()
+            while is_whitespace(chars.next):
+                chars.move_next()
+
+        if chars.next is None:
+            break
+
+        c = chars.move_next()
+
+        if c == "(":
             yield StartParamListToken()
         elif c == ")":
             yield EndParamListToken()
@@ -101,8 +120,6 @@ def lex(chars_iter):
             yield EndFunctionDefToken()
         elif c == ",":
             yield ListSeparatorToken()
-        elif c == ";":
-            yield StatementSeparatorToken()
         elif c == ":":
             yield ParamListPreludeToken()
         elif c == "=":

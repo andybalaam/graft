@@ -3,6 +3,7 @@ class PeekableStream:
 
     def __init__(self, iterator):
         self.iterator = iter(iterator)
+        self.next = None
         self._fill()
 
     def _fill(self):

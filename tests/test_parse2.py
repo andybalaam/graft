@@ -26,20 +26,12 @@ def test_Empty_file_produces_nothing():
 
 
 def test_Number_is_parsed_as_expression():
-    assert parsed("56;") == [NumberTree("56")]
-
-
-def test_Missing_semicolon_is_an_error():
-    with pytest.raises(
-        Exception,
-        message=r"Hit end of file - expected ';'."
-    ):
-        parsed("56")
+    assert parsed("56") == [NumberTree("56")]
 
 
 def test_Sum_of_numbers_is_parsed_as_expression():
     assert (
-        parsed("32 + 44;") ==
+        parsed("32+44") ==
         [
             OperationTree("+", NumberTree("32"), NumberTree("44"))
         ]
@@ -48,7 +40,7 @@ def test_Sum_of_numbers_is_parsed_as_expression():
 
 def test_Difference_of_symbol_and_number_is_parsed_as_expression():
     assert (
-        parsed("foo - 44;") ==
+        parsed("foo-44") ==
         [
             OperationTree("-", SymbolTree("foo"), NumberTree("44"))
         ]
@@ -57,7 +49,7 @@ def test_Difference_of_symbol_and_number_is_parsed_as_expression():
 
 def test_Multiplication_of_symbols_is_parsed_as_expression():
     assert (
-        parsed("foo * bar;") ==
+        parsed("foo*bar") ==
         [
             OperationTree("*", SymbolTree("foo"), SymbolTree("bar"))
         ]
@@ -66,7 +58,7 @@ def test_Multiplication_of_symbols_is_parsed_as_expression():
 
 def test_Variable_assignment_gets_parsed():
     assert (
-        parsed("x = 3;") ==
+        parsed("x=3") ==
         [
             AssignmentTree(SymbolTree("x"), NumberTree("3"))
         ]
@@ -75,7 +67,7 @@ def test_Variable_assignment_gets_parsed():
 
 def test_Function_call_with_no_args_gets_parsed():
     assert (
-        parsed("print();") ==
+        parsed("print()") ==
         [
             FunctionCallTree(SymbolTree("print"), [])
         ]
@@ -84,7 +76,7 @@ def test_Function_call_with_no_args_gets_parsed():
 
 def test_Function_call_with_various_args_gets_parsed():
     assert (
-        parsed("print( 'a', 3, 4 / 12 );") ==
+        parsed("print('a',3,4/12)") ==
         [
             FunctionCallTree(
                 SymbolTree("print"),
@@ -100,7 +92,7 @@ def test_Function_call_with_various_args_gets_parsed():
 
 def test_Multiple_function_calls_with_no_args_get_parsed():
     assert (
-        parsed("print()();") ==
+        parsed("print()()") ==
         [
             FunctionCallTree(FunctionCallTree(SymbolTree("print"), []), [])
         ]
@@ -109,7 +101,7 @@ def test_Multiple_function_calls_with_no_args_get_parsed():
 
 def test_Multiple_function_calls_with_various_args_get_parsed():
     assert (
-        parsed("print( 'a', 3, 4 / 12 )(512)();") ==
+        parsed("print('a',3,4/12)(512)()") ==
         [
             FunctionCallTree(
                 FunctionCallTree(
@@ -138,22 +130,22 @@ def test_Multiple_function_calls_with_various_args_get_parsed():
 def test_Assigning_to_a_number_is_an_error():
     with pytest.raises(
         Exception,
-        message=r"You can't assign to anything except a symbol."
+        match=r"You can't assign to anything except a symbol."
     ):
-        parsed("3 = x;")
+        parsed("3=x")
 
 
 def test_Assigning_to_an_expression_is_an_error():
     with pytest.raises(
         Exception,
-        message=r"You can't assign to anything except a symbol."
+        match=r"You can't assign to anything except a symbol."
     ):
-        parsed("x(4) = 5;")
+        parsed("x(4)=5")
 
 
 def test_Empty_function_definition_gets_parsed():
     assert (
-        parsed("{};") ==
+        parsed("{}") ==
         [
             FunctionDefTree([], [])
         ]
@@ -163,16 +155,16 @@ def test_Empty_function_definition_gets_parsed():
 def test_Missing_param_definition_with_colon_is_an_error():
     with pytest.raises(
         Exception,
-        message=r"':' must be followed by '(' in a function."
+        match=r"':' must be followed by '\(' in a function."
     ):
-        parsed("{:print(x););")
+        parsed("{:print(x))")
 
 
 def test_Multiple_commands_parse_into_multiple_expressions():
     program = """
-    x = 3;
-    func = {:(a) print(a);};
-    func(x);
+    x=3
+    func={:(a)print(a)}
+    func(x)
     """
     assert (
         parsed(program) ==
@@ -195,7 +187,7 @@ def test_Multiple_commands_parse_into_multiple_expressions():
 
 def test_Empty_function_definition_with_params_gets_parsed():
     assert (
-        parsed("{:(aa, bb, cc, dd)};") ==
+        parsed("{:(aa,bb,cc,dd)}") ==
         [
             FunctionDefTree(
                 [
@@ -213,21 +205,53 @@ def test_Empty_function_definition_with_params_gets_parsed():
 def test_Function_params_that_are_not_symbols_is_an_error():
     with pytest.raises(
         Exception,
-        message=(
+        match=(
             "Only symbols are allowed in function parameter lists. " +
             "I found: " +
-            "('operation', " +
-            "'+', " +
-            "SymbolTree(value='aa'), " +
-            "NumberTree(value='3'))."
+            "OperationTree\(operation='\+', " +
+            "symbol=SymbolTree\(value='aa'\), " +
+            "new_value=NumberTree\(value='3'\)\)."
+            # TODO: show original code
         )
     ):
-        parsed("{:(aa + 3, d)};"),
+        parsed("{:(aa+3,d)}"),
+
+
+def test_Unended_function_call_is_an_error():
+    with pytest.raises(
+        Exception,
+        match=r"Hit end of file - expected '\)'"
+    ):
+        parsed("pr(")
+
+
+def test_Unended_function_params_is_an_error():
+    with pytest.raises(
+        Exception,
+        match=r"Unexpected token: \}"
+    ):
+        parsed("{:(}")
+
+
+def test_Unended_function_def_is_an_error():
+    with pytest.raises(
+        Exception,
+        match=r"Hit end of file - expected '\}'"
+    ):
+        parsed("{")
+
+
+def test_Unended_nested_function_def_is_an_error():
+    with pytest.raises(
+        Exception,
+        match=r"Hit end of file - expected '\}'"
+    ):
+        parsed("x=3 f() {:(y){} print(4)")
 
 
 def test_Function_definition_containing_commands_gets_parsed():
     assert (
-        parsed('{print(3-4); a = "x"; print(a);};') ==
+        parsed('{print(3-4) a="x" print(a)}') ==
         [
             FunctionDefTree(
                 [],
@@ -252,7 +276,7 @@ def test_Function_definition_containing_commands_gets_parsed():
 
 def test_Function_definition_with_params_and_commands_gets_parsed():
     assert (
-        parsed('{:(x,yy)print(3-4); a = "x"; print(a);};') ==
+        parsed('{:(x,yy)print(3-4) a="x" print(a)}') ==
         [
             FunctionDefTree(
                 [
@@ -280,20 +304,13 @@ def test_Function_definition_with_params_and_commands_gets_parsed():
 
 def test_A_complex_example_program_parses():
     example = """
-        double =
-            {:(x)
-                2 * x;
-            };
+        double={:(x)2*x}
 
-        num1 = 3;
-        num2 = double( num );
+        num1=3
+        num2=double(num)
 
-        answer =
-            if( greater_than( num2, 5 ),
-                {"LARGE!"},
-                {"small."}
-            );
+        answer=if(greater_than(num2,5),{"LARGE!"},{"small."})
 
-        print( answer );
+        print(answer)
     """
     parsed(example)
