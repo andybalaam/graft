@@ -226,8 +226,16 @@ def test_A_closure_holds_updateable_values():
     assert (
         evald(
             """
-            counter={x=0 {:(meth)
-                dumb_if_equal(meth,"get",{x},{dumb_set("x",x+1)})}
+            counter={
+                x=0
+                {:(meth)
+                    dumb_if_equal(
+                        meth,
+                        "get",
+                        {x},
+                        {dumb_set("x",x+1)}
+                    )
+                }
             }()
             counter("inc")
             counter("inc")

@@ -318,7 +318,12 @@ def test_A_complex_example_program_parses():
 
 def test_Spaces_are_allowed_where_unimportant():
     assert (
-        parsed('{:(x,y) x+y}(3,4)') ==
+        parsed('''
+        {:( x, y )
+            x+y
+            foo( 3 )
+        }( 3, 4 )
+        ''') ==
         [
             FunctionCallTree(
                 FunctionDefTree(
@@ -331,6 +336,12 @@ def test_Spaces_are_allowed_where_unimportant():
                             '+',
                             SymbolTree("x"),
                             SymbolTree("y"),
+                        ),
+                        FunctionCallTree(
+                            SymbolTree("foo"),
+                            [
+                                NumberTree("3"),
+                            ]
                         ),
                     ]
                 ),

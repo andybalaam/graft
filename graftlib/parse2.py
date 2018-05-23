@@ -98,7 +98,8 @@ class Parser:
             nxt = self.next_expression(None)
             return self.next_expression(AssignmentTree(prev, nxt))
         elif typ == StatementSeparatorToken:
-            pass  # We skip whitespace where we weren't expecting it
+            # Ignore whitespace anywhere it wasn't expected
+            return self.next_expression(prev)
         else:
             raise Exception("Unexpected token: " + str(tok.code()))
 
