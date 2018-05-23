@@ -209,8 +209,8 @@ def test_Function_params_that_are_not_symbols_is_an_error():
             "Only symbols are allowed in function parameter lists. " +
             "I found: " +
             "OperationTree\(operation='\+', " +
-            "symbol=SymbolTree\(value='aa'\), " +
-            "new_value=NumberTree\(value='3'\)\)."
+            "left=SymbolTree\(value='aa'\), " +
+            "right=NumberTree\(value='3'\)\)."
             # TODO: show original code
         )
     ):
@@ -314,3 +314,30 @@ def test_A_complex_example_program_parses():
         print(answer)
     """
     parsed(example)
+
+
+def test_Spaces_are_allowed_where_unimportant():
+    assert (
+        parsed('{:(x,y) x+y}(3,4)') ==
+        [
+            FunctionCallTree(
+                FunctionDefTree(
+                    [
+                        SymbolTree("x"),
+                        SymbolTree("y"),
+                    ],
+                    [
+                        OperationTree(
+                            '+',
+                            SymbolTree("x"),
+                            SymbolTree("y"),
+                        ),
+                    ]
+                ),
+                [
+                    NumberTree("3"),
+                    NumberTree("4"),
+                ]
+            )
+        ]
+    )

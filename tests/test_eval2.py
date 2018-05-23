@@ -1,0 +1,239 @@
+import pytest
+from graftlib.lex2 import lex
+from graftlib.parse2 import FunctionCallTree, FunctionDefTree, parse
+from graftlib.eval2 import NoneValue, eval_expr, eval_list
+from graftlib.env import Env
+
+
+# --- Utils ---
+
+
+def evald(inp, env=None):
+    if env is None:
+        env = Env()
+    return eval_list(parse(lex(inp)), env)
+
+
+def assert_prog_fails(program, error, env=None):
+    with pytest.raises(
+        Exception,
+        match=error
+    ):
+        evald(program, env)
+
+
+# --- Evaluating ---
+
+
+def test_Evaluating_an_empty_program_gives_none():
+    assert evald("") == ("none",)
+
+
+def test_Evaluating_a_primitive_returns_itself():
+    assert evald("3") == ("number", 3)
+    assert evald("3.1") == ("number", 3.1)
+    assert evald("'foo'") == ("string", "foo")
+
+
+def test_Arithmetic_expressions_come_out_correct():
+    assert evald("3+4") == ("number", 7)
+    assert evald("3-4") == ("number", -1)
+    assert evald("3*4") == ("number", 12)
+    assert evald("3/4") == ("number", 0.75)
+
+
+def test_Referring_to_an_unknown_symbol_is_an_error():
+    assert_prog_fails("x", "Unknown symbol 'x'.")
+
+
+def test_Can_define_a_value_and_retrieve_it():
+    assert evald("x=30 x ") == ("number", 30)
+    assert evald("y='foo' y") == ("string", "foo")
+
+
+def test_Modifying_a_value_is_an_error():
+    assert_prog_fails("x=30 x=10", "Not allowed to re-assign symbol 'x'.")
+
+
+def test_Value_of_an_assignment_is_the_value_assigned():
+    assert evald("x=31") == ("number", 31)
+
+
+def test_None_evaluates_to_None():
+    assert eval_expr(NoneValue(), Env()) == NoneValue()
+
+
+def test_Calling_a_function_returns_its_last_value():
+    assert (
+        evald("{10 11}()") ==
+        ("number", 11)
+    )
+
+
+def test_Body_of_a_function_can_use_arg_values():
+    assert (
+        evald("{:(x,y)x+y}(100,1)") ==
+        ("number", 101)
+    )
+
+
+def test_Can_hold_a_reference_to_a_function_and_call_it():
+    assert (
+        evald(
+            """
+            add={:(x,y)x+y}
+            add(20,2.2)
+            """
+        ) ==
+        ("number", 22.2)
+    )
+
+
+def test_A_symbol_has_different_life_inside_and_outside_a_function():
+    """Define a symbol outside a function, redefine inside,
+       then evaluate outside.  What happened inside the
+       function should not affect the value outside."""
+
+    assert (
+        evald(
+            """
+            foo="bar"
+            {foo=3}()
+            foo
+            """
+        ) ==
+        ("string", "bar")
+    )
+
+
+def test_A_symbol_within_a_function_has_the_local_value():
+    assert (
+        evald(
+            """
+            foo=3
+            bar={foo=77 foo}()
+            bar
+            """
+        ) ==
+        ("number", 77)
+    )
+
+
+def test_Native_function_gets_called():
+    def native_fn(env, x, y):
+        return ("number", x[1] + y[1])
+    env = Env()
+    env.set("native_fn", ("native", native_fn))
+    assert evald("native_fn(2,8)", env) == ("number", 10)
+
+
+def test_Wrong_number_of_arguments_to_a_function_is_an_error():
+    assert_prog_fails(
+        "{}(3)",
+        (
+            "1 arguments passed to function " +
+            "FunctionDefTree\(params=\[\], body=\[\]\), " +
+            "but it requires 0 arguments."
+        ),
+    )
+    assert_prog_fails(
+        "x={:(a,b,c)} x(3,2)",
+        (
+            "2 arguments passed to function SymbolTree\(value='x'\), " +
+            "but it requires 3 arguments."
+        ),
+    )
+
+
+def test_Wrong_number_of_arguments_to_a_native_function_is_an_error():
+    def native_fn0(env):
+        return ("number", 12)
+
+    def native_fn3(env, x, y, z):
+        return ("number", 12)
+    env = Env()
+    env.set("native_fn0", ("native", native_fn0))
+    env.set("native_fn3", ("native", native_fn3))
+    assert_prog_fails(
+        "native_fn0(3)",
+        (
+            "1 arguments passed to function " +
+            "SymbolTree\(value='native_fn0'\), " +
+            "but it requires 0 arguments."
+        ),
+        env
+    )
+    assert_prog_fails(
+        "native_fn3(3,2)",
+        (
+            "2 arguments passed to function " +
+            "SymbolTree\(value='native_fn3'\), " +
+            "but it requires 3 arguments."
+        ),
+        env
+    )
+
+
+def test_Function_arguments_are_independent():
+    assert (
+        evald(
+            """
+            fn={:(x){x}}
+            a=fn("a")
+            b=fn("b")
+            a()
+            """
+        ) ==
+        evald("'a'")
+    )
+    assert (
+        evald(
+            """
+            fn={:(x){x}}
+            a=fn("a")
+            b=fn("b")
+            b()
+            """
+        ) ==
+        evald("'b'")
+    )
+
+
+def test_A_native_function_can_edit_the_environment():
+    def mx3(env):
+        env.set("x", ("number", 3))
+    env = Env()
+    env.set("make_x_three", ("native", mx3))
+    assert (
+        evald("x=1 make_x_three() x", env) ==
+        ("number", 3)
+    )
+
+
+def test_A_closure_holds_updateable_values():
+    def dumb_set(env, sym, val):
+        env.parent.parent.parent.set(sym[1], val)
+
+    def dumb_if_equal(env, val1, val2, then_fn, else_fn):
+        if val1 == val2:
+            ret = then_fn
+        else:
+            ret = else_fn
+        return eval_expr(FunctionCallTree(ret, []), env)
+    env = Env()
+    env.set("dumb_set", ("native", dumb_set))
+    env.set("dumb_if_equal", ("native", dumb_if_equal))
+    assert (
+        evald(
+            """
+            counter={x=0 {:(meth)
+                dumb_if_equal(meth,"get",{x},{dumb_set("x",x+1)})}
+            }()
+            counter("inc")
+            counter("inc")
+            counter("get")
+            """,
+            env
+        ) ==
+        ("number", 2)
+    )

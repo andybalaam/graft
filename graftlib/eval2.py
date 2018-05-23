@@ -1,0 +1,111 @@
+import inspect
+import attr
+
+from graftlib.parse2 import (
+    AssignmentTree,
+    FunctionCallTree,
+    FunctionDefTree,
+    NumberTree,
+    OperationTree,
+    StringTree,
+    SymbolTree,
+)
+
+from graftlib.env import Env
+
+
+@attr.s
+class NoneValue:
+    pass
+
+
+def _operation(expr, env):
+    arg1 = eval_expr(expr.left, env)
+    arg2 = eval_expr(expr.right, env)
+    if expr.operation == "+":
+        return ("number", arg1[1] + arg2[1])
+    elif expr.operation == "-":
+        return ("number", arg1[1] - arg2[1])
+    elif expr.operation == "*":
+        return ("number", arg1[1] * arg2[1])
+    elif expr.operation == "/":
+        return ("number", arg1[1] / arg2[1])
+    else:
+        raise Exception("Unknown operation: " + expr.operation)
+
+
+def fail_if_wrong_number_of_args(fn_name, params, args):
+    if len(params) != len(args):
+        raise Exception((
+            "%d arguments passed to function %s, but it " +
+            "requires %d arguments."
+        ) % (len(args), fn_name, len(params)))
+
+
+def _function_call(expr, env):
+    fn = eval_expr(expr.fn, env)
+    args = list((eval_expr(a, env) for a in expr.args))
+    if fn[0] == "function":
+        params = fn[1]
+        fail_if_wrong_number_of_args(expr.fn, params, args)
+        body = fn[2]
+        fn_env = fn[3]
+        new_env = Env(fn_env)
+        for p, a in zip(params, args):
+            new_env.set(p.value, a)
+        return eval_list(body, new_env)
+    elif fn[0] == "native":
+        py_fn = fn[1]
+        params = inspect.getargspec(py_fn).args
+        fail_if_wrong_number_of_args(expr.fn, params[1:], args)
+        return fn[1](env, *args)
+    else:
+        raise Exception(
+            "Attempted to call something that is not a function: %s" %
+            str(fn)
+        )
+
+
+def eval_expr(expr, env):
+    typ = type(expr)
+    if typ == NumberTree:
+        return ("number", float(expr.value))
+    elif typ == StringTree:
+        return ("string", expr.value)
+    elif typ == NoneValue:
+        return expr
+    elif typ == OperationTree:
+        return _operation(expr, env)
+    elif typ == SymbolTree:
+        ret = env.get(expr.value)
+        if ret is None:
+            raise Exception("Unknown symbol '%s'." % expr.value)
+        else:
+            return ret
+    elif typ == AssignmentTree:
+        var_name = expr.symbol.value
+        if var_name in env.items:
+            raise Exception("Not allowed to re-assign symbol '%s'." % var_name)
+        val = eval_expr(expr.value, env)
+        env.set(var_name, val)
+        return val
+    elif typ == FunctionCallTree:
+        return _function_call(expr, env)
+    elif typ == FunctionDefTree:
+        return ("function", expr.params, expr.body, Env(env))
+    elif typ == tuple and expr[0] == "function":
+        return expr
+    else:
+        raise Exception("Unknown expression type: " + str(expr))
+
+
+def eval_iter(exprs, env):
+    for expr in exprs:
+        yield eval_expr(expr, env)
+
+
+def eval_list(exprs, env):
+    ret = ("none",)
+    for expr in eval_iter(exprs, env):
+        ret = expr
+    return ret

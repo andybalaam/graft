@@ -44,8 +44,8 @@ class FunctionDefTree:
 @attr.s
 class OperationTree:
     operation: str = attr.ib()
-    symbol = attr.ib()
-    new_value = attr.ib()
+    left = attr.ib()
+    right = attr.ib()
 
 
 @attr.s
@@ -97,6 +97,8 @@ class Parser:
                     "You can't assign to anything except a symbol.")
             nxt = self.next_expression(None)
             return self.next_expression(AssignmentTree(prev, nxt))
+        elif typ == StatementSeparatorToken:
+            pass  # We skip whitespace where we weren't expecting it
         else:
             raise Exception("Unexpected token: " + str(tok.code()))
 
