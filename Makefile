@@ -1,4 +1,4 @@
-all: test-full
+all: test
 
 setup:
 	sudo apt install \
@@ -18,9 +18,8 @@ test:
 	pytest-3 --pep8 -vv
 
 
-test-full:
+test-full: test
 	pytest-3 \
 		--quiet \
-		--pep8 \
 		--pylama \
 		--pylint --pylint-rcfile=.pylintrc \

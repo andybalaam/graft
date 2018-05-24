@@ -1,6 +1,6 @@
 import pytest
 from graftlib.lex2 import lex
-from graftlib.parse2 import FunctionCallTree, FunctionDefTree, parse
+from graftlib.parse2 import FunctionCallTree, parse
 from graftlib.eval2 import (
     NativeFunctionValue,
     NoneValue,
@@ -127,7 +127,7 @@ def test_A_symbol_within_a_function_has_the_local_value():
 
 
 def test_Native_function_gets_called():
-    def native_fn(env, x, y):
+    def native_fn(_env, x, y):
         return NumberValue(x.value + y.value)
     env = Env()
     env.set("native_fn", NativeFunctionValue(native_fn))
@@ -139,24 +139,24 @@ def test_Wrong_number_of_arguments_to_a_function_is_an_error():
         "{}(3)",
         (
             "1 arguments passed to function " +
-            "FunctionDefTree\(params=\[\], body=\[\]\), " +
+            r"FunctionDefTree\(params=\[\], body=\[\]\), " +
             "but it requires 0 arguments."
         ),
     )
     assert_prog_fails(
         "x={:(a,b,c)} x(3,2)",
         (
-            "2 arguments passed to function SymbolTree\(value='x'\), " +
+            r"2 arguments passed to function SymbolTree\(value='x'\), " +
             "but it requires 3 arguments."
         ),
     )
 
 
 def test_Wrong_number_of_arguments_to_a_native_function_is_an_error():
-    def native_fn0(env):
+    def native_fn0(_env):
         return NumberValue(12)
 
-    def native_fn3(env, x, y, z):
+    def native_fn3(_env, _x, _y, _z):
         return NumberValue(12)
     env = Env()
     env.set("native_fn0", NativeFunctionValue(native_fn0))
@@ -165,7 +165,7 @@ def test_Wrong_number_of_arguments_to_a_native_function_is_an_error():
         "native_fn0(3)",
         (
             "1 arguments passed to function " +
-            "SymbolTree\(value='native_fn0'\), " +
+            r"SymbolTree\(value='native_fn0'\), " +
             "but it requires 0 arguments."
         ),
         env
@@ -174,7 +174,7 @@ def test_Wrong_number_of_arguments_to_a_native_function_is_an_error():
         "native_fn3(3,2)",
         (
             "2 arguments passed to function " +
-            "SymbolTree\(value='native_fn3'\), " +
+            r"SymbolTree\(value='native_fn3'\), " +
             "but it requires 3 arguments."
         ),
         env

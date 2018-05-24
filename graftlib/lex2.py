@@ -92,7 +92,7 @@ def is_whitespace(c):
     if c is None:
         return False
     else:
-        return (c in " \n")
+        return c in " \n"
 
 
 def lex(chars_iter):

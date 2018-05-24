@@ -208,13 +208,13 @@ def test_Function_params_that_are_not_symbols_is_an_error():
         match=(
             "Only symbols are allowed in function parameter lists. " +
             "I found: " +
-            "OperationTree\(operation='\+', " +
-            "left=SymbolTree\(value='aa'\), " +
-            "right=NumberTree\(value='3'\)\)."
+            r"OperationTree\(operation='\+', " +
+            r"left=SymbolTree\(value='aa'\), " +
+            r"right=NumberTree\(value='3'\)\)."
             # TODO: show original code
         )
     ):
-        parsed("{:(aa+3,d)}"),
+        parsed("{:(aa+3,d)}")
 
 
 def test_Unended_function_call_is_an_error():
