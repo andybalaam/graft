@@ -18,8 +18,9 @@ test:
 	pytest-3 --pep8 -vv
 
 
-test-full: test
+test-full:
 	pytest-3 \
 		--quiet \
+		--pep8 \
 		--pylama \
 		--pylint --pylint-rcfile=.pylintrc \
