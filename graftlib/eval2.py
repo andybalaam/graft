@@ -1,4 +1,5 @@
 import inspect
+from typing import List
 import attr
 
 from graftlib.parse2 import (
@@ -15,21 +16,43 @@ from graftlib.env import Env
 
 
 @attr.s
+class NativeFunctionValue:
+    py_fn: float = attr.ib()
+
+
+@attr.s
 class NoneValue:
     pass
+
+
+@attr.s
+class NumberValue:
+    value: float = attr.ib()
+
+
+@attr.s
+class StringValue:
+    value: str = attr.ib()
+
+
+@attr.s
+class UserFunctionValue:
+    params: List = attr.ib()
+    body: List = attr.ib()
+    env: Env = attr.ib()
 
 
 def _operation(expr, env):
     arg1 = eval_expr(expr.left, env)
     arg2 = eval_expr(expr.right, env)
     if expr.operation == "+":
-        return ("number", arg1[1] + arg2[1])
+        return NumberValue(arg1.value + arg2.value)
     elif expr.operation == "-":
-        return ("number", arg1[1] - arg2[1])
+        return NumberValue(arg1.value - arg2.value)
     elif expr.operation == "*":
-        return ("number", arg1[1] * arg2[1])
+        return NumberValue(arg1.value * arg2.value)
     elif expr.operation == "/":
-        return ("number", arg1[1] / arg2[1])
+        return NumberValue(arg1.value / arg2.value)
     else:
         raise Exception("Unknown operation: " + expr.operation)
 
@@ -45,20 +68,17 @@ def fail_if_wrong_number_of_args(fn_name, params, args):
 def _function_call(expr, env):
     fn = eval_expr(expr.fn, env)
     args = list((eval_expr(a, env) for a in expr.args))
-    if fn[0] == "function":
-        params = fn[1]
-        fail_if_wrong_number_of_args(expr.fn, params, args)
-        body = fn[2]
-        fn_env = fn[3]
-        new_env = Env(fn_env)
-        for p, a in zip(params, args):
+    typ = type(fn)
+    if typ == UserFunctionValue:
+        fail_if_wrong_number_of_args(expr.fn, fn.params, args)
+        new_env = Env(fn.env)
+        for p, a in zip(fn.params, args):
             new_env.set(p.value, a)
-        return eval_list(body, new_env)
-    elif fn[0] == "native":
-        py_fn = fn[1]
-        params = inspect.getargspec(py_fn).args
+        return eval_list(fn.body, new_env)
+    elif typ == NativeFunctionValue:
+        params = inspect.getargspec(fn.py_fn).args
         fail_if_wrong_number_of_args(expr.fn, params[1:], args)
-        return fn[1](env, *args)
+        return fn.py_fn(env, *args)
     else:
         raise Exception(
             "Attempted to call something that is not a function: %s" %
@@ -69,9 +89,9 @@ def _function_call(expr, env):
 def eval_expr(expr, env):
     typ = type(expr)
     if typ == NumberTree:
-        return ("number", float(expr.value))
+        return NumberValue(float(expr.value))
     elif typ == StringTree:
-        return ("string", expr.value)
+        return StringValue(expr.value)
     elif typ == NoneValue:
         return expr
     elif typ == OperationTree:
@@ -92,8 +112,8 @@ def eval_expr(expr, env):
     elif typ == FunctionCallTree:
         return _function_call(expr, env)
     elif typ == FunctionDefTree:
-        return ("function", expr.params, expr.body, Env(env))
-    elif typ == tuple and expr[0] == "function":
+        return UserFunctionValue(expr.params, expr.body, Env(env))
+    elif typ == UserFunctionValue:
         return expr
     else:
         raise Exception("Unknown expression type: " + str(expr))
@@ -105,7 +125,7 @@ def eval_iter(exprs, env):
 
 
 def eval_list(exprs, env):
-    ret = ("none",)
+    ret = NoneValue()
     for expr in eval_iter(exprs, env):
         ret = expr
     return ret
