@@ -1,5 +1,13 @@
 # Graft TODO
 
+- Cell syntax
+  + Import Cell lexer, parser, evaluator
+  + Convert it to space-separated commands
+  - Create Graft execution environment
+  - Update all examples
+  - Switch between 2 syntaxes on command line
+  - Default to new syntax
+
 ## Later
 
 * Warning when you throw away a value?
