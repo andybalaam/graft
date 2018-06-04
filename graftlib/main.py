@@ -2,10 +2,14 @@ from typing import Optional, Tuple
 from argparse import ArgumentParser
 
 from graftlib.animation import Animation
-from graftlib.eval_ import eval_  # , eval_debug
+from graftlib.env import Env
+from graftlib.eval_ import eval_
+from graftlib.eval2 import eval_ as eval2
 from graftlib.lex import lex
+from graftlib.lex2 import lex as lex2
 from graftlib.strokeoptimiser import StrokeOptimiser
 from graftlib.parse import parse
+from graftlib.parse2 import parse as parse2
 from graftlib.world import World
 from graftlib.ui.gtk3ui import Gtk3Ui
 from graftlib.ui.gifui import GifUi
@@ -75,6 +79,28 @@ def make_animation(
     return Animation(opt, opt, lookahead, max_strokes, dot_size)
 
 
+def make_animation2(
+        program: str,
+        frames: Optional[int],
+        rand,
+        max_forks: int,
+        lookahead_steps: int,
+):
+    """
+    Given a program, return an iterator that lexes, parses,
+    evaluates and optimises it, yielding actual strokes to draw on
+    the screen, limited to the number of frames supplied, and using
+    the random number generator supplied.
+    """
+    opt = StrokeOptimiser(
+        eval2(parse2(lex2(program)), Env())
+    )
+    # , frames, rand, max_forks
+    frames = lookahead_steps if frames is None else frames
+    lookahead = min(frames, lookahead_steps)
+    return Animation(opt, opt, lookahead, max_strokes, dot_size)
+
+
 def main(world: World) -> int:
     """Run the main program and return the status code to emit"""
     # for command in eval_debug(parse(lex(world.argv[1])), 10):
@@ -124,6 +150,11 @@ def main(world: World) -> int:
         help="How many steps to use to calculate the initial zoom level.",
     )
     argparser.add_argument(
+        '--cell',
+        action="store_true",
+        help="Write programs in Cell, instead of normal Graft syntax.",
+    )
+    argparser.add_argument(
         'program',
         help="The actual graft program to run, e.g. '+d:S' to draw a circle."
     )
@@ -132,13 +163,22 @@ def main(world: World) -> int:
 
     frames = None if args.frames < 0 else args.frames
 
-    animation = make_animation(
-        args.program,
-        frames,
-        world.random.uniform,
-        args.max_forks,
-        args.lookahead_steps,
-    )
+    if args.cell:
+        animation = make_animation2(
+            args.program,
+            frames,
+            world.random.uniform,
+            args.max_forks,
+            args.lookahead_steps,
+        )
+    else:
+        animation = make_animation(
+            args.program,
+            frames,
+            world.random.uniform,
+            args.max_forks,
+            args.lookahead_steps,
+        )
     image_size = (args.width, args.height)
 
     if args.gif:

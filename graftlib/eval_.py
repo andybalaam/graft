@@ -4,6 +4,9 @@ import math
 import operator
 
 import attr
+
+from graftlib.dot import Dot
+from graftlib.line import Line
 from graftlib.parse import (
     FunctionCall,
     FunctionDef,
@@ -12,27 +15,7 @@ from graftlib.parse import (
     Number,
     Symbol,
 )
-
-
-@attr.s(cmp=True, frozen=True)
-class Pt:
-    x: float = attr.ib()
-    y: float = attr.ib()
-
-
-@attr.s(cmp=True, frozen=True)
-class Line():
-    start: Pt = attr.ib()
-    end: Pt = attr.ib()
-    color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
-    size: float = attr.ib(default=5.0)
-
-
-@attr.s(cmp=True, frozen=True)
-class Dot():
-    pos: Pt = attr.ib()
-    color: Tuple = attr.ib(default=(0.0, 0.0, 0.0, 100.0))
-    size: float = attr.ib(default=5.0)
+from graftlib.pt import Pt
 
 
 @attr.s
@@ -40,12 +23,11 @@ class BuiltInFn:
     fn = attr.ib()
 
 
-def zero():
-    return 0.0
-
-
 def new_env() -> Dict[str, object]:
     """Create a dict of default variable values."""
+
+    def zero():
+        return 0.0
 
     return defaultdict(
         zero,

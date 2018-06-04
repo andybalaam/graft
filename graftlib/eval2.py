@@ -13,11 +13,7 @@ from graftlib.parse2 import (
 )
 
 from graftlib.env import Env
-
-
-@attr.s
-class NativeFunctionValue:
-    py_fn: float = attr.ib()
+from graftlib.nativefunctionvalue import NativeFunctionValue
 
 
 @attr.s
@@ -119,13 +115,13 @@ def eval_expr(expr, env):
         raise Exception("Unknown expression type: " + str(expr))
 
 
-def eval_iter(exprs, env):
+def eval_(exprs, env):
     for expr in exprs:
         yield eval_expr(expr, env)
 
 
 def eval_list(exprs, env):
     ret = NoneValue()
-    for expr in eval_iter(exprs, env):
+    for expr in eval_(exprs, env):
         ret = expr
     return ret
