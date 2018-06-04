@@ -15,12 +15,8 @@ from graftlib.parse import (
     Number,
     Symbol,
 )
+from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.pt import Pt
-
-
-@attr.s
-class BuiltInFn:
-    fn = attr.ib()
 
 
 def new_env() -> Dict[str, object]:
@@ -42,12 +38,12 @@ def new_env() -> Dict[str, object]:
             "b": 0.0,    # blue  0-100 (and 0 to -100)
             "a": 100.0,  # alpha 0-100 (and 0 to -100)
             "z": 5.0,    # brush size
-            "D": BuiltInFn(Functions.dot),
-            "F": BuiltInFn(Functions.fork),
-            "J": BuiltInFn(Functions.jump),
-            "L": BuiltInFn(Functions.line_to),
-            "R": BuiltInFn(Functions.random),
-            "S": BuiltInFn(Functions.step),
+            "D": NativeFunctionValue(Functions.dot),
+            "F": NativeFunctionValue(Functions.fork),
+            "J": NativeFunctionValue(Functions.jump),
+            "L": NativeFunctionValue(Functions.line_to),
+            "R": NativeFunctionValue(Functions.random),
+            "S": NativeFunctionValue(Functions.step),
         }
     )
 
@@ -186,8 +182,8 @@ class Evaluator:
             raise Exception("Unknown function %s" % fn_name)
 
         fnwrap = self.state.get_variable(fn_name)
-        if type(fnwrap) == BuiltInFn:
-            return fnwrap.fn.__get__(self.functions)()
+        if type(fnwrap) == NativeFunctionValue:
+            return fnwrap.py_fn.__get__(self.functions)()
         else:
             raise Exception(
                 "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
