@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Optional
+from typing import Iterable, List, Optional
 import operator
 
 import attr
@@ -15,7 +15,6 @@ from graftlib.parse import (
     Symbol,
 )
 from graftlib.nativefunctionvalue import NativeFunctionValue
-from graftlib.pt import Pt
 from graftlib.state import State
 
 
