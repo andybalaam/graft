@@ -1,16 +1,19 @@
 import itertools
+
 from typing import Iterable, List, Optional, Tuple, Union
+
+from graftlib.dot import Dot
+from graftlib.env import Env
 from graftlib.eval_ import (
-    Dot,
-    Line,
-    Pt,
-    State,
     eval_,
     eval_debug,
 )
 from graftlib.lex import lex
+from graftlib.line import Line
+from graftlib.pt import Pt
 from graftlib.parse import parse
 from graftlib.round_ import round_float, round_stroke
+from graftlib.state import State, graft_env
 
 
 def round_strokes(strokes: Iterable[List[Union[Dot, Line]]]) -> (
@@ -19,17 +22,43 @@ def round_strokes(strokes: Iterable[List[Union[Dot, Line]]]) -> (
         yield [round_stroke(stroke) for stroke in par_strokes]
 
 
-def round_if_float(v):
+def round_value(v):
     if type(v) == float:
         return round_float(v)
+    elif type(v) == int:
+        return float(v)
+    elif type(v) == Pt:
+        return round_pt(v)
+    elif type(v) in (Line, Dot):
+        return round_stroke(v)
     else:
         return v
 
 
-def round_state(state: State):
-    return State(
-        env={k: round_if_float(v) for k, v in state.env.items()}
-    )
+def rounded_dict(env):
+    """
+    Return a map of name->value of names visible in
+    env and its parents, excluding any values that
+    are equal to the default environment.
+    Float values are rounded.
+    """
+
+    default_env = graft_env()
+    ret = {}
+
+    def add_items(env):
+        if env.parent is not None:
+            add_items(env.parent)
+        for k, v in env.items.items():
+            v = round_value(v)
+            if round_value(default_env.items[k]) == v:
+                if k in ret:
+                    del ret[k]
+            else:
+                ret[k] = v
+
+    add_items(env)
+    return ret
 
 
 def round_debug(strokes: Iterable[List[Tuple[Optional[Line], State]]]) -> (
@@ -38,7 +67,7 @@ def round_debug(strokes: Iterable[List[Tuple[Optional[Line], State]]]) -> (
         yield [
             (
                 None if stroke is None else round_stroke(stroke),
-                round_state(state)
+                rounded_dict(state.env)
             ) for (stroke, state) in par_strokes
         ]
 
@@ -72,7 +101,7 @@ def test_incrementing_a_variable_adds_ten():
 
     assert (
         do_eval_debug("+d", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": 10.0, "s": 10.0}))]]
+        [[(None, {"d": 10.0})]]
     )
 
 
@@ -81,36 +110,36 @@ def test_subtracting_a_variable_removes_ten():
 
     assert (
         do_eval_debug("-d", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": -10.0, "s": 10.0}))]]
+        [[(None, {"d": -10.0})]]
     )
 
 
 def test_subtracting():
     assert (
         do_eval_debug("2-d", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": -2.0, "s": 10.0}))]]
+        [[(None, {"d": -2.0})]]
     )
     assert (
         do_eval_debug("-2-d", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": 2.0, "s": 10.0}))]]
+        [[(None, {"d": 2.0})]]
     )
 
 
 def test_dividing():
     assert (
         do_eval_debug("2/s", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": 0.0, "s": 5.0}))]]
+        [[(None, {"s": 5.0})]]
     )
     assert (
         do_eval_debug("-2/s", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": 0.0, "s": -5.0}))]]
+        [[(None, {"s": -5.0})]]
     )
 
 
 def test_adding_a_negative_subtracts():
     assert (
         do_eval_debug("-2+d", 1) ==
-        [[(None, State(env={"x": 0.0, "y": 0.0, "d": -2.0, "s": 10.0}))]]
+        [[(None, {"d": -2.0})]]
     )
 
 
@@ -118,8 +147,8 @@ def test_multiplying_a_variable():
     assert (
         do_eval_debug("2=d3.1d", 2) ==
         [
-            [(None, State(env={"x": 0.0, "y": 0.0, "d": 2.0, "s": 10.0}))],
-            [(None, State(env={"x": 0.0, "y": 0.0, "d": 6.2, "s": 10.0}))],
+            [(None, {"d": 2.0})],
+            [(None, {"d": 6.2})],
         ]
     )
 
@@ -134,19 +163,19 @@ def test_turn_right_and_jump():
         [
             [(
                 None,
-                State(env={"x": 0.0, "y": 0.0, "d": 90.0, "s": 10.0}),
+                {"d": 90.0},
             )],
             [(
                 None,
-                State(env={"x": 0.0, "y": 0.0, "d": 90.0, "s": 25.0}),
+                {"d": 90.0, "s": 25.0},
             )],
             [(
                 None,
-                State(env={"x": 25.0, "y": 0.0, "d": 90.0, "s": 25.0}),
+                {"x": 25.0, "d": 90.0, "s": 25.0},
             )],
             [(
                 Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
-                State(env={"x": 50.0, "y": 0.0, "d": 90.0, "s": 25.0}),
+                {"x": 50.0, "d": 90.0, "s": 25.0},
             )],
         ]
     )
@@ -185,7 +214,7 @@ def test_draw_in_different_size():
             [Line(Pt(0.0, 0.0), Pt(0, 10.0), size=20.0)],
             [Line(
                 Pt(0.0, 10.0),
-                Pt(0, 20.0),
+                Pt(0.0, 20.0),
                 size=20.0,
                 color=(5.0, 0.0, 0.0, 100.0),
             )],
@@ -216,19 +245,22 @@ def test_repeating_multiple_commands():
 
 
 def test_semicolon_to_separate_statements():
-    assert do_eval("s;s:S", 1) == [[Line(Pt(0, 0), Pt(0, 10))]]
+    assert do_eval("s;s:S", 1) == [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
 
 
 def test_pass_symbol_to_operator():
-    assert do_eval("90=s;s~+d:S", 1) == [[Line(Pt(0, 0), Pt(90, 0))]]
+    assert do_eval("90=s;s~+d:S", 1) == [[Line(Pt(0.0, 0.0), Pt(90.0, 0.0))]]
 
 
 def test_define_custom_variable():
-    assert do_eval("180=aa;aa~+d:S", 1) == [[Line(Pt(0, 0), Pt(0, -10))]]
+    assert (
+        do_eval("180=aa;aa~+d:S", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, -10.0))]]
+    )
 
 
 def test_multiply_by_variable():
-    assert do_eval("2=aa;aa~s:S", 1) == [[Line(Pt(0, 0), Pt(0, 20))]]
+    assert do_eval("2=aa;aa~s:S", 1) == [[Line(Pt(0.0, 0.0), Pt(0.0, 20.0))]]
 
 
 def test_move_in_a_circle():
@@ -291,8 +323,8 @@ def test_repeat_starts_at_beginning_if_no_label():
     assert (
         do_eval("90=d90+d:S", 2) ==
         [
-            [Line(Pt(0, 0), Pt(0, -10.0))],
-            [Line(Pt(0, -10), Pt(0, -20.0))],
+            [Line(Pt(0.0, 0.0), Pt(0.0, -10.0))],
+            [Line(Pt(0.0, -10.0), Pt(0.0, -20.0))],
         ]
     )
 
@@ -301,8 +333,8 @@ def test_repeat_starts_at_label_if_present():
     assert (
         do_eval("90=d^90+d:S", 2) ==
         [
-            [Line(Pt(0, 0), Pt(0, -10.0))],
-            [Line(Pt(0, -10), Pt(-10.0, -10.0))],
+            [Line(Pt(0.0, 0.0), Pt(0.0, -10.0))],
+            [Line(Pt(0.0, -10.0), Pt(-10.0, -10.0))],
         ]
     )
 
@@ -311,15 +343,19 @@ def test_fork_draws_lines_in_parallel():
     assert (
         do_eval(":F:S", 1) ==
         [
-            [Line(Pt(0, 0), Pt(0, 10.0)), Line(Pt(0, 0), Pt(0, 10.0))],
+            [
+                Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+                Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+            ],
         ]
     )
 
 
 def fork_ids(debug_time_step):
-    return [
-        state.get_variable("f") for _, state in debug_time_step
-    ]
+    return list(
+        env_vars["f"] if "f" in env_vars else 0
+        for _, env_vars in debug_time_step
+    )
 
 
 def test_fork_increments_the_fork_id():
@@ -362,10 +398,10 @@ def test_past_fork_limit_lines_still_move_you():
     assert (
         do_eval(":F:S", n=4, rand=None, max_forks=1) ==
         [
-            [Line(Pt(0, 0), Pt(0, 10))],
-            [Line(Pt(0, 10), Pt(0, 20))],
-            [Line(Pt(0, 20), Pt(0, 30))],
-            [Line(Pt(0, 30), Pt(0, 40))],
+            [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
+            [Line(Pt(0.0, 10.0), Pt(0.0, 20.0))],
+            [Line(Pt(0.0, 20.0), Pt(0.0, 30.0))],
+            [Line(Pt(0.0, 30.0), Pt(0.0, 40.0))],
         ]
     )
 
@@ -377,10 +413,22 @@ def test_parallel_past_fork_limit_lines_still_move_you():
     assert (
         do_eval(":F;f~=d90d^:S:F", n=4, rand=None, max_forks=2) ==
         [
-            [Line(Pt(0, 0), Pt(0, 10)), Line(Pt(0, 0), Pt(10, 0))],
-            [Line(Pt(0, 10), Pt(0, 20)), Line(Pt(10, 0), Pt(20, 0))],
-            [Line(Pt(0, 20), Pt(0, 30)), Line(Pt(20, 0), Pt(30, 0))],
-            [Line(Pt(0, 30), Pt(0, 40)), Line(Pt(30, 0), Pt(40, 0))],
+            [
+                Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+                Line(Pt(0.0, 0.0), Pt(10.0, 0.0)),
+            ],
+            [
+                Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
+                Line(Pt(10.0, 0.0), Pt(20.0, 0.0)),
+            ],
+            [
+                Line(Pt(0.0, 20.0), Pt(0.0, 30.0)),
+                Line(Pt(20.0, 0.0), Pt(30.0, 0.0)),
+            ],
+            [
+                Line(Pt(0.0, 30.0), Pt(0.0, 40.0)),
+                Line(Pt(30.0, 0.0), Pt(40.0, 0.0)),
+            ],
         ]
     )
 
@@ -394,7 +442,10 @@ def test_multi_fork_produces_lines_in_sync_with_each_other():
     )
 
     def assert_line(n):
-        assert actuals[n] == [Line(Pt(0, n * 10), Pt(0, (n + 1) * 10))] * 20
+        assert (
+            actuals[n] ==
+            [Line(Pt(0.0, n * 10.0), Pt(0., (n + 1) * 10.0))] * 20
+        )
 
     assert_line(0)
     assert_line(1)

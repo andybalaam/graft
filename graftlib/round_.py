@@ -1,6 +1,8 @@
 from typing import Tuple, Union
 
-from graftlib.eval_ import Dot, Line, Pt
+from graftlib.dot import Dot
+from graftlib.line import Line
+from graftlib.pt import Pt
 
 
 def round_float(x: float) -> float:

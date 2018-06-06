@@ -1,4 +1,6 @@
-from graftlib.eval_ import Dot, Line, Pt
+from graftlib.dot import Dot
+from graftlib.line import Line
+from graftlib.pt import Pt
 from graftlib.strokeoptimiser import Elided, StrokeOptimiser
 
 
