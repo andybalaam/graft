@@ -61,7 +61,7 @@ class Evaluator:
     def _function_call_once(self, function_call_stmt: FunctionCall) -> List:
         fn = function_call_stmt.fn
         if type(fn) == Symbol:
-            return [self._function_call_symbol(fn.value)]
+            return self._function_call_symbol(fn.value)
         elif type(fn) == FunctionDef:
             return self._function_call_userdefined(fn)
 

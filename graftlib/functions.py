@@ -22,34 +22,34 @@ class Functions:
             old_pos.y + s * math.cos(th),
         )
         self.state.set_pos(new_pos)
-        return Line(
+        return [Line(
             old_pos,
             new_pos,
             color=self.state.color(),
             size=self.state.brush_size()
-        )
+        )]
 
     def dot(self):
-        return Dot(
+        return [Dot(
             self.state.pos(),
             self.state.color(),
             self.state.brush_size()
-        )
+        )]
 
     def line_to(self):
-        return Line(
+        return [Line(
             self.state.prev_pos(),
             self.state.pos(),
             color=self.state.color(),
             size=self.state.brush_size(),
-        )
+        )]
 
     def jump(self):
         self.step()
-        return None
+        return [None]
 
     def random(self):
-        return float(self.rand.__call__(-10, 10))
+        return [float(self.rand.__call__(-10, 10))]
 
     def fork(self):
-        return self.fork_callback.__call__()
+        return [self.fork_callback.__call__()]
