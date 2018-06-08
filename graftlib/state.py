@@ -34,19 +34,8 @@ def graft_env() -> Env:
     return ret
 
 
-def clone_env(from_):
-    assert isinstance(from_, Env)
-    parent = None if from_.parent is None else convert_env(from_.parent)
-    ret = Env(
-        parent=parent,
-        stdin=from_.stdin,
-        stdout=from_.stdout,
-        stderr=from_.stderr,
-    )
-    print(from_.items)
-    for k, v in from_.items.items():
-        ret.set(k, v)
-    return ret
+def clone_env(from_: Env):
+    return from_.clone()
 
 
 @attr.s

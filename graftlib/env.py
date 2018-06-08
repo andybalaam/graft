@@ -16,6 +16,18 @@ class Env:
             self.stderr = parent.stderr
         self.items = {}
 
+    def clone(self):
+        parent = None if self.parent is None else self.parent.clone()
+        ret = Env(
+            parent=parent,
+            stdin=self.stdin,
+            stdout=self.stdout,
+            stderr=self.stderr,
+        )
+        for k, v in self.items.items():
+            ret.set(k, v)
+        return ret
+
     def get(self, name):
         if name in self.items:
             return self.items[name]
