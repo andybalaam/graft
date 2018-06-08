@@ -10,10 +10,11 @@ from graftlib.eval_ import (
 )
 from graftlib.lex import lex
 from graftlib.line import Line
+from graftlib.make_graft_env import make_graft_env
 from graftlib.pt import Pt
 from graftlib.parse import parse
 from graftlib.round_ import round_float, round_stroke
-from graftlib.state import State, graft_env
+from graftlib.state import State
 
 
 def round_strokes(strokes: Iterable[List[Union[Dot, Line]]]) -> (
@@ -43,7 +44,7 @@ def rounded_dict(env):
     Float values are rounded.
     """
 
-    default_env = graft_env()
+    default_env = make_graft_env()
     ret = {}
 
     def add_items(env):
