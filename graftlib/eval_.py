@@ -6,6 +6,7 @@ import attr
 from graftlib.dot import Dot
 from graftlib.functions import Functions
 from graftlib.line import Line
+from graftlib.make_graft_env import make_graft_env
 from graftlib.parse import (
     FunctionCall,
     FunctionDef,
@@ -171,7 +172,7 @@ class RunningProgram:
         self.program: List = program
         self.rand = rand
         self.fork_callback = fork_callback
-        self.state: State = state if state else State()
+        self.state: State = state if state else State(make_graft_env())
         self.evaluator = (
             evaluator if evaluator else Evaluator(self.state, rand, self.fork)
         )
@@ -203,7 +204,7 @@ class RunningProgram:
                 list(self.program),
                 self.rand,
                 self.fork_callback,
-                attr.evolve(self.state),
+                State(self.state.env.clone()),
                 None,
                 self.pc,
                 self.label,
@@ -240,7 +241,7 @@ class MultipleRunningPrograms:
         for prog, queue in self.programs:
             # Note: return a reference to state.  In eval_debug we
             # will copy it if needed.
-            ret.append((queue.pop(0), prog.state))
+            ret.append((queue.pop(0), prog.state.env))
 
         self.programs.extend(self.new_programs)
         self.new_programs = []
@@ -295,13 +296,13 @@ def _run_program(program: Iterable, rand, max_forks) -> Iterable:
         yield progs.next()
 
 
-def copy_states(parallel_commands):
+def copy_envs(parallel_commands):
     return [
-        (stroke, attr.evolve(state)) for (stroke, state) in parallel_commands
+        (stroke, env.clone()) for (stroke, env) in parallel_commands
     ]
 
 
-#: Iterable[Tree], n -> Iterable[(Command, State)]
+#: Iterable[Tree], n -> Iterable[(Command, Env)]
 def eval_debug(
         program: Iterable,
         n: Optional[int],
@@ -310,7 +311,7 @@ def eval_debug(
 ) -> Iterable:
     frames_counter = FramesCounter(n)
     for parallel_commands in _run_program(program, rand, max_forks):
-        yield copy_states(parallel_commands)
+        yield copy_envs(parallel_commands)
         frames_counter.next_frame(parallel_commands)
 
 
@@ -321,8 +322,8 @@ def eval_(program: Iterable, n: Optional[int], rand, max_forks) -> Iterable:
     """
 
     frames_counter = FramesCounter(n)
-    for cmds_states in _run_program(program, rand, max_forks):
-        commands = [x[0] for x in cmds_states]
+    for cmds_envs in _run_program(program, rand, max_forks):
+        commands = [x[0] for x in cmds_envs]
         if any(commands):
             yield commands
-        frames_counter.next_frame(cmds_states)
+        frames_counter.next_frame(cmds_envs)

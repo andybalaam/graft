@@ -9,16 +9,9 @@ from graftlib.pt import Pt
 from graftlib.make_graft_env import make_graft_env
 
 
-def clone_env(from_: Env):
-    return from_.clone()
-
-
 @attr.s
 class State:
-    env: Env = attr.ib(
-        default=attr.Factory(make_graft_env),
-        convert=clone_env
-    )
+    env: Env = attr.ib()
 
     def theta(self) -> float:
         """Angle we are facing in radians"""

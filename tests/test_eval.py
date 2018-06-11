@@ -14,7 +14,6 @@ from graftlib.make_graft_env import make_graft_env
 from graftlib.pt import Pt
 from graftlib.parse import parse
 from graftlib.round_ import round_float, round_stroke
-from graftlib.state import State
 
 
 def round_strokes(strokes: Iterable[List[Union[Dot, Line]]]) -> (
@@ -65,14 +64,14 @@ def rounded_dict(env):
     return ret
 
 
-def round_debug(strokes: Iterable[List[Tuple[Optional[Line], State]]]) -> (
-        Iterable[List[Tuple[Optional[Union[Dot, Line]], State]]]):
+def round_debug(strokes: Iterable[List[Tuple[Optional[Line], Env]]]) -> (
+        Iterable[List[Tuple[Optional[Union[Dot, Line]], Env]]]):
     for par_strokes in strokes:
         yield [
             (
                 None if stroke is None else round_stroke(stroke),
-                rounded_dict(state.env)
-            ) for (stroke, state) in par_strokes
+                rounded_dict(env)
+            ) for (stroke, env) in par_strokes
         ]
 
 
