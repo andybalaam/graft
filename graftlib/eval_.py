@@ -165,7 +165,6 @@ class RunningProgram:
             rand,
             fork_callback,
             state=None,
-            evaluator=None,
             pc=None,
             label=None,
     ):
@@ -173,9 +172,6 @@ class RunningProgram:
         self.rand = rand
         self.fork_callback = fork_callback
         self.state: State = state if state else State(make_graft_env())
-        self.evaluator = (
-            evaluator if evaluator else Evaluator(self.state, rand, self.fork)
-        )
 
         """
         pc = program counter - the next instruction from program to run
@@ -183,6 +179,7 @@ class RunningProgram:
         """
         self.pc = pc if pc is not None else 0
         self.label = label if label is not None else 0
+        self.evaluator = Evaluator(self.state, rand, self.fork)
 
     def set_label(self):
         self.label = self.pc
@@ -205,7 +202,6 @@ class RunningProgram:
                 self.rand,
                 self.fork_callback,
                 State(self.state.env.clone()),
-                None,
                 self.pc,
                 self.label,
             )
