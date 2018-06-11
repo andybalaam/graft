@@ -52,7 +52,10 @@ def rounded_dict(env):
             add_items(env.parent)
         for k, v in env.items.items():
             v = round_value(v)
-            if round_value(default_env.items[k]) == v:
+            if (
+                k in default_env.items and
+                round_value(default_env.items[k]) == v
+            ):
                 if k in ret:
                     del ret[k]
             else:
@@ -172,11 +175,11 @@ def test_turn_right_and_jump():
             )],
             [(
                 None,
-                {"x": 25.0, "d": 90.0, "s": 25.0},
+                {"x": 25.0, "d": 90.0, "s": 25.0, "xprev": 0.0, "yprev": 0.0},
             )],
             [(
                 Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
-                {"x": 50.0, "d": 90.0, "s": 25.0},
+                {"x": 50.0, "d": 90.0, "s": 25.0, "xprev": 25.0, "yprev": 0.0},
             )],
         ]
     )

@@ -20,22 +20,19 @@ class State:
         convert=clone_env
     )
 
-    prev_x: float = attr.ib(default=0, init=False)
-    prev_y: float = attr.ib(default=0, init=False)
-
     def theta(self) -> float:
         """Angle we are facing in radians"""
         return 2 * math.pi * (self.env.get("d") / 360.0)
 
     def prev_pos(self) -> Pt:
-        return Pt(self.prev_x, self.prev_y)
+        return Pt(self.env.get("xprev"), self.env.get("yprev"))
 
     def pos(self) -> Pt:
         return Pt(self.env.get("x"), self.env.get("y"))
 
     def set_pos(self, pos: Pt):
-        self.prev_x = self.env.get("x")
-        self.prev_y = self.env.get("y")
+        self.env.set("xprev", self.env.get("x"))
+        self.env.set("yprev", self.env.get("y"))
         self.env.set("x", pos.x)
         self.env.set("y", pos.y)
 
@@ -59,9 +56,9 @@ class State:
     def set_variable(self, name, value):
         # x and y are magic variables that remember their previous values
         if name == "x":
-            self.prev_x = self.env.get("x")
+            self.env.set("xprev", self.env.get("x"))
         elif name == "y":
-            self.prev_y = self.env.get("y")
+            self.env.set("yprev", self.env.get("y"))
         self.env.set(name, value)
 
     def get_variable(self, name):
