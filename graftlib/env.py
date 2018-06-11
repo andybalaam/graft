@@ -1,3 +1,6 @@
+from graftlib.numbervalue import NumberValue
+
+
 class Env:
     def __init__(self, parent=None, stdin=None, stdout=None, stderr=None):
         """
@@ -34,7 +37,8 @@ class Env:
         elif self.parent is not None:
             return self.parent.get(name)
         else:
-            return None
+            self.items[name] = NumberValue(0.0)
+            return self.items[name]
 
     def set(self, name, value):
         self.items[name] = value

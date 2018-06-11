@@ -49,8 +49,8 @@ def test_Arithmetic_expressions_come_out_correct():
     assert evald("3/4") == NumberValue(0.75)
 
 
-def test_Referring_to_an_unknown_symbol_is_an_error():
-    assert_prog_fails("x", "Unknown symbol 'x'.")
+def test_Referring_to_an_unknown_symbol_yields_0():
+    assert evald("unkn") == NumberValue(0.0)
 
 
 def test_Can_define_a_value_and_retrieve_it():

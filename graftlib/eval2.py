@@ -14,16 +14,12 @@ from graftlib.parse2 import (
 
 from graftlib.env import Env
 from graftlib.nativefunctionvalue import NativeFunctionValue
+from graftlib.numbervalue import NumberValue
 
 
 @attr.s
 class NoneValue:
     pass
-
-
-@attr.s
-class NumberValue:
-    value: float = attr.ib()
 
 
 @attr.s
