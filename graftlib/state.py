@@ -6,7 +6,6 @@ import attr
 
 from graftlib.env import Env
 from graftlib.pt import Pt
-from graftlib.make_graft_env import make_graft_env
 
 
 @attr.s

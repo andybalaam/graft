@@ -39,7 +39,7 @@ class Evaluator:
     def __init__(self, state, rand, fork_callback):
         self.rand = rand
         self.state: State = state
-        self.functions: Functions = Functions(state, rand, fork_callback)
+        self.functions: Functions = Functions(rand, fork_callback)
 
     def _function_call_symbol(self, fn_name):
         if not self.state.has_variable(fn_name):
