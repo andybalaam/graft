@@ -36,18 +36,19 @@ def _operator_fn(opstr: str):
 
 
 class Evaluator:
-    def __init__(self, state, rand, fork_callback):
+    def __init__(self, env, rand, fork_callback):
         self.rand = rand
-        self.state: State = state
+        self.env: Env = env
         self.functions: Functions = Functions(rand, fork_callback)
 
     def _function_call_symbol(self, fn_name):
-        if not self.state.has_variable(fn_name):
+        state = State(self.env)
+        if not state.has_variable(fn_name):
             raise Exception("Unknown function %s" % fn_name)
 
-        fnwrap = self.state.get_variable(fn_name)
+        fnwrap = state.get_variable(fn_name)
         if type(fnwrap) == NativeFunctionValue:
-            return fnwrap.py_fn.__get__(self.functions)(self.state.env)
+            return fnwrap.py_fn.__get__(self.functions)(self.env)
         else:
             raise Exception(
                 "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
@@ -80,7 +81,7 @@ class Evaluator:
         elif type_ == FunctionCall:
             return self._function_call(value_expr)[-1]
         elif type_ == Symbol:
-            return self.state.get_variable(value_expr.value)
+            return State(self.env).get_variable(value_expr.value)
         else:
             raise Exception(
                 "I don't know how to evaluate a value like %s." %
@@ -92,9 +93,9 @@ class Evaluator:
         val = self._value(modify_stmt.value)
         op = _operator_fn(modify_stmt.op)
 
-        self.state.set_variable(
+        State(self.env).set_variable(
             var_name,
-            op(self.state.get_variable(var_name), val)
+            op(State(self.env).get_variable(var_name), val)
         )
 
         return None
@@ -164,14 +165,14 @@ class RunningProgram:
             program: List,
             rand,
             fork_callback,
-            state=None,
+            env,
             pc=None,
             label=None,
     ):
         self.program: List = program
         self.rand = rand
         self.fork_callback = fork_callback
-        self.state: State = state if state else State(make_graft_env())
+        self.env = env
 
         """
         pc = program counter - the next instruction from program to run
@@ -179,7 +180,7 @@ class RunningProgram:
         """
         self.pc = pc if pc is not None else 0
         self.label = label if label is not None else 0
-        self.evaluator = Evaluator(self.state, rand, self.fork)
+        self.evaluator = Evaluator(self.env, rand, self.fork)
 
     def set_label(self):
         self.label = self.pc
@@ -201,7 +202,7 @@ class RunningProgram:
                 list(self.program),
                 self.rand,
                 self.fork_callback,
-                State(self.state.env.clone()),
+                self.env.clone(),
                 self.pc,
                 self.label,
             )
@@ -217,7 +218,13 @@ class MultipleRunningPrograms:
         # programs is a list of (RunningProgram, queue)
         # where queue is a list of commands already returned by that program,
         # waiting to be returned.
-        self.programs = [(RunningProgram(program, rand, self.fork), [])]
+        initial_program = RunningProgram(
+            program,
+            rand,
+            self.fork,
+            make_graft_env()
+        )
+        self.programs = [(initial_program, [])]
         self.max_forks = max_forks
         self.new_programs = []
         self._fork_id_counter = 0
@@ -235,9 +242,9 @@ class MultipleRunningPrograms:
 
         ret = []
         for prog, queue in self.programs:
-            # Note: return a reference to state.  In eval_debug we
+            # Note: return a reference to env.  In eval_debug we
             # will copy it if needed.
-            ret.append((queue.pop(0), prog.state.env))
+            ret.append((queue.pop(0), prog.env))
 
         self.programs.extend(self.new_programs)
         self.new_programs = []
@@ -249,7 +256,7 @@ class MultipleRunningPrograms:
         return ret
 
     def fork(self, cloned_running_program: RunningProgram):
-        cloned_running_program.state.set_fork_id(self.next_fork_id())
+        State(cloned_running_program.env).set_fork_id(self.next_fork_id())
         self.new_programs.append((cloned_running_program, []))
         # If we fork many times, we return SKIPPED many times,
         # so the output of the main fork would be lots of
