@@ -13,7 +13,7 @@ class Functions:
     rand = attr.ib()
     fork_callback = attr.ib()
 
-    def step(self):
+    def step(self, env):
         th = self.state.theta()
         s = self.state.step()
         old_pos = self.state.pos()
@@ -29,14 +29,14 @@ class Functions:
             size=self.state.brush_size()
         )]
 
-    def dot(self):
+    def dot(self, env):
         return [Dot(
             self.state.pos(),
             self.state.color(),
             self.state.brush_size()
         )]
 
-    def line_to(self):
+    def line_to(self, env):
         return [Line(
             self.state.prev_pos(),
             self.state.pos(),
@@ -44,12 +44,12 @@ class Functions:
             size=self.state.brush_size(),
         )]
 
-    def jump(self):
-        self.step()
+    def jump(self, env):
+        self.step(env)
         return [None]
 
-    def random(self):
+    def random(self, env):
         return [float(self.rand.__call__(-10, 10))]
 
-    def fork(self):
+    def fork(self, env):
         return [self.fork_callback.__call__()]

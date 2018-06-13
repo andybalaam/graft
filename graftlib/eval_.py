@@ -47,7 +47,7 @@ class Evaluator:
 
         fnwrap = self.state.get_variable(fn_name)
         if type(fnwrap) == NativeFunctionValue:
-            return fnwrap.py_fn.__get__(self.functions)()
+            return fnwrap.py_fn.__get__(self.functions)(self.state.env)
         else:
             raise Exception(
                 "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
