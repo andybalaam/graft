@@ -43,7 +43,7 @@ def rounded_dict(env):
     Float values are rounded.
     """
 
-    default_env = make_graft_env()
+    default_env = make_graft_env(None, None)
     ret = {}
 
     def add_items(env):

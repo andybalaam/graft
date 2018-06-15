@@ -2,10 +2,20 @@ from graftlib.numbervalue import NumberValue
 
 
 class Env:
-    def __init__(self, parent=None, stdin=None, stdout=None, stderr=None):
+    def __init__(
+        self,
+        rand,
+        fork_callback,
+        parent=None,
+        stdin=None,
+        stdout=None,
+        stderr=None
+    ):
         """
         Supply _either_ std{in,out,err} _or_ parent, not both.
         """
+        self.rand = rand
+        self.fork_callback = fork_callback
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
@@ -22,6 +32,8 @@ class Env:
     def clone(self):
         parent = None if self.parent is None else self.parent.clone()
         ret = Env(
+            self.rand,
+            self.fork_callback,
             parent=parent,
             stdin=self.stdin,
             stdout=self.stdout,
@@ -30,6 +42,13 @@ class Env:
         for k, v in self.items.items():
             ret.set(k, v)
         return ret
+
+    def make_child(self):
+        return Env(
+            self.rand,
+            self.fork_callback,
+            parent=self,
+        )
 
     def get(self, name):
         if name in self.items:

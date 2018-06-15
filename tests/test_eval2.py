@@ -17,7 +17,7 @@ from graftlib.env import Env
 
 def evald(inp, env=None):
     if env is None:
-        env = Env()
+        env = Env(None, None)
     return eval_list(parse(lex(inp)), env)
 
 
@@ -67,7 +67,7 @@ def test_Value_of_an_assignment_is_the_value_assigned():
 
 
 def test_None_evaluates_to_None():
-    assert eval_expr(NoneValue(), Env()) == NoneValue()
+    assert eval_expr(NoneValue(), Env(None, None)) == NoneValue()
 
 
 def test_Calling_a_function_returns_its_last_value():
@@ -129,7 +129,7 @@ def test_A_symbol_within_a_function_has_the_local_value():
 def test_Native_function_gets_called():
     def native_fn(_env, x, y):
         return NumberValue(x.value + y.value)
-    env = Env()
+    env = Env(None, None)
     env.set("native_fn", NativeFunctionValue(native_fn))
     assert evald("native_fn(2,8)", env) == NumberValue(10)
 
@@ -158,7 +158,7 @@ def test_Wrong_number_of_arguments_to_a_native_function_is_an_error():
 
     def native_fn3(_env, _x, _y, _z):
         return NumberValue(12)
-    env = Env()
+    env = Env(None, None)
     env.set("native_fn0", NativeFunctionValue(native_fn0))
     env.set("native_fn3", NativeFunctionValue(native_fn3))
     assert_prog_fails(
@@ -209,7 +209,7 @@ def test_Function_arguments_are_independent():
 def test_A_native_function_can_edit_the_environment():
     def mx3(env):
         env.set("x", NumberValue(3))
-    env = Env()
+    env = Env(None, None)
     env.set("make_x_three", NativeFunctionValue(mx3))
     assert (
         evald("x=1 make_x_three() x", env) ==
@@ -227,7 +227,7 @@ def test_A_closure_holds_updateable_values():
         else:
             ret = else_fn
         return eval_expr(FunctionCallTree(ret, []), env)
-    env = Env()
+    env = Env(None, None)
     env.set("dumb_set", NativeFunctionValue(dumb_set))
     env.set("dumb_if_equal", NativeFunctionValue(dumb_if_equal))
     assert (

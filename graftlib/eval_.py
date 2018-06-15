@@ -222,7 +222,7 @@ class MultipleRunningPrograms:
             program,
             rand,
             self.fork,
-            make_graft_env()
+            make_graft_env(rand, self.fork)
         )
         self.programs = [(initial_program, [])]
         self.max_forks = max_forks

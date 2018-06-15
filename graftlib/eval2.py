@@ -63,7 +63,7 @@ def _function_call(expr, env):
     typ = type(fn)
     if typ == UserFunctionValue:
         fail_if_wrong_number_of_args(expr.fn, fn.params, args)
-        new_env = Env(fn.env)
+        new_env = fn.env.make_child()
         for p, a in zip(fn.params, args):
             new_env.set(p.value, a)
         return eval_list(fn.body, new_env)
@@ -104,7 +104,11 @@ def eval_expr(expr, env):
     elif typ == FunctionCallTree:
         return _function_call(expr, env)
     elif typ == FunctionDefTree:
-        return UserFunctionValue(expr.params, expr.body, Env(env))
+        return UserFunctionValue(
+            expr.params,
+            expr.body,
+            env.make_child()
+        )
     elif typ == UserFunctionValue:
         return expr
     else:

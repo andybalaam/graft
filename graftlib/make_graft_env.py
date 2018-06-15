@@ -3,10 +3,10 @@ from graftlib.functions import Functions
 from graftlib.nativefunctionvalue import NativeFunctionValue
 
 
-def make_graft_env() -> Env:
+def make_graft_env(rand, fork_callback) -> Env:
     """Create an environment with all the default Graft values"""
 
-    ret = Env()
+    ret = Env(rand, fork_callback)
     ret.set("f", 0)      # Fork ID
     ret.set("x", 0.0)    # x coord
     ret.set("y", 0.0)    # y coord
