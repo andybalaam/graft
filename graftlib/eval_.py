@@ -15,6 +15,7 @@ from graftlib.parse import (
     Number,
     Symbol,
 )
+from graftlib.programenv import ProgramEnv
 from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.state import State
 
@@ -39,7 +40,7 @@ class Evaluator:
     def __init__(self, env, rand, fork_callback):
         self.rand = rand
         self.env: Env = env
-        self.functions: Functions = Functions(rand, fork_callback)
+        self.functions: Functions = Functions()
 
     def _function_call_symbol(self, fn_name):
         state = State(self.env)
@@ -172,7 +173,7 @@ class RunningProgram:
         self.program: List = program
         self.rand = rand
         self.fork_callback = fork_callback
-        self.env = env
+        self.env = ProgramEnv(env, rand, self.fork)
 
         """
         pc = program counter - the next instruction from program to run
@@ -222,7 +223,7 @@ class MultipleRunningPrograms:
             program,
             rand,
             self.fork,
-            make_graft_env(rand, self.fork)
+            make_graft_env()
         )
         self.programs = [(initial_program, [])]
         self.max_forks = max_forks

@@ -3,25 +3,25 @@ from graftlib.env import Env
 
 
 def test_Getting_a_name_after_setting_returns_its_value():
-    env = Env(None, None)
+    env = Env()
     env.set("mythree", 3)
     assert env.get("mythree") == 3
 
 
 def test_Empty_Env_does_not_contain_names():
-    env = Env(None, None)
+    env = Env()
     assert not env.contains("x")
 
 
 def test_After_setting_a_name_Env_contains_it():
-    env = Env(None, None)
+    env = Env()
     env.set("myname", "foo")
     assert env.contains("myname")
     assert not env.contains("othername")
 
 
 def test_Values_from_parent_are_found_via_get():
-    world = Env(None, None)
+    world = Env()
     world.set("w", 2)
     town = world.make_child()
     town.set("t", 3)
@@ -36,9 +36,7 @@ def test_Values_from_parent_are_found_via_get():
 
 
 def test_Cloned_Env_has_same_values():
-    rand = "rand"
-    fork_callback = "fork_callback"
-    parent = Env(rand, fork_callback)
+    parent = Env()
     parent.set("p", 10)
     child = parent.make_child()
     child.set("c", 8)
@@ -46,12 +44,10 @@ def test_Cloned_Env_has_same_values():
     new_child = child.clone()
     assert child.get("c") == 8
     assert child.get("p") == 10
-    assert child.rand == "rand"
-    assert child.fork_callback == "fork_callback"
 
 
 def test_Cloned_env_and_parents_are_independent():
-    parent = Env(None, None)
+    parent = Env()
     parent.set("p", 10)
     child = parent.make_child()
     child.set("c", 8)
@@ -70,7 +66,7 @@ def test_Cloned_env_and_parents_are_independent():
 
     # Change new child and its parent
     new_child.set("c", 0)
-    new_child.parent.set("p", 1)
+    new_child.parent().set("p", 1)
     assert new_child.get("p") == 1
     assert new_child.get("c") == 0
 

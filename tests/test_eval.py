@@ -43,17 +43,17 @@ def rounded_dict(env):
     Float values are rounded.
     """
 
-    default_env = make_graft_env(None, None)
+    default_env = make_graft_env()
     ret = {}
 
     def add_items(env):
-        if env.parent is not None:
-            add_items(env.parent)
-        for k, v in env.items.items():
+        if env.parent() is not None:
+            add_items(env.parent())
+        for k, v in env.local_items().items():
             v = round_value(v)
             if (
-                k in default_env.items and
-                round_value(default_env.items[k]) == v
+                k in default_env.local_items() and
+                round_value(default_env.local_items()[k]) == v
             ):
                 if k in ret:
                     del ret[k]

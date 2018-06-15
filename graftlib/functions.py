@@ -10,9 +10,6 @@ from graftlib.state import State
 
 @attr.s
 class Functions:
-    rand = attr.ib()
-    fork_callback = attr.ib()
-
     def step(self, env):
         state = State(env)
         th = state.theta()
@@ -52,7 +49,7 @@ class Functions:
         return [None]
 
     def random(self, env):
-        return [float(self.rand.__call__(-10, 10))]
+        return [float(env.rand.__call__(-10, 10))]
 
     def fork(self, env):
-        return [self.fork_callback.__call__()]
+        return [env.fork_callback.__call__()]
