@@ -55,7 +55,7 @@ class Evaluator:
     def _function_call_userdefined(self, fn_def: FunctionDef) -> List:
         ret = []
         for stmt in fn_def.body:
-            ret += self.statement(stmt, None)
+            ret += self.statement(stmt)
         return ret
 
     def _function_call_once(self, function_call_stmt: FunctionCall) -> List:
@@ -99,7 +99,7 @@ class Evaluator:
 
         return None
 
-    def statement(self, statement, set_label):
+    def statement(self, statement):
         stmt_type = type(statement)
         if stmt_type == FunctionCall:
             return self._function_call(statement)
@@ -111,12 +111,8 @@ class Evaluator:
         elif stmt_type == Number:
             return [None]
         elif stmt_type == Label:
-            if set_label is not None:
-                set_label()
-                return [None]
-            else:
-                raise Exception(
-                    "You cannot (yet?) define labels inside functions.")
+            raise Exception(
+                "You cannot (yet?) define labels inside functions.")
         elif stmt_type == FunctionDef:
             raise Exception(
                 "You defined a function but didn't call it: " + str(statement))
@@ -191,9 +187,17 @@ class RunningProgram:
         self.pc += 1
         return non_strokes_to_none(
             consolidate_skipped(
-                self.evaluator.statement(statement, self.set_label)
+                self.statement(statement)
             )
         )
+
+    def statement(self, statement):
+        stmt_type = type(statement)
+        if stmt_type == Label:
+            self.set_label()
+            return [None]
+        else:
+            return self.evaluator.statement(statement)
 
     def fork(self):
         return self.fork_callback.__call__(
