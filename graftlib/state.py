@@ -53,8 +53,5 @@ class State:
             self.env.set("yprev", self.env.get("y"))
         self.env.set(name, value)
 
-    def get_variable(self, name):
-        return self.env.get(name)
-
     def has_variable(self, name):
         return self.env.get(name) is not None

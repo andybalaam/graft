@@ -45,7 +45,7 @@ class Evaluator:
         if not state.has_variable(fn_name):
             raise Exception("Unknown function %s" % fn_name)
 
-        fnwrap = state.get_variable(fn_name)
+        fnwrap = self.env.get(fn_name)
         if type(fnwrap) == NativeFunctionValue:
             return fnwrap.py_fn(self.env)
         else:
@@ -80,7 +80,7 @@ class Evaluator:
         elif type_ == FunctionCall:
             return self._function_call(value_expr)[-1]
         elif type_ == Symbol:
-            return State(self.env).get_variable(value_expr.value)
+            return self.env.get(value_expr.value)
         else:
             raise Exception(
                 "I don't know how to evaluate a value like %s." %
@@ -94,7 +94,7 @@ class Evaluator:
 
         State(self.env).set_variable(
             var_name,
-            op(State(self.env).get_variable(var_name), val)
+            op(self.env.get(var_name), val)
         )
 
         return None
