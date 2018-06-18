@@ -4,6 +4,7 @@ import operator
 import attr
 
 from graftlib.dot import Dot
+from graftlib import functions
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
 from graftlib.parse import (
@@ -16,7 +17,6 @@ from graftlib.parse import (
 )
 from graftlib.programenv import ProgramEnv
 from graftlib.nativefunctionvalue import NativeFunctionValue
-from graftlib.state import State
 
 
 _ops = {
@@ -41,8 +41,7 @@ class Evaluator:
         self.env: Env = env
 
     def _function_call_symbol(self, fn_name):
-        state = State(self.env)
-        if not state.has_variable(fn_name):
+        if not functions.has_variable(self.env, fn_name):
             raise Exception("Unknown function %s" % fn_name)
 
         fnwrap = self.env.get(fn_name)
@@ -92,7 +91,8 @@ class Evaluator:
         val = self._value(modify_stmt.value)
         op = _operator_fn(modify_stmt.op)
 
-        State(self.env).set_variable(
+        functions.set_variable(
+            self.env,
             var_name,
             op(self.env.get(var_name), val)
         )
@@ -255,7 +255,7 @@ class MultipleRunningPrograms:
         return ret
 
     def fork(self, cloned_running_program: RunningProgram):
-        State(cloned_running_program.env).set_fork_id(self.next_fork_id())
+        functions.set_fork_id(cloned_running_program.env, self.next_fork_id())
         self.new_programs.append((cloned_running_program, []))
         # If we fork many times, we return SKIPPED many times,
         # so the output of the main fork would be lots of
