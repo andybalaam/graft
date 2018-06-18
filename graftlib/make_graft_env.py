@@ -1,5 +1,5 @@
 from graftlib.env import Env
-from graftlib.functions import Functions
+from graftlib import functions
 from graftlib.nativefunctionvalue import NativeFunctionValue
 
 
@@ -17,11 +17,11 @@ def make_graft_env() -> Env:
     ret.set("b", 0.0)    # blue  0-100 (and 0 to -100)
     ret.set("a", 100.0)  # alpha 0-100 (and 0 to -100)
     ret.set("z", 5.0)    # brush size
-    ret.set("D", NativeFunctionValue(Functions.dot))
-    ret.set("F", NativeFunctionValue(Functions.fork))
-    ret.set("J", NativeFunctionValue(Functions.jump))
-    ret.set("L", NativeFunctionValue(Functions.line_to))
-    ret.set("R", NativeFunctionValue(Functions.random))
-    ret.set("S", NativeFunctionValue(Functions.step))
+    ret.set("D", NativeFunctionValue(functions.dot))
+    ret.set("F", NativeFunctionValue(functions.fork))
+    ret.set("J", NativeFunctionValue(functions.jump))
+    ret.set("L", NativeFunctionValue(functions.line_to))
+    ret.set("R", NativeFunctionValue(functions.random))
+    ret.set("S", NativeFunctionValue(functions.step))
 
     return ret

@@ -4,7 +4,6 @@ import operator
 import attr
 
 from graftlib.dot import Dot
-from graftlib.functions import Functions
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
 from graftlib.parse import (
@@ -40,7 +39,6 @@ class Evaluator:
     def __init__(self, env, rand, fork_callback):
         self.rand = rand
         self.env: Env = env
-        self.functions: Functions = Functions()
 
     def _function_call_symbol(self, fn_name):
         state = State(self.env)
@@ -49,7 +47,7 @@ class Evaluator:
 
         fnwrap = state.get_variable(fn_name)
         if type(fnwrap) == NativeFunctionValue:
-            return fnwrap.py_fn.__get__(self.functions)(self.env)
+            return fnwrap.py_fn(self.env)
         else:
             raise Exception(
                 "%s is not a function - it is a %s" % (fn_name, type(fnwrap))
