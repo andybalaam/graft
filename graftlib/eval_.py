@@ -36,8 +36,7 @@ def _operator_fn(opstr: str):
 
 
 class Evaluator:
-    def __init__(self, env, rand, fork_callback):
-        self.rand = rand
+    def __init__(self, env):
         self.env: Env = env
 
     def _function_call_symbol(self, fn_name):
@@ -175,7 +174,7 @@ class RunningProgram:
         """
         self.pc = pc if pc is not None else 0
         self.label = label if label is not None else 0
-        self.evaluator = Evaluator(self.env, rand, self.fork)
+        self.evaluator = Evaluator(self.env)
 
     def set_label(self):
         self.label = self.pc
