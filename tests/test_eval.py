@@ -8,6 +8,7 @@ from graftlib.eval_ import (
     eval_,
     eval_debug,
 )
+from graftlib.eval1 import eval1_expr
 from graftlib.lex import lex
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
@@ -76,13 +77,31 @@ def round_debug(strokes: Iterable[List[Tuple[Optional[Line], Env]]]) -> (
 
 
 def do_eval(chars: Iterable[str], n: int, rand=None, max_forks=10):
-    return list(round_strokes(eval_(parse(lex(chars)), n, rand, max_forks)))
+    return list(
+        round_strokes(
+            eval_(
+                parse(lex(chars)),
+                n,
+                rand,
+                max_forks,
+                eval1_expr,
+            )
+        )
+    )
 
 
 def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_forks=10):
     return list(
         itertools.islice(
-            round_debug(eval_debug(parse(lex(chars)), n, rand, max_forks)),
+            round_debug(
+                eval_debug(
+                    parse(lex(chars)),
+                    n,
+                    rand,
+                    max_forks,
+                    eval1_expr,
+                )
+            ),
             0,
             n
         )

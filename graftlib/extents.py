@@ -2,8 +2,10 @@ from typing import Iterable, List, Union
 import itertools
 import attr
 
+from graftlib.dot import Dot
+from graftlib.line import Line
+from graftlib.pt import Pt
 from graftlib.strokeoptimiser import Elided
-from graftlib.eval_ import Dot, Line, Pt
 
 
 @attr.s

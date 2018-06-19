@@ -6,7 +6,7 @@ from graftlib.eval2 import (
     NoneValue,
     NumberValue,
     StringValue,
-    eval_expr,
+    eval2_expr,
     eval_list,
 )
 from graftlib.env import Env
@@ -67,7 +67,7 @@ def test_Value_of_an_assignment_is_the_value_assigned():
 
 
 def test_None_evaluates_to_None():
-    assert eval_expr(NoneValue(), Env(None, None)) == NoneValue()
+    assert eval2_expr(Env(None, None), NoneValue()) == NoneValue()
 
 
 def test_Calling_a_function_returns_its_last_value():
@@ -226,7 +226,7 @@ def test_A_closure_holds_updateable_values():
             ret = then_fn
         else:
             ret = else_fn
-        return eval_expr(FunctionCallTree(ret, []), env)
+        return eval2_expr(env, FunctionCallTree(ret, []))
     env = Env(None, None)
     env.set("dumb_set", NativeFunctionValue(dumb_set))
     env.set("dumb_if_equal", NativeFunctionValue(dumb_if_equal))

@@ -63,7 +63,7 @@ class Env:
 
     def __str__(self):
         ret = ""
-        for k, v in self.items.items():
+        for k, v in self._items.items():
             ret += "%s=%s\n" % (k, v)
         ret += ".\n" + str(self._parent)
         return ret

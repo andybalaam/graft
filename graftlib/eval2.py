@@ -35,8 +35,8 @@ class UserFunctionValue:
 
 
 def _operation(expr, env):
-    arg1 = eval_expr(expr.left, env)
-    arg2 = eval_expr(expr.right, env)
+    arg1 = eval2_expr(env, expr.left)
+    arg2 = eval2_expr(env, expr.right)
     if expr.operation == "+":
         return NumberValue(arg1.value + arg2.value)
     elif expr.operation == "-":
@@ -58,8 +58,8 @@ def fail_if_wrong_number_of_args(fn_name, params, args):
 
 
 def _function_call(expr, env):
-    fn = eval_expr(expr.fn, env)
-    args = list((eval_expr(a, env) for a in expr.args))
+    fn = eval2_expr(env, expr.fn)
+    args = list((eval2_expr(env, a) for a in expr.args))
     typ = type(fn)
     if typ == UserFunctionValue:
         fail_if_wrong_number_of_args(expr.fn, fn.params, args)
@@ -78,7 +78,7 @@ def _function_call(expr, env):
         )
 
 
-def eval_expr(expr, env):
+def eval2_expr(env, expr):
     typ = type(expr)
     if typ == NumberTree:
         return NumberValue(float(expr.value))
@@ -98,7 +98,7 @@ def eval_expr(expr, env):
         var_name = expr.symbol.value
         if var_name in env.local_items():
             raise Exception("Not allowed to re-assign symbol '%s'." % var_name)
-        val = eval_expr(expr.value, env)
+        val = eval2_expr(env, expr.value)
         env.set(var_name, val)
         return val
     elif typ == FunctionCallTree:
@@ -117,7 +117,7 @@ def eval_expr(expr, env):
 
 def eval_(exprs, env):
     for expr in exprs:
-        yield eval_expr(expr, env)
+        yield eval2_expr(env, expr)
 
 
 def eval_list(exprs, env):

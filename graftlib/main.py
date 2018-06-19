@@ -4,7 +4,8 @@ from argparse import ArgumentParser
 from graftlib.animation import Animation
 from graftlib.env import Env
 from graftlib.eval_ import eval_
-from graftlib.eval2 import eval_ as eval2
+from graftlib.eval1 import eval1_expr
+from graftlib.eval2 import eval2_expr
 from graftlib.lex import lex
 from graftlib.lex2 import lex as lex2
 from graftlib.strokeoptimiser import StrokeOptimiser
@@ -59,43 +60,16 @@ def main_gtk3(animation: Animation, image_size: Tuple[int, int]) -> int:
 
 
 def make_animation(
-        program: str,
+        program_values,
         frames: Optional[int],
-        rand,
-        max_forks: int,
         lookahead_steps: int,
 ):
     """
-    Given a program, return an iterator that lexes, parses,
-    evaluates and optimises it, yielding actual strokes to draw on
-    the screen, limited to the number of frames supplied, and using
-    the random number generator supplied.
+    Given the values from evaluating a program, return an iterator that
+    optimises it, yielding actual strokes to draw on the screen, limited to the
+    number of frames supplied, and using the random number generator supplied.
     """
-    opt = StrokeOptimiser(
-        eval_(parse(lex(program)), frames, rand, max_forks)
-    )
-    frames = lookahead_steps if frames is None else frames
-    lookahead = min(frames, lookahead_steps)
-    return Animation(opt, opt, lookahead, max_strokes, dot_size)
-
-
-def make_animation2(
-        program: str,
-        frames: Optional[int],
-        rand,
-        max_forks: int,
-        lookahead_steps: int,
-):
-    """
-    Given a program, return an iterator that lexes, parses,
-    evaluates and optimises it, yielding actual strokes to draw on
-    the screen, limited to the number of frames supplied, and using
-    the random number generator supplied.
-    """
-    opt = StrokeOptimiser(
-        eval2(parse2(lex2(program)), Env())
-    )
-    # , frames, rand, max_forks
+    opt = StrokeOptimiser(program_values)
     frames = lookahead_steps if frames is None else frames
     lookahead = min(frames, lookahead_steps)
     return Animation(opt, opt, lookahead, max_strokes, dot_size)
@@ -164,21 +138,21 @@ def main(world: World) -> int:
     frames = None if args.frames < 0 else args.frames
 
     if args.cell:
-        animation = make_animation2(
-            args.program,
-            frames,
-            world.random.uniform,
-            args.max_forks,
-            args.lookahead_steps,
-        )
+        parsed = parse2(lex2(args.program))
+        eval_expr = eval2_expr
     else:
-        animation = make_animation(
-            args.program,
-            frames,
-            world.random.uniform,
-            args.max_forks,
-            args.lookahead_steps,
-        )
+        parsed = parse(lex(args.program))
+        eval_expr = eval1_expr
+
+    program_values = eval_(
+        parsed,
+        frames,
+        world.random.uniform,
+        args.max_forks,
+        eval_expr,
+    )
+
+    animation = make_animation(program_values, frames, args.lookahead_steps)
     image_size = (args.width, args.height)
 
     if args.gif:

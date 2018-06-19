@@ -1,8 +1,10 @@
 from typing import Iterable, List, Union
 
-from graftlib.eval_ import Dot, Pt, Line
-from graftlib.strokeoptimiser import Elided
+from graftlib.dot import Dot
 from graftlib.extents import Extents
+from graftlib.line import Line
+from graftlib.pt import Pt
+from graftlib.strokeoptimiser import Elided
 from graftlib.windowanimator import WindowAnimator
 
 

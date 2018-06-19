@@ -4,7 +4,6 @@ import attr
 
 from graftlib import functions
 from graftlib.dot import Dot
-from graftlib.eval1 import eval1_expr
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
 from graftlib.parse import Label
@@ -52,6 +51,7 @@ class RunningProgram:
             rand,
             fork_callback,
             env,
+            eval_expr,
             pc=None,
             label=None,
     ):
@@ -59,6 +59,7 @@ class RunningProgram:
         self.rand = rand
         self.fork_callback = fork_callback
         self.env = ProgramEnv(env, rand, self.fork)
+        self.eval_expr = eval_expr
 
         """
         pc = program counter - the next instruction from program to run
@@ -87,7 +88,7 @@ class RunningProgram:
             self.set_label()
             return [None]
         else:
-            return eval1_expr(self.env, statement)
+            return self.eval_expr(self.env, statement)
 
     def fork(self):
         return self.fork_callback.__call__(
@@ -96,6 +97,7 @@ class RunningProgram:
                 self.rand,
                 self.fork_callback,
                 self.env.clone(),
+                self.eval_expr,
                 self.pc,
                 self.label,
             )
@@ -107,7 +109,7 @@ def empty(queue: List) -> bool:
 
 
 class MultipleRunningPrograms:
-    def __init__(self, program: List, rand, max_forks: int):
+    def __init__(self, program: List, rand, max_forks: int, eval_expr):
         # programs is a list of (RunningProgram, queue)
         # where queue is a list of commands already returned by that program,
         # waiting to be returned.
@@ -115,7 +117,8 @@ class MultipleRunningPrograms:
             program,
             rand,
             self.fork,
-            make_graft_env()
+            make_graft_env(),
+            eval_expr,
         )
         self.programs = [(initial_program, [])]
         self.max_forks = max_forks
@@ -185,8 +188,8 @@ class FramesCounter:
             raise StopIteration()
 
 
-def _run_program(program: Iterable, rand, max_forks) -> Iterable:
-    progs = MultipleRunningPrograms(list(program), rand, max_forks)
+def _run_program(program: Iterable, rand, max_forks, eval_expr) -> Iterable:
+    progs = MultipleRunningPrograms(list(program), rand, max_forks, eval_expr)
     while True:
         # Run a line of code, and get back the animation frame(s) that result
         yield progs.next()
@@ -203,22 +206,29 @@ def eval_debug(
         program: Iterable,
         n: Optional[int],
         rand,
-        max_forks
+        max_forks,
+        eval_expr,
 ) -> Iterable:
     frames_counter = FramesCounter(n)
-    for parallel_commands in _run_program(program, rand, max_forks):
+    for parallel_commands in _run_program(program, rand, max_forks, eval_expr):
         yield copy_envs(parallel_commands)
         frames_counter.next_frame(parallel_commands)
 
 
 #: Iterable[Tree], n -> Iterable[Command]
-def eval_(program: Iterable, n: Optional[int], rand, max_forks) -> Iterable:
+def eval_(
+    program: Iterable,
+    n: Optional[int],
+    rand,
+    max_forks,
+    eval_expr
+) -> Iterable:
     """
     Run the supplied program for n steps, or forever if n is None.
     """
 
     frames_counter = FramesCounter(n)
-    for cmds_envs in _run_program(program, rand, max_forks):
+    for cmds_envs in _run_program(program, rand, max_forks, eval_expr):
         commands = [x[0] for x in cmds_envs]
         if any(commands):
             yield commands
