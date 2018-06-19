@@ -3,9 +3,9 @@ from argparse import ArgumentParser
 
 from graftlib.animation import Animation
 from graftlib.env import Env
-from graftlib.eval_ import eval_
 from graftlib.eval1 import eval1_expr
 from graftlib.eval2 import eval2_expr
+from graftlib.graftrun import eval_
 from graftlib.lex import lex
 from graftlib.lex2 import lex as lex2
 from graftlib.strokeoptimiser import StrokeOptimiser

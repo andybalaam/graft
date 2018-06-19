@@ -4,7 +4,7 @@ from typing import Iterable, List, Optional, Tuple, Union
 
 from graftlib.dot import Dot
 from graftlib.env import Env
-from graftlib.eval_ import eval_
+from graftlib.graftrun import eval_
 from graftlib.eval2 import eval2_expr
 from graftlib.lex2 import lex
 from graftlib.line import Line

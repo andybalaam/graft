@@ -1,7 +1,8 @@
 from typing import List, Set, Union
 import attr
 
-from graftlib.eval_ import Dot, Line
+from graftlib.dot import Dot
+from graftlib.line import Line
 from graftlib.round_ import round_stroke
 
 

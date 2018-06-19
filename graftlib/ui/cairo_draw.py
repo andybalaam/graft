@@ -3,8 +3,10 @@ import math
 from typing import Tuple
 
 import cairo
+
 from graftlib.animation import Animation
-from graftlib.eval_ import Dot, Line
+from graftlib.dot import Dot
+from graftlib.line import Line
 
 
 min_visible_line_width = 1.0
