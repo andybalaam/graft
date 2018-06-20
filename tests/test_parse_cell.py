@@ -1,6 +1,6 @@
 import pytest
-from graftlib.lex2 import lex
-from graftlib.parse2 import (
+from graftlib.lex_cell import lex
+from graftlib.parse_cell import (
     parse,
     AssignmentTree,
     FunctionCallTree,

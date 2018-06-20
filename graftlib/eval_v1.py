@@ -4,7 +4,7 @@ import operator
 from graftlib.env import Env
 from graftlib import functions
 from graftlib.nativefunctionvalue import NativeFunctionValue
-from graftlib.parse import (
+from graftlib.parse_v1 import (
     FunctionCall,
     FunctionDef,
     Modify,

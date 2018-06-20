@@ -1,5 +1,5 @@
 from typing import List, Optional
-from graftlib.lex import (
+from graftlib.lex_v1 import (
     ContinuationToken,
     EndFunctionDefToken,
     FunctionCallToken,

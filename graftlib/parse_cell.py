@@ -2,7 +2,7 @@ from typing import List
 import attr
 
 from graftlib.peekablestream import PeekableStream
-from graftlib.lex2 import (
+from graftlib.lex_cell import (
     AssignmentToken,
     EndFunctionDefToken,
     EndParamListToken,

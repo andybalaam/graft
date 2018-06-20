@@ -2,7 +2,7 @@ import inspect
 from typing import List
 import attr
 
-from graftlib.parse2 import (
+from graftlib.parse_cell import (
     AssignmentTree,
     FunctionCallTree,
     FunctionDefTree,

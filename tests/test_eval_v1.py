@@ -8,12 +8,12 @@ from graftlib.graftrun import (
     graftrun,
     graftrun_debug,
 )
-from graftlib.eval1 import eval1_expr
-from graftlib.lex import lex
+from graftlib.eval_v1 import eval1_expr
+from graftlib.lex_v1 import lex
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
 from graftlib.pt import Pt
-from graftlib.parse import parse
+from graftlib.parse_v1 import parse
 from graftlib.round_ import round_float, round_stroke
 
 

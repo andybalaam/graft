@@ -1,6 +1,6 @@
 from typing import Iterable
-from graftlib.lex import lex
-from graftlib.parse import (
+from graftlib.lex_v1 import lex
+from graftlib.parse_v1 import (
     FunctionCall,
     FunctionDef,
     Label,

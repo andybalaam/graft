@@ -1,7 +1,7 @@
 import pytest
-from graftlib.lex2 import lex
-from graftlib.parse2 import FunctionCallTree, parse
-from graftlib.eval2 import (
+from graftlib.lex_cell import lex
+from graftlib.parse_cell import FunctionCallTree, parse
+from graftlib.eval_cell import (
     NativeFunctionValue,
     NoneValue,
     NumberValue,

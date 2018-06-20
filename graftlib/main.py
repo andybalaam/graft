@@ -3,14 +3,14 @@ from argparse import ArgumentParser
 
 from graftlib.animation import Animation
 from graftlib.env import Env
-from graftlib.eval1 import eval1_expr
-from graftlib.eval2 import eval2_expr
+from graftlib.eval_cell import eval2_expr
+from graftlib.eval_v1 import eval1_expr
 from graftlib.graftrun import graftrun
-from graftlib.lex import lex
-from graftlib.lex2 import lex as lex2
+from graftlib.lex_cell import lex as lex2
+from graftlib.lex_v1 import lex
 from graftlib.strokeoptimiser import StrokeOptimiser
-from graftlib.parse import parse
-from graftlib.parse2 import parse as parse2
+from graftlib.parse_cell import parse as parse2
+from graftlib.parse_v1 import parse
 from graftlib.world import World
 from graftlib.ui.gtk3ui import Gtk3Ui
 from graftlib.ui.gifui import GifUi

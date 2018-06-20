@@ -5,11 +5,11 @@ from typing import Iterable, List, Optional, Tuple, Union
 from graftlib.dot import Dot
 from graftlib.env import Env
 from graftlib.graftrun import graftrun
-from graftlib.eval2 import eval2_expr
-from graftlib.lex2 import lex
+from graftlib.eval_cell import eval2_expr
+from graftlib.lex_cell import lex
 from graftlib.line import Line
 from graftlib.pt import Pt
-from graftlib.parse2 import parse
+from graftlib.parse_cell import parse
 from graftlib.round_ import round_float, round_stroke
 
 

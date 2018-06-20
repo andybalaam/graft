@@ -6,7 +6,7 @@ from graftlib import functions
 from graftlib.dot import Dot
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
-from graftlib.parse import Label
+from graftlib.parse_v1 import Label
 from graftlib.programenv import ProgramEnv
 
 

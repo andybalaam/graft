@@ -1,5 +1,5 @@
 import pytest
-from graftlib.lex2 import (
+from graftlib.lex_cell import (
     lex,
     AssignmentToken,
     EndFunctionDefToken,
