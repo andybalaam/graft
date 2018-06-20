@@ -202,7 +202,7 @@ def copy_envs(parallel_commands):
 
 
 #: Iterable[Tree], n -> Iterable[(Command, Env)]
-def eval_debug(
+def graftrun_debug(
         program: Iterable,
         n: Optional[int],
         rand,
@@ -216,7 +216,7 @@ def eval_debug(
 
 
 #: Iterable[Tree], n -> Iterable[Command]
-def eval_(
+def graftrun(
     program: Iterable,
     n: Optional[int],
     rand,

@@ -4,7 +4,7 @@ from typing import Iterable, List, Optional, Tuple, Union
 
 from graftlib.dot import Dot
 from graftlib.env import Env
-from graftlib.graftrun import eval_
+from graftlib.graftrun import graftrun
 from graftlib.eval2 import eval2_expr
 from graftlib.lex2 import lex
 from graftlib.line import Line
@@ -75,7 +75,7 @@ def round_debug(strokes: Iterable[List[Tuple[Optional[Line], Env]]]) -> (
 def do_eval(chars: Iterable[str], n: int, rand=None, max_forks=10):
     return list(
         round_strokes(
-            eval_(
+            graftrun(
                 parse(lex(chars)),
                 n,
                 rand,
@@ -90,7 +90,7 @@ def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_forks=10):
     return list(
         itertools.islice(
             round_debug(
-                eval_(
+                graftrun_debug(
                     parse(lex(chars)),
                     n,
                     rand,

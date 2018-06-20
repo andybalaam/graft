@@ -5,7 +5,7 @@ from graftlib.animation import Animation
 from graftlib.env import Env
 from graftlib.eval1 import eval1_expr
 from graftlib.eval2 import eval2_expr
-from graftlib.graftrun import eval_
+from graftlib.graftrun import graftrun
 from graftlib.lex import lex
 from graftlib.lex2 import lex as lex2
 from graftlib.strokeoptimiser import StrokeOptimiser
@@ -77,8 +77,6 @@ def make_animation(
 
 def main(world: World) -> int:
     """Run the main program and return the status code to emit"""
-    # for command in eval_debug(parse(lex(world.argv[1])), 10):
-    #     world.stdout.write("{}\n".format(command))
 
     argparser = ArgumentParser(prog='graft')
     argparser.add_argument(
@@ -144,7 +142,7 @@ def main(world: World) -> int:
         parsed = parse(lex(args.program))
         eval_expr = eval1_expr
 
-    program_values = eval_(
+    program_values = graftrun(
         parsed,
         frames,
         world.random.uniform,
