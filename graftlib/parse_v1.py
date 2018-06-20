@@ -57,20 +57,20 @@ class Symbol:
     value: str = attr.ib()
 
 
-def swallow_continuations(tok, it: Peekable):
+def _swallow_continuations(tok, it: Peekable):
     while type(tok) == ContinuationToken:
         tok = next(it)
     return tok
 
 
 @attr.s
-class Parser:
+class _Parser:
     it: Peekable = attr.ib()
     end_tok_type = attr.ib()
     single_item: bool = attr.ib()
 
     def greedy(self):
-        return Parser(self.it, self.end_tok_type, True)
+        return _Parser(self.it, self.end_tok_type, True)
 
     def next_or_single(self, value):
         if self.single_item:
@@ -176,7 +176,7 @@ class Parser:
         # We have decided at this point that any so_far we do have
         # is OK to pass on to the next person, so we get rid of
         # ~s, which just tell us to do exactly that.
-        tok = swallow_continuations(tok, self.it)
+        tok = _swallow_continuations(tok, self.it)
 
         tok_type = type(tok)
         if tok_type == FunctionCallToken:
@@ -233,10 +233,10 @@ class Parser:
 
 
 #: Iterable[Token]
-def parse(tokens):
+def parse_v1(tokens):
     return _parse_peekable(Peekable(iter(tokens)), None)
 
 
 def _parse_peekable(it: Peekable, end_tok_type):
     while True:
-        yield Parser(it, end_tok_type, False).next_tree()
+        yield _Parser(it, end_tok_type, False).next_tree()

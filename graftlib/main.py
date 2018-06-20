@@ -3,14 +3,14 @@ from argparse import ArgumentParser
 
 from graftlib.animation import Animation
 from graftlib.env import Env
-from graftlib.eval_cell import eval2_expr
-from graftlib.eval_v1 import eval1_expr
+from graftlib.eval_cell import eval_cell
+from graftlib.eval_v1 import eval_v1
 from graftlib.graftrun import graftrun
-from graftlib.lex_cell import lex as lex2
-from graftlib.lex_v1 import lex
+from graftlib.lex_cell import lex_cell
+from graftlib.lex_v1 import lex_v1
 from graftlib.strokeoptimiser import StrokeOptimiser
-from graftlib.parse_cell import parse as parse2
-from graftlib.parse_v1 import parse
+from graftlib.parse_cell import parse_cell
+from graftlib.parse_v1 import parse_v1
 from graftlib.world import World
 from graftlib.ui.gtk3ui import Gtk3Ui
 from graftlib.ui.gifui import GifUi
@@ -136,14 +136,16 @@ def main(world: World) -> int:
     frames = None if args.frames < 0 else args.frames
 
     if args.cell:
-        parsed = parse2(lex2(args.program))
-        eval_expr = eval2_expr
+        lex = lex_cell
+        parse = parse_cell
+        eval_expr = eval_cell
     else:
-        parsed = parse(lex(args.program))
-        eval_expr = eval1_expr
+        lex = lex_v1
+        parse = parse_v1
+        eval_expr = eval_v1
 
     program_values = graftrun(
-        parsed,
+        parse(lex(args.program)),
         frames,
         world.random.uniform,
         args.max_forks,

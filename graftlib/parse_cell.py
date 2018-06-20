@@ -58,7 +58,7 @@ class SymbolTree:
     value: str = attr.ib()
 
 
-class Parser:
+class _Parser:
     def __init__(self, tokens, stop_at):
         self.tokens = tokens
         self.stop_at = stop_at
@@ -127,7 +127,7 @@ class Parser:
         if typ == end:
             self.tokens.move_next()
         else:
-            arg_parser = Parser(self.tokens, (sep, end))
+            arg_parser = _Parser(self.tokens, (sep, end))
             while typ != end:
                 p = arg_parser.next_expression(None)
                 if p is not None:
@@ -143,8 +143,8 @@ class Parser:
                 "Hit end of file - expected '%s'." % (expected.code()))
 
 
-def parse(tokens_iterator):
-    parser = Parser(
+def parse_cell(tokens_iterator):
+    parser = _Parser(
         PeekableStream(tokens_iterator),
         (StatementSeparatorToken,)
     )

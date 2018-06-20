@@ -1,5 +1,5 @@
 from typing import Iterable
-from graftlib.lex_v1 import lex
+from graftlib.lex_v1 import lex_v1
 from graftlib.parse_v1 import (
     FunctionCall,
     FunctionDef,
@@ -7,13 +7,13 @@ from graftlib.parse_v1 import (
     Modify,
     Number,
     Symbol,
-    parse,
+    parse_v1,
 )
 import pytest
 
 
 def do_parse(chars: Iterable[str]):
-    return list(parse(lex(chars)))
+    return list(parse_v1(lex_v1(chars)))
 
 
 def test_function_calls_are_parsed():

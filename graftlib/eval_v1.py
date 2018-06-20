@@ -113,6 +113,6 @@ class Evaluator:
             raise Exception("Unknown statement type: " + str(statement))
 
 
-def eval1_expr(env, statement):
+def eval_v1(env, statement):
     evaluator = Evaluator(env)
     return evaluator.statement(statement)

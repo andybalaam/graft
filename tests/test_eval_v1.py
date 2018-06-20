@@ -8,12 +8,12 @@ from graftlib.graftrun import (
     graftrun,
     graftrun_debug,
 )
-from graftlib.eval_v1 import eval1_expr
-from graftlib.lex_v1 import lex
+from graftlib.eval_v1 import eval_v1
+from graftlib.lex_v1 import lex_v1
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
 from graftlib.pt import Pt
-from graftlib.parse_v1 import parse
+from graftlib.parse_v1 import parse_v1
 from graftlib.round_ import round_float, round_stroke
 
 
@@ -80,11 +80,11 @@ def do_eval(chars: Iterable[str], n: int, rand=None, max_forks=10):
     return list(
         round_strokes(
             graftrun(
-                parse(lex(chars)),
+                parse_v1(lex_v1(chars)),
                 n,
                 rand,
                 max_forks,
-                eval1_expr,
+                eval_v1,
             )
         )
     )
@@ -95,11 +95,11 @@ def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_forks=10):
         itertools.islice(
             round_debug(
                 graftrun_debug(
-                    parse(lex(chars)),
+                    parse_v1(lex_v1(chars)),
                     n,
                     rand,
                     max_forks,
-                    eval1_expr,
+                    eval_v1,
                 )
             ),
             0,

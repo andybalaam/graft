@@ -1,6 +1,6 @@
 import pytest
 from graftlib.lex_cell import (
-    lex,
+    lex_cell,
     AssignmentToken,
     EndFunctionDefToken,
     EndParamListToken,
@@ -19,7 +19,7 @@ from graftlib.lex_cell import (
 
 
 def lexed(inp):
-    return list(lex(inp))
+    return list(lex_cell(inp))
 
 
 # --- Lexing ---

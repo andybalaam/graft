@@ -55,7 +55,7 @@ class SymbolToken:
     value: str = attr.ib()
 
 
-def collect(c: str, it: Iterator[str], regex: Pattern) -> str:
+def _collect(c: str, it: Iterator[str], regex: Pattern) -> str:
     ret = c
     try:
         while regex.match(it.peek()):
@@ -79,15 +79,15 @@ semicolon: Pattern = re.compile(";")
 symbol_letter: Pattern = re.compile("[_a-zA-Z]")
 
 
-def next_token(c: str, it: Iterable[str]):
+def _next_token(c: str, it: Iterable[str]):
     if digit.match(c):
-        return NumberToken(collect(c, it, digit))
+        return NumberToken(_collect(c, it, digit))
     elif caret.match(c):
         return LabelToken()
     elif colon.match(c):
         return FunctionCallToken()
     elif operator.match(c):
-        return OperatorToken(collect(c, it, operator))
+        return OperatorToken(_collect(c, it, operator))
     elif tilda.match(c):
         return ContinuationToken()
     elif semicolon.match(c):
@@ -97,11 +97,11 @@ def next_token(c: str, it: Iterable[str]):
     elif close_brace.match(c):
         return EndFunctionDefToken()
     else:
-        return SymbolToken(collect(c, it, symbol_letter))
+        return SymbolToken(_collect(c, it, symbol_letter))
 
 
-def lex(chars: Iterable[str]):
+def lex_v1(chars: Iterable[str]):
     it = Peekable(iter(chars))
     while True:
         c = next(it)
-        yield next_token(c, it)
+        yield _next_token(c, it)

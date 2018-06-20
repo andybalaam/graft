@@ -1,7 +1,7 @@
 import pytest
-from graftlib.lex_cell import lex
+from graftlib.lex_cell import lex_cell
 from graftlib.parse_cell import (
-    parse,
+    parse_cell,
     AssignmentTree,
     FunctionCallTree,
     FunctionDefTree,
@@ -15,7 +15,7 @@ from graftlib.parse_cell import (
 
 
 def parsed(inp):
-    return list(parse(lex(inp)))
+    return list(parse_cell(lex_cell(inp)))
 
 
 # --- Parsing ---

@@ -88,21 +88,21 @@ def _scan_string(delim, chars):
     return ret
 
 
-def is_whitespace(c):
+def _is_whitespace(c):
     if c is None:
         return False
     else:
         return c in " \n"
 
 
-def lex(chars_iter):
+def lex_cell(chars_iter):
     chars = PeekableStream(chars_iter)
 
     while True:
-        if is_whitespace(chars.next):
+        if _is_whitespace(chars.next):
             chars.move_next()
             yield StatementSeparatorToken()
-            while is_whitespace(chars.next):
+            while _is_whitespace(chars.next):
                 chars.move_next()
 
         if chars.next is None:

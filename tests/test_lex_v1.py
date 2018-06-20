@@ -9,12 +9,12 @@ from graftlib.lex_v1 import (
     SeparatorToken,
     StartFunctionDefToken,
     SymbolToken,
-    lex,
+    lex_v1,
 )
 
 
 def do_lex(chars: Iterable[str]):
-    return list(lex(chars))
+    return list(lex_v1(chars))
 
 
 def test_symbol_is_lexed():

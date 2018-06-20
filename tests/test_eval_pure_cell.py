@@ -1,13 +1,13 @@
 import pytest
-from graftlib.lex_cell import lex
-from graftlib.parse_cell import FunctionCallTree, parse
+from graftlib.lex_cell import lex_cell
+from graftlib.parse_cell import FunctionCallTree, parse_cell
 from graftlib.eval_cell import (
     NativeFunctionValue,
     NoneValue,
     NumberValue,
     StringValue,
-    eval2_expr,
-    eval_list,
+    eval_cell,
+    eval_cell_list,
 )
 from graftlib.env import Env
 
@@ -18,7 +18,7 @@ from graftlib.env import Env
 def evald(inp, env=None):
     if env is None:
         env = Env(None, None)
-    return eval_list(parse(lex(inp)), env)
+    return eval_cell_list(parse_cell(lex_cell(inp)), env)
 
 
 def assert_prog_fails(program, error, env=None):
@@ -67,7 +67,7 @@ def test_Value_of_an_assignment_is_the_value_assigned():
 
 
 def test_None_evaluates_to_None():
-    assert eval2_expr(Env(None, None), NoneValue()) == NoneValue()
+    assert eval_cell(Env(None, None), NoneValue()) == NoneValue()
 
 
 def test_Calling_a_function_returns_its_last_value():
@@ -226,7 +226,7 @@ def test_A_closure_holds_updateable_values():
             ret = then_fn
         else:
             ret = else_fn
-        return eval2_expr(env, FunctionCallTree(ret, []))
+        return eval_cell(env, FunctionCallTree(ret, []))
     env = Env(None, None)
     env.set("dumb_set", NativeFunctionValue(dumb_set))
     env.set("dumb_if_equal", NativeFunctionValue(dumb_if_equal))

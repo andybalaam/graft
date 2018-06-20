@@ -5,11 +5,11 @@ from typing import Iterable, List, Optional, Tuple, Union
 from graftlib.dot import Dot
 from graftlib.env import Env
 from graftlib.graftrun import graftrun
-from graftlib.eval_cell import eval2_expr
-from graftlib.lex_cell import lex
+from graftlib.eval_cell import eval_cell
+from graftlib.lex_cell import lex_cell
 from graftlib.line import Line
 from graftlib.pt import Pt
-from graftlib.parse_cell import parse
+from graftlib.parse_cell import parse_cell
 from graftlib.round_ import round_float, round_stroke
 
 
@@ -76,11 +76,11 @@ def do_eval(chars: Iterable[str], n: int, rand=None, max_forks=10):
     return list(
         round_strokes(
             graftrun(
-                parse(lex(chars)),
+                parse_cell(lex_cell(chars)),
                 n,
                 rand,
                 max_forks,
-                eval2_expr,
+                eval_cell,
             )
         )
     )
@@ -91,11 +91,11 @@ def do_eval_debug(chars: Iterable[str], n: int, rand=None, max_forks=10):
         itertools.islice(
             round_debug(
                 graftrun_debug(
-                    parse(lex(chars)),
+                    parse_cell(lex_cell(chars)),
                     n,
                     rand,
                     max_forks,
-                    eval2_expr,
+                    eval_cell,
                 )
             ),
             0,
