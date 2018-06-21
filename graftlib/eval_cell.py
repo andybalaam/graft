@@ -37,6 +37,8 @@ class UserFunctionValue:
 def _operation(expr, env):
     arg1 = eval_cell(env, expr.left)
     arg2 = eval_cell(env, expr.right)
+    print(arg1)
+    print(arg2)
     if expr.operation == "+":
         return NumberValue(arg1.value + arg2.value)
     elif expr.operation == "-":
@@ -96,8 +98,6 @@ def eval_cell(env, expr):
             return ret
     elif typ == AssignmentTree:
         var_name = expr.symbol.value
-        if var_name in env.local_items():
-            raise Exception("Not allowed to re-assign symbol '%s'." % var_name)
         val = eval_cell(env, expr.value)
         env.set(var_name, val)
         return val

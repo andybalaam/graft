@@ -58,8 +58,12 @@ def test_Can_define_a_value_and_retrieve_it():
     assert evald("y='foo' y") == StringValue("foo")
 
 
-def test_Modifying_a_value_is_an_error():
-    assert_prog_fails("x=30 x=10", "Not allowed to re-assign symbol 'x'.")
+def test_Undefined_variables_are_equal_to_0():
+    assert evald("foo") == NumberValue(0)
+
+
+def test_Modifying_a_value_is_allowed():
+    assert evald("x=30 x=10 x") == NumberValue(10)
 
 
 def test_Value_of_an_assignment_is_the_value_assigned():
