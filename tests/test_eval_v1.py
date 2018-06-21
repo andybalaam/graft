@@ -12,6 +12,7 @@ from graftlib.eval_v1 import eval_v1
 from graftlib.lex_v1 import lex_v1
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
+from graftlib.numbervalue import NumberValue
 from graftlib.pt import Pt
 from graftlib.parse_v1 import parse_v1
 from graftlib.round_ import round_float, round_stroke
@@ -28,6 +29,8 @@ def round_value(v):
         return round_float(v)
     elif type(v) == int:
         return float(v)
+    elif type(v) == NumberValue:
+        return NumberValue(round_value(v.value))
     elif type(v) == Pt:
         return round_pt(v)
     elif type(v) in (Line, Dot):
@@ -123,7 +126,7 @@ def test_incrementing_a_variable_adds_ten():
 
     assert (
         do_eval_debug("+d", 1) ==
-        [[(None, {"d": 10.0})]]
+        [[(None, {"d": NumberValue(10.0)})]]
     )
 
 
@@ -132,36 +135,36 @@ def test_subtracting_a_variable_removes_ten():
 
     assert (
         do_eval_debug("-d", 1) ==
-        [[(None, {"d": -10.0})]]
+        [[(None, {"d": NumberValue(-10.0)})]]
     )
 
 
 def test_subtracting():
     assert (
         do_eval_debug("2-d", 1) ==
-        [[(None, {"d": -2.0})]]
+        [[(None, {"d": NumberValue(-2.0)})]]
     )
     assert (
         do_eval_debug("-2-d", 1) ==
-        [[(None, {"d": 2.0})]]
+        [[(None, {"d": NumberValue(2.0)})]]
     )
 
 
 def test_dividing():
     assert (
         do_eval_debug("2/s", 1) ==
-        [[(None, {"s": 5.0})]]
+        [[(None, {"s": NumberValue(5.0)})]]
     )
     assert (
         do_eval_debug("-2/s", 1) ==
-        [[(None, {"s": -5.0})]]
+        [[(None, {"s": NumberValue(-5.0)})]]
     )
 
 
 def test_adding_a_negative_subtracts():
     assert (
         do_eval_debug("-2+d", 1) ==
-        [[(None, {"d": -2.0})]]
+        [[(None, {"d": NumberValue(-2.0)})]]
     )
 
 
@@ -169,8 +172,8 @@ def test_multiplying_a_variable():
     assert (
         do_eval_debug("2=d3.1d", 2) ==
         [
-            [(None, {"d": 2.0})],
-            [(None, {"d": 6.2})],
+            [(None, {"d": NumberValue(2.0)})],
+            [(None, {"d": NumberValue(6.2)})],
         ]
     )
 
@@ -185,19 +188,31 @@ def test_turn_right_and_jump():
         [
             [(
                 None,
-                {"d": 90.0},
+                {"d": NumberValue(90.0)},
             )],
             [(
                 None,
-                {"d": 90.0, "s": 25.0},
+                {"d": NumberValue(90.0), "s": NumberValue(25.0)},
             )],
             [(
                 None,
-                {"x": 25.0, "d": 90.0, "s": 25.0, "xprev": 0.0, "yprev": 0.0},
+                {
+                    "x": NumberValue(25.0),
+                    "d": NumberValue(90.0),
+                    "s": NumberValue(25.0),
+                    "xprev": NumberValue(0.0),
+                    "yprev": NumberValue(0.0)
+                },
             )],
             [(
                 Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
-                {"x": 50.0, "d": 90.0, "s": 25.0, "xprev": 25.0, "yprev": 0.0},
+                {
+                    "x": NumberValue(50.0),
+                    "d": NumberValue(90.0),
+                    "s": NumberValue(25.0),
+                    "xprev": NumberValue(25.0),
+                    "yprev": NumberValue(0.0),
+                },
             )],
         ]
     )
@@ -375,7 +390,7 @@ def test_fork_draws_lines_in_parallel():
 
 def fork_ids(debug_time_step):
     return list(
-        env_vars["f"] if "f" in env_vars else 0
+        env_vars["f"].value if "f" in env_vars else 0
         for _, env_vars in debug_time_step
     )
 

@@ -4,6 +4,7 @@ import operator
 from graftlib.env import Env
 from graftlib import functions
 from graftlib.nativefunctionvalue import NativeFunctionValue
+from graftlib.numbervalue import NumberValue
 from graftlib.parse_v1 import (
     FunctionCall,
     FunctionDef,
@@ -68,7 +69,7 @@ class Evaluator:
         type_ = type(value_expr)
         if type_ == Number:
             neg = -1.0 if value_expr.negative else 1.0
-            return float(value_expr.value) * neg
+            return NumberValue(float(value_expr.value) * neg)
         elif type_ == FunctionCall:
             return self._function_call(value_expr)[-1]
         elif type_ == Symbol:
@@ -87,7 +88,7 @@ class Evaluator:
         functions.set_variable(
             self.env,
             var_name,
-            op(self.env.get(var_name), val)
+            NumberValue(op(self.env.get(var_name).value, val.value))
         )
 
         return None

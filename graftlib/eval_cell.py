@@ -37,8 +37,6 @@ class UserFunctionValue:
 def _operation(expr, env):
     arg1 = eval_cell(env, expr.left)
     arg2 = eval_cell(env, expr.right)
-    print(arg1)
-    print(arg2)
     if expr.operation == "+":
         return NumberValue(arg1.value + arg2.value)
     elif expr.operation == "-":

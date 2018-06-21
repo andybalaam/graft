@@ -5,6 +5,7 @@ from typing import Tuple
 
 from graftlib.dot import Dot
 from graftlib.line import Line
+from graftlib.numbervalue import NumberValue
 from graftlib.pt import Pt
 
 
@@ -48,7 +49,7 @@ def jump(env):
 
 
 def random(env):
-    return [float(env.rand.__call__(-10, 10))]
+    return [NumberValue(float(env.rand.__call__(-10, 10)))]
 
 
 def fork(env):
@@ -57,43 +58,43 @@ def fork(env):
 
 def theta(self) -> float:
     """Angle we are facing in radians"""
-    return 2 * math.pi * (self.env.get("d") / 360.0)
+    return 2 * math.pi * (self.env.get("d").value / 360.0)
 
 
 def prev_pos(self) -> Pt:
-    return Pt(self.env.get("xprev"), self.env.get("yprev"))
+    return Pt(self.env.get("xprev").value, self.env.get("yprev").value)
 
 
 def pos(self) -> Pt:
-    return Pt(self.env.get("x"), self.env.get("y"))
+    return Pt(self.env.get("x").value, self.env.get("y").value)
 
 
 def set_pos(self, pos: Pt):
     self.env.set("xprev", self.env.get("x"))
     self.env.set("yprev", self.env.get("y"))
-    self.env.set("x", pos.x)
-    self.env.set("y", pos.y)
+    self.env.set("x", NumberValue(pos.x))
+    self.env.set("y", NumberValue(pos.y))
 
 
 def step_size(self) -> float:
-    return self.env.get("s")
+    return self.env.get("s").value
 
 
 def color(self) -> Tuple[float, float, float, float]:
     return (
-        self.env.get("r"),
-        self.env.get("g"),
-        self.env.get("b"),
-        self.env.get("a"),
+        self.env.get("r").value,
+        self.env.get("g").value,
+        self.env.get("b").value,
+        self.env.get("a").value,
     )
 
 
 def brush_size(self) -> float:
-    return self.env.get("z")
+    return self.env.get("z").value
 
 
 def set_fork_id(self, new_id):
-    self.env.set("f", new_id)
+    self.env.set("f", NumberValue(new_id))
 
 
 def set_variable(env, name, value):
