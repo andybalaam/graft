@@ -133,15 +133,15 @@ def test_changing_a_variable():
     )
 
 
-# def test_incrementing_a_variable_adds_ten():
-#     assert do_eval("+d", 100) == []  # Does terminate even though no strokes
-#
-#     assert (
-#         do_eval_debug("+d", 1) ==
-#         [[(None, {"d": NumberValue(10.0)})]]
-#     )
-#
-#
+def test_incrementing_a_variable_adds_ten():
+    assert do_eval("d+=10", 100) == []  # Does terminate even though no strokes
+
+    assert (
+        do_eval_debug("d+=10", 1) ==
+        [[(None, {"d": NumberValue(10.0)})]]
+    )
+
+
 # def test_subtracting_a_variable_removes_ten():
 #     assert do_eval("-d", 1) == []
 #

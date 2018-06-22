@@ -7,6 +7,7 @@ from graftlib.lex_cell import (
     EndFunctionDefToken,
     EndParamListToken,
     ListSeparatorToken,
+    ModifyToken,
     NumberToken,
     OperatorToken,
     ParamListPreludeToken,
@@ -20,6 +21,13 @@ from graftlib.lex_cell import (
 
 @attr.s
 class AssignmentTree:
+    symbol = attr.ib()
+    value = attr.ib()
+
+
+@attr.s
+class ModifyTree:
+    operation: str = attr.ib()
     symbol = attr.ib()
     value = attr.ib()
 
@@ -97,6 +105,15 @@ class _Parser:
                     "You can't assign to anything except a symbol.")
             nxt = self.next_expression(None)
             return self.next_expression(AssignmentTree(prev, nxt))
+        elif typ == ModifyToken:
+            if type(prev) != SymbolTree:
+                raise Exception(
+                    "You can't modify (%s) anything except a symbol." % (
+                        tok.code()
+                    )
+                )
+            nxt = self.next_expression(None)
+            return self.next_expression(ModifyTree(tok.value, prev, nxt))
         elif typ == StatementSeparatorToken:
             # Ignore whitespace anywhere it wasn't expected
             return self.next_expression(prev)

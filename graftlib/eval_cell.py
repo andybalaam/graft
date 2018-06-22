@@ -6,6 +6,7 @@ from graftlib.parse_cell import (
     AssignmentTree,
     FunctionCallTree,
     FunctionDefTree,
+    ModifyTree,
     NumberTree,
     OperationTree,
     StringTree,
@@ -47,6 +48,26 @@ def _operation(expr, env):
         return NumberValue(arg1.value / arg2.value)
     else:
         raise Exception("Unknown operation: " + expr.operation)
+
+
+def _modify(expr: ModifyTree, env):
+    var_name = expr.symbol.value
+    val = _eval(env, expr.value).value
+    prev_val = env.get(var_name).value
+
+    if expr.operation == "+=":
+        new_val = prev_val + val
+    elif expr.operation == "-=":
+        new_val = prev_val - val
+    elif expr.operation == "*=":
+        new_val = prev_val * val
+    elif expr.operation == "/=":
+        new_val = prev_val / val
+    else:
+        raise Exception("Unknown modify operation: " + expr.operation)
+
+    env.set(var_name, NumberValue(new_val))
+    return env.get(var_name)
 
 
 def fail_if_wrong_number_of_args(fn_name, params, args):
@@ -107,6 +128,8 @@ def _eval(env, expr):
         val = _eval(env, expr.value)
         env.set(var_name, val)
         return val
+    elif typ == ModifyTree:
+        return _modify(expr, env)
     elif typ == FunctionCallTree:
         return _function_call(expr, env)
     elif typ == FunctionDefTree:

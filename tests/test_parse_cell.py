@@ -47,6 +47,23 @@ def test_Difference_of_symbol_and_number_is_parsed_as_expression():
     )
 
 
+def test_Modify_symbol_is_parsed_as_expression():
+    assert (
+        parsed("foo-=44") ==
+        [
+            ModifyTree("-=", SymbolTree("foo"), NumberTree("44"))
+        ]
+    )
+
+
+def test_Modify_symbol_is_parsed_as_expression():
+    with pytest.raises(
+        Exception,
+        match=r"You can't modify \(\*=\) anything except a symbol\."
+    ):
+        parsed("3*=44")
+
+
 def test_Multiplication_of_symbols_is_parsed_as_expression():
     assert (
         parsed("foo*bar") ==

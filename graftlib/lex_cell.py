@@ -6,7 +6,9 @@ from graftlib.peekablestream import PeekableStream
 
 @attr.s
 class AssignmentToken:
-    pass
+    @staticmethod
+    def code():
+        return "="
 
 
 @attr.s
@@ -25,47 +27,77 @@ class EndParamListToken:
 
 @attr.s
 class ListSeparatorToken:
-    pass
+    @staticmethod
+    def code(self):
+        return ","
+
+
+@attr.s
+class ModifyToken:
+    value: str = attr.ib()
+
+    def code(self):
+        return self.value
 
 
 @attr.s
 class NumberToken:
     value: str = attr.ib()
 
+    def code(self):
+        return self.value
+
 
 @attr.s
 class OperatorToken:
     value: str = attr.ib()
 
+    def code(self):
+        return self.value
+
 
 @attr.s
 class ParamListPreludeToken:
-    pass
+    @staticmethod
+    def code(self):
+        return ":"
 
 
 @attr.s
 class StartParamListToken:
-    pass
+    @staticmethod
+    def code(self):
+        return "("
 
 
 @attr.s
 class StartFunctionDefToken:
-    pass
+    @staticmethod
+    def code(self):
+        return "{"
 
 
 @attr.s
 class StatementSeparatorToken:
-    pass
+    @staticmethod
+    def code(self):
+        return " "
 
 
 @attr.s
 class StringToken:
     value: str = attr.ib()
 
+    def code(self):
+        return '"%s"' % self.value
+
 
 @attr.s
 class SymbolToken:
     value: str = attr.ib()
+
+    def code(self):
+        return self.value
 
 
 def _scan(first_char, chars, allowed):
@@ -126,7 +158,12 @@ def lex_cell(chars_iter):
             yield AssignmentToken()
 
         elif c in "+-*/":
-            yield OperatorToken(c)
+            nc = chars.next
+            if nc == "=":
+                chars.move_next()
+                yield ModifyToken(c + nc)
+            else:
+                yield OperatorToken(c)
 
         elif c in ("'", '"'):
             yield StringToken(_scan_string(c, chars))

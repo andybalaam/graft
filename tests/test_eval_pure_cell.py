@@ -49,8 +49,24 @@ def test_Arithmetic_expressions_come_out_correct():
     assert evald("3/4") == NumberValue(0.75)
 
 
+def test_Modifying_arithmetic_expressions_come_out_correct():
+    assert evald("r=3 r+=4 r") == NumberValue(7)
+    assert evald("r=3 r-=4 r") == NumberValue(-1)
+    assert evald("r=3 r*=4 r") == NumberValue(12)
+    assert evald("r=3 r/=4 r") == NumberValue(0.75)
+
+
+def TODO_FAILS_test_Modifying_by_negative_numbers_comes_out_correct():
+    assert evald("r=3 r+=-4 r") == NumberValue(-1)
+    assert evald("r=3 r*=-4 r") == NumberValue(-12)
+
+
 def test_Referring_to_an_unknown_symbol_yields_0():
     assert evald("unkn") == NumberValue(0.0)
+
+
+def TODO_FAILS_test_Can_define_a_value_as_a_negative():
+    assert evald("x=-30 x") == NumberValue(-30)
 
 
 def test_Can_define_a_value_and_retrieve_it():

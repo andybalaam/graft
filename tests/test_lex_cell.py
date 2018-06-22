@@ -5,6 +5,7 @@ from graftlib.lex_cell import (
     EndFunctionDefToken,
     EndParamListToken,
     ListSeparatorToken,
+    ModifyToken,
     NumberToken,
     OperatorToken,
     ParamListPreludeToken,
@@ -168,6 +169,13 @@ def test_Arithmetic_operators_produce_operation_tokens():
     assert lexed("-") == [OperatorToken("-")]
     assert lexed("*") == [OperatorToken("*")]
     assert lexed("/") == [OperatorToken("/")]
+
+
+def test_Arithmetic_operators_produce_operation_tokens():
+    assert lexed("+=") == [ModifyToken("+=")]
+    assert lexed("-=") == [ModifyToken("-=")]
+    assert lexed("*=") == [ModifyToken("*=")]
+    assert lexed("/=") == [ModifyToken("/=")]
 
 
 def test_Multiple_token_types_can_be_combined():
