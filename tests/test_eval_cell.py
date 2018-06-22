@@ -123,6 +123,16 @@ def test_setting_a_variable():
     )
 
 
+def test_changing_a_variable():
+    assert (
+        do_eval_debug("d=3 d=d+4", 2) ==
+        [
+            [(None, {"d": NumberValue(3.0)})],
+            [(None, {"d": NumberValue(7.0)})],
+        ]
+    )
+
+
 # def test_incrementing_a_variable_adds_ten():
 #     assert do_eval("+d", 100) == []  # Does terminate even though no strokes
 #
