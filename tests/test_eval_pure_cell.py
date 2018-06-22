@@ -71,7 +71,7 @@ def test_Value_of_an_assignment_is_the_value_assigned():
 
 
 def test_None_evaluates_to_None():
-    assert eval_cell(Env(None, None), NoneValue()) == NoneValue()
+    assert eval_cell_list([NoneValue()], Env(None, None)) == NoneValue()
 
 
 def test_Calling_a_function_returns_its_last_value():
@@ -230,7 +230,7 @@ def test_A_closure_holds_updateable_values():
             ret = then_fn
         else:
             ret = else_fn
-        return eval_cell(env, FunctionCallTree(ret, []))
+        return eval_cell_list([FunctionCallTree(ret, [])], env)
     env = Env(None, None)
     env.set("dumb_set", NativeFunctionValue(dumb_set))
     env.set("dumb_if_equal", NativeFunctionValue(dumb_if_equal))

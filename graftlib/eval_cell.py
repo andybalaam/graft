@@ -35,8 +35,8 @@ class UserFunctionValue:
 
 
 def _operation(expr, env):
-    arg1 = eval_cell(env, expr.left)
-    arg2 = eval_cell(env, expr.right)
+    arg1 = _eval(env, expr.left)
+    arg2 = _eval(env, expr.right)
     if expr.operation == "+":
         return NumberValue(arg1.value + arg2.value)
     elif expr.operation == "-":
@@ -58,9 +58,10 @@ def fail_if_wrong_number_of_args(fn_name, params, args):
 
 
 def _function_call(expr, env):
-    fn = eval_cell(env, expr.fn)
-    args = list((eval_cell(env, a) for a in expr.args))
+    fn = _eval(env, expr.fn)
+    args = list((_eval(env, a) for a in expr.args))
     typ = type(fn)
+
     if typ == UserFunctionValue:
         fail_if_wrong_number_of_args(expr.fn, fn.params, args)
         new_env = fn.env.make_child()
@@ -79,6 +80,13 @@ def _function_call(expr, env):
 
 
 def eval_cell(env, expr):
+    ret = _eval(env, expr)
+    # Wrap values in [] if they are not already
+    # a list of strokes.
+    return ret if type(ret) is list else [ret]
+
+
+def _eval(env, expr):
     typ = type(expr)
     if typ == NumberTree:
         return NumberValue(float(expr.value))
@@ -96,7 +104,7 @@ def eval_cell(env, expr):
             return ret
     elif typ == AssignmentTree:
         var_name = expr.symbol.value
-        val = eval_cell(env, expr.value)
+        val = _eval(env, expr.value)
         env.set(var_name, val)
         return val
     elif typ == FunctionCallTree:
@@ -115,7 +123,7 @@ def eval_cell(env, expr):
 
 def _eval_iter(exprs, env):
     for expr in exprs:
-        yield eval_cell(env, expr)
+        yield _eval(env, expr)
 
 
 def eval_cell_list(exprs, env):

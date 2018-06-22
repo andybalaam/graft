@@ -4,10 +4,12 @@ from typing import Iterable, List, Optional, Tuple, Union
 
 from graftlib.dot import Dot
 from graftlib.env import Env
-from graftlib.graftrun import graftrun
+from graftlib.graftrun import graftrun, graftrun_debug
 from graftlib.eval_cell import eval_cell
 from graftlib.lex_cell import lex_cell
 from graftlib.line import Line
+from graftlib.make_graft_env import make_graft_env
+from graftlib.numbervalue import NumberValue
 from graftlib.pt import Pt
 from graftlib.parse_cell import parse_cell
 from graftlib.round_ import round_float, round_stroke
@@ -111,6 +113,13 @@ def test_calling_s_moves_forward():
             [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
             [Line(Pt(0.0, 10.0), Pt(0.0, 20.0))],
         ]
+    )
+
+
+def test_setting_a_variable():
+    assert (
+        do_eval_debug("d=3", 1) ==
+        [[(None, {"d": NumberValue(3)})]]
     )
 
 
