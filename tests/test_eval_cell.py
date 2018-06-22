@@ -128,7 +128,7 @@ def test_setting_a_variable():
 #
 #     assert (
 #         do_eval_debug("+d", 1) ==
-#         [[(None, {"d": 10.0})]]
+#         [[(None, {"d": NumberValue(10.0)})]]
 #     )
 #
 #
@@ -137,36 +137,36 @@ def test_setting_a_variable():
 #
 #     assert (
 #         do_eval_debug("-d", 1) ==
-#         [[(None, {"d": -10.0})]]
+#         [[(None, {"d": NumberValue(-10.0)})]]
 #     )
 #
 #
 # def test_subtracting():
 #     assert (
 #         do_eval_debug("2-d", 1) ==
-#         [[(None, {"d": -2.0})]]
+#         [[(None, {"d": NumberValue(-2.0)})]]
 #     )
 #     assert (
 #         do_eval_debug("-2-d", 1) ==
-#         [[(None, {"d": 2.0})]]
+#         [[(None, {"d": NumberValue(2.0)})]]
 #     )
 #
 #
 # def test_dividing():
 #     assert (
 #         do_eval_debug("2/s", 1) ==
-#         [[(None, {"s": 5.0})]]
+#         [[(None, {"s": NumberValue(5.0)})]]
 #     )
 #     assert (
 #         do_eval_debug("-2/s", 1) ==
-#         [[(None, {"s": -5.0})]]
+#         [[(None, {"s": NumberValue(-5.0)})]]
 #     )
 #
 #
 # def test_adding_a_negative_subtracts():
 #     assert (
 #         do_eval_debug("-2+d", 1) ==
-#         [[(None, {"d": -2.0})]]
+#         [[(None, {"d": NumberValue(-2.0)})]]
 #     )
 #
 #
@@ -174,8 +174,8 @@ def test_setting_a_variable():
 #     assert (
 #         do_eval_debug("2=d3.1d", 2) ==
 #         [
-#             [(None, {"d": 2.0})],
-#             [(None, {"d": 6.2})],
+#             [(None, {"d": NumberValue(2.0)})],
+#             [(None, {"d": NumberValue(6.2)})],
 #         ]
 #     )
 #
@@ -190,21 +190,31 @@ def test_setting_a_variable():
 #         [
 #             [(
 #                 None,
-#                 {"d": 90.0},
+#                 {"d": NumberValue(90.0)},
 #             )],
 #             [(
 #                 None,
-#                 {"d": 90.0, "s": 25.0},
+#                 {"d": NumberValue(90.0), "s": NumberValue(25.0)},
 #             )],
 #             [(
 #                 None,
-#                 {"x": 25.0, "d": 90.0, "s": 25.0,
-# "xprev": 0.0, "yprev": 0.0},
+#                 {
+#                     "x": NumberValue(25.0),
+#                     "d": NumberValue(90.0),
+#                     "s": NumberValue(25.0),
+#                     "xprev": NumberValue(0.0),
+#                     "yprev": NumberValue(0.0)
+#                 },
 #             )],
 #             [(
 #                 Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
-#                 {"x": 50.0, "d": 90.0, "s": 25.0,
-# "xprev": 25.0, "yprev": 0.0},
+#                 {
+#                     "x": NumberValue(50.0),
+#                     "d": NumberValue(90.0),
+#                     "s": NumberValue(25.0),
+#                     "xprev": NumberValue(25.0),
+#                     "yprev": NumberValue(0.0),
+#                 },
 #             )],
 #         ]
 #     )
@@ -382,7 +392,7 @@ def test_setting_a_variable():
 #
 # def fork_ids(debug_time_step):
 #     return list(
-#         env_vars["f"] if "f" in env_vars else 0
+#         env_vars["f"].value if "f" in env_vars else 0
 #         for _, env_vars in debug_time_step
 #     )
 #
