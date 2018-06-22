@@ -182,10 +182,10 @@ def test_multiplying_a_variable():
     )
 
 
-# def test_turn_right_and_move():
-#     assert do_eval("90+d25=s:S", 1) == [[Line(Pt(0, 0), Pt(25, 0))]]
-#
-#
+def test_turn_right_and_move():
+    assert do_eval("d+=90 s=25 S()", 1) == [[Line(Pt(0, 0), Pt(25, 0))]]
+
+
 # def test_turn_right_and_jump():
 #     assert (
 #         do_eval_debug("90+d25=s:J:S", 4) ==
