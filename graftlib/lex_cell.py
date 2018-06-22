@@ -28,7 +28,7 @@ class EndParamListToken:
 @attr.s
 class ListSeparatorToken:
     @staticmethod
-    def code(self):
+    def code():
         return ","
 
 
@@ -59,28 +59,28 @@ class OperatorToken:
 @attr.s
 class ParamListPreludeToken:
     @staticmethod
-    def code(self):
+    def code():
         return ":"
 
 
 @attr.s
 class StartParamListToken:
     @staticmethod
-    def code(self):
+    def code():
         return "("
 
 
 @attr.s
 class StartFunctionDefToken:
     @staticmethod
-    def code(self):
+    def code():
         return "{"
 
 
 @attr.s
 class StatementSeparatorToken:
     @staticmethod
-    def code(self):
+    def code():
         return " "
 
 
