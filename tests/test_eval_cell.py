@@ -165,23 +165,23 @@ def test_dividing():
     )
 
 
-# def test_adding_a_negative_subtracts():
-#     assert (
-#         do_eval_debug("-2+d", 1) ==
-#         [[(None, {"d": NumberValue(-2.0)})]]
-#     )
-#
-#
-# def test_multiplying_a_variable():
-#     assert (
-#         do_eval_debug("2=d3.1d", 2) ==
-#         [
-#             [(None, {"d": NumberValue(2.0)})],
-#             [(None, {"d": NumberValue(6.2)})],
-#         ]
-#     )
-#
-#
+def TODO_FAILS_test_adding_a_negative_subtracts():
+    assert (
+        do_eval_debug("d+=-2", 1) ==
+        [[(None, {"d": NumberValue(-2.0)})]]
+    )
+
+
+def test_multiplying_a_variable():
+    assert (
+        do_eval_debug("d=2 d*=3.1", 2) ==
+        [
+            [(None, {"d": NumberValue(2.0)})],
+            [(None, {"d": NumberValue(6.2)})],
+        ]
+    )
+
+
 # def test_turn_right_and_move():
 #     assert do_eval("90+d25=s:S", 1) == [[Line(Pt(0, 0), Pt(25, 0))]]
 #
