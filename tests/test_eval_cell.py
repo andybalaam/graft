@@ -142,37 +142,29 @@ def test_incrementing_a_variable_adds_ten():
     )
 
 
-# def test_subtracting_a_variable_removes_ten():
-#     assert do_eval("-d", 1) == []
-#
-#     assert (
-#         do_eval_debug("-d", 1) ==
-#         [[(None, {"d": NumberValue(-10.0)})]]
-#     )
-#
-#
-# def test_subtracting():
-#     assert (
-#         do_eval_debug("2-d", 1) ==
-#         [[(None, {"d": NumberValue(-2.0)})]]
-#     )
-#     assert (
-#         do_eval_debug("-2-d", 1) ==
-#         [[(None, {"d": NumberValue(2.0)})]]
-#     )
-#
-#
-# def test_dividing():
-#     assert (
-#         do_eval_debug("2/s", 1) ==
-#         [[(None, {"s": NumberValue(5.0)})]]
-#     )
-#     assert (
-#         do_eval_debug("-2/s", 1) ==
-#         [[(None, {"s": NumberValue(-5.0)})]]
-#     )
-#
-#
+def test_subtracting_from_a_variable():
+    assert do_eval("d-=10", 1) == []
+
+    assert (
+        do_eval_debug("d-=10", 1) ==
+        [[(None, {"d": NumberValue(-10.0)})]]
+    )
+
+
+def TODO_FAILS_test_subtracting_a_negative():
+    assert (
+        do_eval_debug("d-=-2", 1) ==
+        [[(None, {"d": NumberValue(2.0)})]]
+    )
+
+
+def test_dividing():
+    assert (
+        do_eval_debug("s/=2", 1) ==
+        [[(None, {"s": NumberValue(5.0)})]]
+    )
+
+
 # def test_adding_a_negative_subtracts():
 #     assert (
 #         do_eval_debug("-2+d", 1) ==
