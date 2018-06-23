@@ -26,6 +26,8 @@ def round_value(v):
         return round_float(v)
     elif type(v) == int:
         return float(v)
+    elif type(v) == NumberValue:
+        return NumberValue(round_value(v.value))
     elif type(v) == Pt:
         return round_pt(v)
     elif type(v) in (Line, Dot):
@@ -186,94 +188,94 @@ def test_turn_right_and_move():
     assert do_eval("d+=90 s=25 S()", 1) == [[Line(Pt(0, 0), Pt(25, 0))]]
 
 
-# def test_turn_right_and_jump():
-#     assert (
-#         do_eval_debug("90+d25=s:J:S", 4) ==
-#         [
-#             [(
-#                 None,
-#                 {"d": NumberValue(90.0)},
-#             )],
-#             [(
-#                 None,
-#                 {"d": NumberValue(90.0), "s": NumberValue(25.0)},
-#             )],
-#             [(
-#                 None,
-#                 {
-#                     "x": NumberValue(25.0),
-#                     "d": NumberValue(90.0),
-#                     "s": NumberValue(25.0),
-#                     "xprev": NumberValue(0.0),
-#                     "yprev": NumberValue(0.0)
-#                 },
-#             )],
-#             [(
-#                 Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
-#                 {
-#                     "x": NumberValue(50.0),
-#                     "d": NumberValue(90.0),
-#                     "s": NumberValue(25.0),
-#                     "xprev": NumberValue(25.0),
-#                     "yprev": NumberValue(0.0),
-#                 },
-#             )],
-#         ]
-#     )
-#
-#
-# def test_turn_random_and_move():
-#     def r(_a, _b):
-#         return 90
-#     assert do_eval(":R~+d:S", n=1, rand=r) == [[Line(Pt(0, 0), Pt(10, 0))]]
-#
-#
-# def test_bare_number_does_nothing():
-#     assert do_eval("3", n=1) == []
-#
-#
-# def test_bare_random_does_nothing():
-#     def r(_a, _b):
-#         return 90
-#     assert do_eval(":R", n=1, rand=r) == []
-#
-#
-# def test_draw_in_different_colour():
-#     assert (
-#         do_eval("0.9=r0.5=g0.1=b0.5=a:S0.1=a:S", 2) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0, 10.0), color=(0.9, 0.5, 0.1, 0.5))],
-#             [Line(Pt(0.0, 10.0), Pt(0, 20.0), color=(0.9, 0.5, 0.1, 0.1))],
-#         ]
-#     )
-#
-#
-# def test_draw_in_different_size():
-#     assert (
-#         do_eval("20=z:S5=r:S", 2) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0, 10.0), size=20.0)],
-#             [Line(
-#                 Pt(0.0, 10.0),
-#                 Pt(0.0, 20.0),
-#                 size=20.0,
-#                 color=(5.0, 0.0, 0.0, 100.0),
-#             )],
-#         ]
-#     )
-#
-#
-# def test_repeating_commands():
-#     assert (
-#         do_eval("3:S", 3) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
-#             [Line(Pt(0.0, 10.0), Pt(0.0, 20.0))],
-#             [Line(Pt(0.0, 20.0), Pt(0.0, 30.0))],
-#         ]
-#     )
-#
-#
+def test_turn_right_and_jump():
+    assert (
+        do_eval_debug("d+=90 s=25 J() S()", 4) ==
+        [
+            [(
+                None,
+                {"d": NumberValue(90.0)},
+            )],
+            [(
+                None,
+                {"d": NumberValue(90.0), "s": NumberValue(25.0)},
+            )],
+            [(
+                None,
+                {
+                    "x": NumberValue(25.0),
+                    "d": NumberValue(90.0),
+                    "s": NumberValue(25.0),
+                    "xprev": NumberValue(0.0),
+                    "yprev": NumberValue(0.0)
+                },
+            )],
+            [(
+                Line(Pt(25.0, 0.0), Pt(50.0, 0.0)),
+                {
+                    "x": NumberValue(50.0),
+                    "d": NumberValue(90.0),
+                    "s": NumberValue(25.0),
+                    "xprev": NumberValue(25.0),
+                    "yprev": NumberValue(0.0),
+                },
+            )],
+        ]
+    )
+
+
+def test_turn_random_and_move():
+    def r(_a, _b):
+        return 90
+    assert do_eval("d+=R() S()", n=1, rand=r) == [[Line(Pt(0, 0), Pt(10, 0))]]
+
+
+def test_bare_number_does_nothing():
+    assert do_eval("3", n=1) == []
+
+
+def test_bare_random_does_nothing():
+    def r(_a, _b):
+        return 90
+    assert do_eval("R()", n=1, rand=r) == []
+
+
+def test_draw_in_different_colour():
+    assert (
+        do_eval("r=0.9 g=0.5 b=0.1 a=0.5 S() a=0.1 S()", 2) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0, 10.0), color=(0.9, 0.5, 0.1, 0.5))],
+            [Line(Pt(0.0, 10.0), Pt(0, 20.0), color=(0.9, 0.5, 0.1, 0.1))],
+        ]
+    )
+
+
+def test_draw_in_different_size():
+    assert (
+        do_eval("z=20 S() r=5 S()", 2) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0, 10.0), size=20.0)],
+            [Line(
+                Pt(0.0, 10.0),
+                Pt(0.0, 20.0),
+                size=20.0,
+                color=(5.0, 0.0, 0.0, 100.0),
+            )],
+        ]
+    )
+
+
+def test_repeating_commands():
+    assert (
+        do_eval("T(3,S)", 3) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
+            [Line(Pt(0.0, 10.0), Pt(0.0, 20.0))],
+            [Line(Pt(0.0, 20.0), Pt(0.0, 30.0))],
+        ]
+    )
+
+
 # def test_repeating_multiple_commands():
 #     assert (
 #         do_eval("3:{:S90+d}", 3) ==

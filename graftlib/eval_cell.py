@@ -52,7 +52,12 @@ def _operation(expr, env):
 
 def _modify(expr: ModifyTree, env):
     var_name = expr.symbol.value
-    val = _eval(env, expr.value).value
+    val = _eval(env, expr.value)
+    if type(val) is list:  # TODO strokes as a monad
+        assert len(val) == 1
+        val = val[0]
+
+    val = val.value
     prev_val = env.get(var_name).value
 
     if expr.operation == "+=":
@@ -113,7 +118,7 @@ def _eval(env, expr):
         return NumberValue(float(expr.value))
     elif typ == StringTree:
         return StringValue(expr.value)
-    elif typ == NoneValue:
+    elif typ in (NoneValue, NativeFunctionValue):
         return expr
     elif typ == OperationTree:
         return _operation(expr, env)

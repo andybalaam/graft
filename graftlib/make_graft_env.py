@@ -1,5 +1,6 @@
-from graftlib.env import Env
+from graftlib import cellfunctions
 from graftlib import functions
+from graftlib.env import Env
 from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.numbervalue import NumberValue
 
@@ -24,5 +25,6 @@ def make_graft_env() -> Env:
     ret.set("L", NativeFunctionValue(functions.line_to))
     ret.set("R", NativeFunctionValue(functions.random))
     ret.set("S", NativeFunctionValue(functions.step))
+    ret.set("T", NativeFunctionValue(cellfunctions.times))
 
     return ret

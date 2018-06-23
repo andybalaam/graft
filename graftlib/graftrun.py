@@ -58,7 +58,7 @@ class RunningProgram:
         self.program: List = program
         self.rand = rand
         self.fork_callback = fork_callback
-        self.env = ProgramEnv(env, rand, self.fork)
+        self.env = ProgramEnv(env, rand, self.fork, eval_expr)
         self.eval_expr = eval_expr
 
         """

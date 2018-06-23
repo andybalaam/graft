@@ -13,6 +13,7 @@ class ProgramEnv:
     env = attr.ib()
     rand = attr.ib()
     fork_callback = attr.ib()
+    eval_expr = attr.ib()
 
     def parent(self):
         return self.env.parent()
@@ -22,6 +23,7 @@ class ProgramEnv:
             self.env.clone(),
             self.rand,
             self.fork_callback,
+            self.eval_expr,
         )
 
     def make_child(self):
