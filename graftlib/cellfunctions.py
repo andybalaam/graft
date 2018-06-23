@@ -4,5 +4,7 @@ def times(env, reps, fn):
     # TODO: when we have "for" this should be written
     #       in Cell, not Python.
     ret = []
-    ret.extend(env.eval_expr(env, FunctionCallTree(fn, [])))
+    for i in range(int(reps.value)):
+        val = env.eval_expr(env, FunctionCallTree(fn, []))
+        ret.extend(val)
     return ret

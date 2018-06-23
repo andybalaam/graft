@@ -92,7 +92,7 @@ def _function_call(expr, env):
         fail_if_wrong_number_of_args(expr.fn, fn.params, args)
         new_env = fn.env.make_child()
         for p, a in zip(fn.params, args):
-            new_env.set(p.value, a)
+            new_env.set_new(p.value, a)
         return eval_cell_list(fn.body, new_env)
     elif typ == NativeFunctionValue:
         params = inspect.getargspec(fn.py_fn).args

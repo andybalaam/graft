@@ -28,8 +28,10 @@ class ProgramEnv:
 
     def make_child(self):
         return ProgramEnv(
-            self.env.make_child,
+            self.env.make_child(),
+            self.rand,
             self.fork_callback,
+            self.eval_expr,
         )
 
     def get(self, name):
@@ -37,6 +39,9 @@ class ProgramEnv:
 
     def set(self, name, value):
         return self.env.set(name, value)
+
+    def set_new(self, name, value):
+        return self.env.set_new(name, value)
 
     def contains(self, name):
         return self.env.contains(name)

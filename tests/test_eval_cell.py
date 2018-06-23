@@ -276,17 +276,29 @@ def test_repeating_commands():
     )
 
 
-# def test_repeating_multiple_commands():
+def test_repeating_multiple_commands():
+    assert (
+        do_eval("T(3,{d+=90 S()})", 3) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(10.0, 0.0))],
+            [Line(Pt(10.0, 0.0), Pt(10.0, -10.0))],
+            [Line(Pt(10.0, -10.0), Pt(0.0, -10.0))],
+        ]
+    )
+
+
+# def TODO_FAILS_REQUIRES_MONADIC_STROKES():
+# #test_repeating_multiple_commands_where_strokes_are_not_last():
 #     assert (
-#         do_eval("3:{:S90+d}", 3) ==
+#         do_eval("T(3,{S() d+=90})", 3) ==
 #         [
 #             [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
 #             [Line(Pt(0.0, 10.0), Pt(10.0, 10.0))],
 #             [Line(Pt(10.0, 10.0), Pt(10.0, 0.0))],
 #         ]
 #     )
-#
-#
+
+
 # def test_semicolon_to_separate_statements():
 #     assert do_eval("s;s:S", 1) == [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
 #

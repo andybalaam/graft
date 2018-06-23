@@ -52,7 +52,27 @@ class Env:
             self._items[name] = NumberValue(0.0)
             return self._items[name]
 
+    def _try_update(self, name, value):
+        """
+        Return true if we found this name in ourselves
+        or a parent, and updated it its value to the
+        value supplier.
+        Return false if this name was not known yet.
+        """
+        if name in self._items:
+            self._items[name] = value
+            return True
+        elif self._parent is None:
+            return False
+        else:
+            return self._parent._try_update(name, value)
+
     def set(self, name, value):
+        was_updated = self._try_update(name, value)
+        if not was_updated:
+            self.set_new(name, value)
+
+    def set_new(self, name, value):
         self._items[name] = value
 
     def contains(self, name):

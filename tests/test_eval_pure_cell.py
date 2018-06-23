@@ -116,21 +116,22 @@ def test_Can_hold_a_reference_to_a_function_and_call_it():
     )
 
 
-def test_A_symbol_has_different_life_inside_and_outside_a_function():
-    """Define a symbol outside a function, redefine inside,
-       then evaluate outside.  What happened inside the
-       function should not affect the value outside."""
-
-    assert (
-        evald(
-            """
-            foo="bar"
-            {foo=3}()
-            foo
-            """
-        ) ==
-        StringValue("bar")
-    )
+# Not true in the mutable version of Cell
+# def test_A_symbol_has_different_life_inside_and_outside_a_function():
+#     """Define a symbol outside a function, redefine inside,
+#        then evaluate outside.  What happened inside the
+#        function should not affect the value outside."""
+#
+#     assert (
+#         evald(
+#             """
+#             foo="bar"
+#             {foo=3}()
+#             foo
+#             """
+#         ) ==
+#         StringValue("bar")
+#     )
 
 
 def test_A_symbol_within_a_function_has_the_local_value():
@@ -223,6 +224,22 @@ def test_Function_arguments_are_independent():
             """
         ) ==
         evald("'b'")
+    )
+
+
+def test_Modifying_inside_an_env_modifies_the_outside():
+    assert (
+        evald(
+            """
+            fn={:(arg)global1=2 global2+=10 arg=200}
+            global1=1
+            global2=10
+            arg=100
+            fn(2000)
+            arg+global1+global2
+            """
+        ) ==
+        evald("122")  # globals get changes, arg does not
     )
 
 
