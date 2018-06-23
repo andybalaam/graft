@@ -356,6 +356,13 @@ def test_go_then_line():
     )
 
 
+def test_go_then_line_modified():
+    assert (
+        do_eval("10=x15=y10+x1+y:L", 1) ==
+        [[Line(Pt(10.0, 15.0), Pt(20.0, 16.0))]]
+    )
+
+
 def test_repeat_starts_at_beginning_if_no_label():
     assert (
         do_eval("90=d90+d:S", 2) ==

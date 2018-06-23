@@ -95,16 +95,3 @@ def brush_size(self) -> float:
 
 def set_fork_id(self, new_id):
     self.env.set("f", NumberValue(new_id))
-
-
-def set_variable(env, name, value):
-    # x and y are magic variables that remember their previous values
-    if name == "x":
-        env.set("xprev", env.get("x"))
-    elif name == "y":
-        env.set("yprev", env.get("y"))
-    env.set(name, value)
-
-
-def has_variable(self, name):
-    return self.env.get(name) is not None

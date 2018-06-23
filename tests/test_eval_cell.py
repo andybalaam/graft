@@ -299,91 +299,101 @@ def test_repeating_multiple_commands():
 #     )
 
 
-# def test_semicolon_to_separate_statements():
-#     assert do_eval("s;s:S", 1) == [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
-#
-#
-# def test_pass_symbol_to_operator():
-#     assert do_eval("90=s;s~+d:S", 1) == [[Line(Pt(0.0, 0.0), Pt(90.0, 0.0))]]
-#
-#
-# def test_define_custom_variable():
-#     assert (
-#         do_eval("180=aa;aa~+d:S", 1) ==
-#         [[Line(Pt(0.0, 0.0), Pt(0.0, -10.0))]]
-#     )
-#
-#
-# def test_multiply_by_variable():
-#     assert do_eval("2=aa;aa~s:S", 1) == [[Line(Pt(0.0, 0.0), Pt(0.0, 20.0))]]
-#
-#
-# def test_move_in_a_circle():
-#     assert (
-#         do_eval(":S+d", 36) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
-#             [Line(start=Pt(x=0.0, y=10.0), end=Pt(x=1.7, y=19.8))],
-#             [Line(start=Pt(x=1.7, y=19.8), end=Pt(x=5.2, y=29.2))],
-#             [Line(start=Pt(x=5.2, y=29.2), end=Pt(x=10.2, y=37.9))],
-#             [Line(start=Pt(x=10.2, y=37.9), end=Pt(x=16.6, y=45.6))],
-#             [Line(start=Pt(x=16.6, y=45.6), end=Pt(x=24.2, y=52.0))],
-#             [Line(start=Pt(x=24.2, y=52.0), end=Pt(x=32.9, y=57.0))],
-#             [Line(start=Pt(x=32.9, y=57.0), end=Pt(x=42.3, y=60.4))],
-#             [Line(start=Pt(x=42.3, y=60.4), end=Pt(x=52.2, y=62.2))],
-#             [Line(start=Pt(x=52.2, y=62.2), end=Pt(x=62.2, y=62.2))],
-#             [Line(start=Pt(x=62.2, y=62.2), end=Pt(x=72.0, y=60.4))],
-#             [Line(start=Pt(x=72.0, y=60.4), end=Pt(x=81.4, y=57.0))],
-#             [Line(start=Pt(x=81.4, y=57.0), end=Pt(x=90.1, y=52.0))],
-#             [Line(start=Pt(x=90.1, y=52.0), end=Pt(x=97.7, y=45.6))],
-#             [Line(start=Pt(x=97.7, y=45.6), end=Pt(x=104.1, y=37.9))],
-#             [Line(start=Pt(x=104.1, y=37.9), end=Pt(x=109.1, y=29.2))],
-#             [Line(start=Pt(x=109.1, y=29.2), end=Pt(x=112.6, y=19.8))],
-#             [Line(start=Pt(x=112.6, y=19.8), end=Pt(x=114.3, y=10.0))],
-#             [Line(start=Pt(x=114.3, y=10.0), end=Pt(x=114.3, y=0.0))],
-#             [Line(start=Pt(x=114.3, y=0.0), end=Pt(x=112.6, y=-9.8))],
-#             [Line(start=Pt(x=112.6, y=-9.8), end=Pt(x=109.1, y=-19.2))],
-#             [Line(start=Pt(x=109.1, y=-19.2), end=Pt(x=104.1, y=-27.9))],
-#             [Line(start=Pt(x=104.1, y=-27.9), end=Pt(x=97.7, y=-35.6))],
-#             [Line(start=Pt(x=97.7, y=-35.6), end=Pt(x=90.1, y=-42.0))],
-#             [Line(start=Pt(x=90.1, y=-42.0), end=Pt(x=81.4, y=-47.0))],
-#             [Line(start=Pt(x=81.4, y=-47.0), end=Pt(x=72.0, y=-50.4))],
-#             [Line(start=Pt(x=72.0, y=-50.4), end=Pt(x=62.2, y=-52.2))],
-#             [Line(start=Pt(x=62.2, y=-52.2), end=Pt(x=52.2, y=-52.2))],
-#             [Line(start=Pt(x=52.2, y=-52.2), end=Pt(x=42.3, y=-50.4))],
-#             [Line(start=Pt(x=42.3, y=-50.4), end=Pt(x=32.9, y=-47.0))],
-#             [Line(start=Pt(x=32.9, y=-47.0), end=Pt(x=24.2, y=-42.0))],
-#             [Line(start=Pt(x=24.2, y=-42.0), end=Pt(x=16.6, y=-35.6))],
-#             [Line(start=Pt(x=16.6, y=-35.6), end=Pt(x=10.2, y=-27.9))],
-#             [Line(start=Pt(x=10.2, y=-27.9), end=Pt(x=5.2, y=-19.2))],
-#             [Line(start=Pt(x=5.2, y=-19.2), end=Pt(x=1.7, y=-9.8))],
-#             [Line(start=Pt(x=1.7, y=-9.8), end=Pt(x=-0.0, y=-0.0))],
-#         ]
-#     )
-#
-#
-# def test_draw_a_dot():
-#     assert do_eval(":D", 1) == [[Dot(Pt(0.0, 0.0))]]
-#     assert do_eval("20=x15=y:D", 1) == [[Dot(Pt(20.0, 15.0))]]
-#
-#
-# def test_go_then_line():
-#     assert (
-#         do_eval("10=x15=y20=x16=y:L", 1) ==
-#         [[Line(Pt(10.0, 15.0), Pt(20.0, 16.0))]]
-#     )
-#
-#
-# def test_repeat_starts_at_beginning_if_no_label():
-#     assert (
-#         do_eval("90=d90+d:S", 2) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0.0, -10.0))],
-#             [Line(Pt(0.0, -10.0), Pt(0.0, -20.0))],
-#         ]
-#     )
-#
-#
+def test_space_to_separate_statements():
+    assert do_eval("s s S()", 1) == [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
+
+
+def test_pass_symbol_to_operator():
+    assert do_eval("s=90 d+=s S()", 1) == [[Line(Pt(0.0, 0.0), Pt(90.0, 0.0))]]
+
+
+def test_define_custom_variable():
+    assert (
+        do_eval("aa=180 d+=aa S()", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, -10.0))]]
+    )
+
+
+def test_multiply_by_variable():
+    assert (
+        do_eval("aa=2 s*=aa S()", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, 20.0))]]
+    )
+
+
+def test_move_in_a_circle():
+    assert (
+        do_eval("S() d+=10", 36) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
+            [Line(start=Pt(x=0.0, y=10.0), end=Pt(x=1.7, y=19.8))],
+            [Line(start=Pt(x=1.7, y=19.8), end=Pt(x=5.2, y=29.2))],
+            [Line(start=Pt(x=5.2, y=29.2), end=Pt(x=10.2, y=37.9))],
+            [Line(start=Pt(x=10.2, y=37.9), end=Pt(x=16.6, y=45.6))],
+            [Line(start=Pt(x=16.6, y=45.6), end=Pt(x=24.2, y=52.0))],
+            [Line(start=Pt(x=24.2, y=52.0), end=Pt(x=32.9, y=57.0))],
+            [Line(start=Pt(x=32.9, y=57.0), end=Pt(x=42.3, y=60.4))],
+            [Line(start=Pt(x=42.3, y=60.4), end=Pt(x=52.2, y=62.2))],
+            [Line(start=Pt(x=52.2, y=62.2), end=Pt(x=62.2, y=62.2))],
+            [Line(start=Pt(x=62.2, y=62.2), end=Pt(x=72.0, y=60.4))],
+            [Line(start=Pt(x=72.0, y=60.4), end=Pt(x=81.4, y=57.0))],
+            [Line(start=Pt(x=81.4, y=57.0), end=Pt(x=90.1, y=52.0))],
+            [Line(start=Pt(x=90.1, y=52.0), end=Pt(x=97.7, y=45.6))],
+            [Line(start=Pt(x=97.7, y=45.6), end=Pt(x=104.1, y=37.9))],
+            [Line(start=Pt(x=104.1, y=37.9), end=Pt(x=109.1, y=29.2))],
+            [Line(start=Pt(x=109.1, y=29.2), end=Pt(x=112.6, y=19.8))],
+            [Line(start=Pt(x=112.6, y=19.8), end=Pt(x=114.3, y=10.0))],
+            [Line(start=Pt(x=114.3, y=10.0), end=Pt(x=114.3, y=0.0))],
+            [Line(start=Pt(x=114.3, y=0.0), end=Pt(x=112.6, y=-9.8))],
+            [Line(start=Pt(x=112.6, y=-9.8), end=Pt(x=109.1, y=-19.2))],
+            [Line(start=Pt(x=109.1, y=-19.2), end=Pt(x=104.1, y=-27.9))],
+            [Line(start=Pt(x=104.1, y=-27.9), end=Pt(x=97.7, y=-35.6))],
+            [Line(start=Pt(x=97.7, y=-35.6), end=Pt(x=90.1, y=-42.0))],
+            [Line(start=Pt(x=90.1, y=-42.0), end=Pt(x=81.4, y=-47.0))],
+            [Line(start=Pt(x=81.4, y=-47.0), end=Pt(x=72.0, y=-50.4))],
+            [Line(start=Pt(x=72.0, y=-50.4), end=Pt(x=62.2, y=-52.2))],
+            [Line(start=Pt(x=62.2, y=-52.2), end=Pt(x=52.2, y=-52.2))],
+            [Line(start=Pt(x=52.2, y=-52.2), end=Pt(x=42.3, y=-50.4))],
+            [Line(start=Pt(x=42.3, y=-50.4), end=Pt(x=32.9, y=-47.0))],
+            [Line(start=Pt(x=32.9, y=-47.0), end=Pt(x=24.2, y=-42.0))],
+            [Line(start=Pt(x=24.2, y=-42.0), end=Pt(x=16.6, y=-35.6))],
+            [Line(start=Pt(x=16.6, y=-35.6), end=Pt(x=10.2, y=-27.9))],
+            [Line(start=Pt(x=10.2, y=-27.9), end=Pt(x=5.2, y=-19.2))],
+            [Line(start=Pt(x=5.2, y=-19.2), end=Pt(x=1.7, y=-9.8))],
+            [Line(start=Pt(x=1.7, y=-9.8), end=Pt(x=-0.0, y=-0.0))],
+        ]
+    )
+
+
+def test_draw_a_dot():
+    assert do_eval("D()", 1) == [[Dot(Pt(0.0, 0.0))]]
+    assert do_eval("x=20 y=15 D()", 1) == [[Dot(Pt(20.0, 15.0))]]
+
+
+def test_go_then_line():
+    assert (
+        do_eval("x=10 y=15 x=20 y=16 L()", 1) ==
+        [[Line(Pt(10.0, 15.0), Pt(20.0, 16.0))]]
+    )
+
+
+def test_go_then_line_modified():
+    assert (
+        do_eval("x=10 y=15 x+=10 y+=1 L()", 1) ==
+        [[Line(Pt(10.0, 15.0), Pt(20.0, 16.0))]]
+    )
+
+
+def test_repeat_starts_at_beginning_if_no_label():
+    assert (
+        do_eval("d=90 d+=90 S()", 2) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0.0, -10.0))],
+            [Line(Pt(0.0, -10.0), Pt(0.0, -20.0))],
+        ]
+    )
+
+
 # def test_repeat_starts_at_label_if_present():
 #     assert (
 #         do_eval("90=d^90+d:S", 2) ==

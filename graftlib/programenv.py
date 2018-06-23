@@ -38,6 +38,11 @@ class ProgramEnv:
         return self.env.get(name)
 
     def set(self, name, value):
+        # x and y are magic variables that remember their previous values
+        if name == "x":
+            self.env.set("xprev", self.env.get("x"))
+        elif name == "y":
+            self.env.set("yprev", self.env.get("y"))
         return self.env.set(name, value)
 
     def set_new(self, name, value):

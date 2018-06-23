@@ -56,6 +56,10 @@ def test_Modifying_arithmetic_expressions_come_out_correct():
     assert evald("r=3 r/=4 r") == NumberValue(0.75)
 
 
+def test_Modifying_uninitialised_variables_comes_out_correct():
+    assert evald("d+=4 d") == NumberValue(4)
+
+
 def TODO_FAILS_test_Modifying_by_negative_numbers_comes_out_correct():
     assert evald("r=3 r+=-4 r") == NumberValue(-1)
     assert evald("r=3 r*=-4 r") == NumberValue(-12)

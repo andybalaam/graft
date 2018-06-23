@@ -35,9 +35,6 @@ class Evaluator:
         self.env: Env = env
 
     def _function_call_symbol(self, fn_name):
-        if not functions.has_variable(self.env, fn_name):
-            raise Exception("Unknown function %s" % fn_name)
-
         fnwrap = self.env.get(fn_name)
         if type(fnwrap) == NativeFunctionValue:
             return fnwrap.py_fn(self.env)
@@ -85,12 +82,10 @@ class Evaluator:
         val = self._value(modify_stmt.value)
         op = _operator_fn(modify_stmt.op)
 
-        functions.set_variable(
-            self.env,
+        self.env.set(
             var_name,
             NumberValue(op(self.env.get(var_name).value, val.value))
         )
-
         return None
 
     def statement(self, statement):
