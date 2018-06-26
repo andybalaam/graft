@@ -1,9 +1,9 @@
 from typing import Iterable
 from graftlib.lex_v1 import lex_v1
+from graftlib.labeltree import LabelTree
 from graftlib.parse_v1 import (
     FunctionCall,
     FunctionDef,
-    Label,
     Modify,
     Number,
     Symbol,
@@ -184,7 +184,7 @@ def test_label_separates_statements():
         do_parse("s^s") ==
         [
             Symbol("s"),
-            Label(),
+            LabelTree(),
             Symbol("s"),
         ]
     )
@@ -197,7 +197,7 @@ def test_MIGHT_BE_WRONG_label_ends_unterminated_statement():
             # Maybe we should return Number even though it's useless?
             # Or maybe we should throw if a value is thrown away?
             # Number("3"),
-            Label(),
+            LabelTree(),
             Symbol("s"),
         ]
     )

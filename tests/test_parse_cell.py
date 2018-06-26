@@ -1,5 +1,6 @@
 import pytest
 from graftlib.lex_cell import lex_cell
+from graftlib.labeltree import LabelTree
 from graftlib.parse_cell import (
     parse_cell,
     AssignmentTree,
@@ -88,6 +89,13 @@ def test_Function_call_with_no_args_gets_parsed():
         [
             FunctionCallTree(SymbolTree("print"), [])
         ]
+    )
+
+
+def test_Label_is_parsed():
+    assert (
+        parsed("12 ^ 3") ==
+        [NumberTree(value='12'), LabelTree(), NumberTree(value='3')]
     )
 
 

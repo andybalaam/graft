@@ -26,6 +26,13 @@ class EndParamListToken:
 
 
 @attr.s
+class LabelToken:
+    @staticmethod
+    def code():
+        return "^"
+
+
+@attr.s
 class ListSeparatorToken:
     @staticmethod
     def code():
@@ -156,6 +163,8 @@ def lex_cell(chars_iter):
             yield ParamListPreludeToken()
         elif c == "=":
             yield AssignmentToken()
+        elif c == "^":
+            yield LabelToken()
 
         elif c in "+-*/":
             nc = chars.next

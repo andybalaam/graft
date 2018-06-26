@@ -3,6 +3,7 @@ import operator
 
 from graftlib.env import Env
 from graftlib import functions
+from graftlib.labeltree import LabelTree
 from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.numbervalue import NumberValue
 from graftlib.parse_v1 import (
@@ -99,7 +100,7 @@ class Evaluator:
             return [None]
         elif stmt_type == Number:
             return [None]
-        elif stmt_type == Label:
+        elif stmt_type == LabelTree:
             raise Exception(
                 "You cannot (yet?) define labels inside functions.")
         elif stmt_type == FunctionDef:

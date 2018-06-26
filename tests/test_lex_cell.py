@@ -4,6 +4,7 @@ from graftlib.lex_cell import (
     AssignmentToken,
     EndFunctionDefToken,
     EndParamListToken,
+    LabelToken,
     ListSeparatorToken,
     ModifyToken,
     NumberToken,
@@ -56,6 +57,18 @@ def test_Single_letter_becomes_a_symbol_token():
 
 def test_Multiple_letters_become_a_symbol_token():
     assert lexed("foo") == [SymbolToken("foo")]
+
+
+def test_A_caret_becomes_a_label_token():
+    assert lexed("^") == [LabelToken()]
+    assert (
+        lexed("a^b") ==
+        [
+            SymbolToken("a"),
+            LabelToken(),
+            SymbolToken("b"),
+        ]
+    )
 
 
 def test_A_symbol_followed_by_a_bracket_becomes_two_tokens():
@@ -201,6 +214,7 @@ def test_A_complex_example_program_lexes():
     example = """
         double={:(x)2*x}
         num1=3
+        ^
         num2=double(num)
         answer=if(greater_than(num2,5),{"LARGE!"},{"small."})
         print(answer)

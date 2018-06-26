@@ -2,10 +2,12 @@ from typing import List
 import attr
 
 from graftlib.peekablestream import PeekableStream
+from graftlib.labeltree import LabelTree
 from graftlib.lex_cell import (
     AssignmentToken,
     EndFunctionDefToken,
     EndParamListToken,
+    LabelToken,
     ListSeparatorToken,
     ModifyToken,
     NumberToken,
@@ -90,6 +92,8 @@ class _Parser:
         elif typ == OperatorToken:
             nxt = self.next_expression(None)
             return self.next_expression(OperationTree(tok.value, prev, nxt))
+        elif typ == LabelToken:
+            return self.next_expression(LabelTree())
         elif typ == StartParamListToken:
             args = self.multiple_expressions(
                 ListSeparatorToken, EndParamListToken)

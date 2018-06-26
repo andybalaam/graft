@@ -1,4 +1,5 @@
 from typing import List, Optional
+from graftlib.labeltree import LabelTree
 from graftlib.lex_v1 import (
     ContinuationToken,
     EndFunctionDefToken,
@@ -38,11 +39,6 @@ class Number:
 
     def negate(self):
         self.negative = not self.negative
-
-
-@attr.s
-class Label:
-    pass
 
 
 @attr.s
@@ -170,7 +166,7 @@ class _Parser:
         return self.next_or_single(FunctionDef(body))
 
     def next_tree_label(self, _so_far, _tok):
-        return Label()
+        return LabelTree()
 
     def next_tree_for_token(self, so_far, tok):
         # We have decided at this point that any so_far we do have

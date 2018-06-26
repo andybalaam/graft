@@ -394,16 +394,16 @@ def test_repeat_starts_at_beginning_if_no_label():
     )
 
 
-# def test_repeat_starts_at_label_if_present():
-#     assert (
-#         do_eval("90=d^90+d:S", 2) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0.0, -10.0))],
-#             [Line(Pt(0.0, -10.0), Pt(-10.0, -10.0))],
-#         ]
-#     )
-#
-#
+def test_repeat_starts_at_label_if_present():
+    assert (
+        do_eval("d=90 ^ d+=90 S()", 2) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0.0, -10.0))],
+            [Line(Pt(0.0, -10.0), Pt(-10.0, -10.0))],
+        ]
+    )
+
+
 # def test_fork_draws_lines_in_parallel():
 #     assert (
 #         do_eval(":F:S", 1) ==

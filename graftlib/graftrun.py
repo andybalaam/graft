@@ -4,9 +4,9 @@ import attr
 
 from graftlib import functions
 from graftlib.dot import Dot
+from graftlib.labeltree import LabelTree
 from graftlib.line import Line
 from graftlib.make_graft_env import make_graft_env
-from graftlib.parse_v1 import Label
 from graftlib.programenv import ProgramEnv
 
 
@@ -84,7 +84,7 @@ class RunningProgram:
 
     def statement(self, statement):
         stmt_type = type(statement)
-        if stmt_type == Label:
+        if stmt_type == LabelTree:
             self.set_label()
             return [None]
         else:

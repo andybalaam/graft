@@ -2,6 +2,7 @@ import inspect
 from typing import List
 import attr
 
+from graftlib.labeltree import LabelTree
 from graftlib.parse_cell import (
     AssignmentTree,
     FunctionCallTree,
@@ -122,6 +123,9 @@ def _eval(env, expr):
         return expr
     elif typ == OperationTree:
         return _operation(expr, env)
+    elif typ == LabelTree:
+        raise Exception(
+            "You cannot (yet?) define labels inside functions.")
     elif typ == SymbolTree:
         ret = env.get(expr.value)
         if ret is None:
