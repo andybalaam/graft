@@ -441,83 +441,83 @@ def test_forking_at_fork_limit_increases_fork_id():
     assert len(result) == 4
 
 
-# def test_fork_repeated_creates_multiple_forks():
-#     result = do_eval_debug("5:F+d", n=2)
-#     assert fork_ids(result[0]) == [0]
-#     assert fork_ids(result[1]) == [0, 1, 2, 3, 4, 5]
-#     assert len(result) == 2
-#
-#
-# def test_fork_repeated_past_fork_limit_gets_max_fork_id():
-#     result = do_eval_debug("5:F+d", n=2, rand=None, max_forks=1)
-#     assert fork_ids(result[0]) == [0]
-#     assert fork_ids(result[1]) == [5]
-#     assert len(result) == 2
-#
-#
-# def test_does_not_lock_if_no_lines_emitted():
-#     do_eval("+d", n=100)
-#
-#
-# def test_past_fork_limit_lines_still_move_you():
-#     assert (
-#         do_eval(":F:S", n=4, rand=None, max_forks=1) ==
-#         [
-#             [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
-#             [Line(Pt(0.0, 10.0), Pt(0.0, 20.0))],
-#             [Line(Pt(0.0, 20.0), Pt(0.0, 30.0))],
-#             [Line(Pt(0.0, 30.0), Pt(0.0, 40.0))],
-#         ]
-#     )
-#
-#
-# def test_parallel_past_fork_limit_lines_still_move_you():
-#     # Fork into 2 lines, then proceed forwards, forking
-#     # each time.  Should essentially act as if no forking
-#     # was happening.
-#     assert (
-#         do_eval(":F;f~=d90d^:S:F", n=4, rand=None, max_forks=2) ==
-#         [
-#             [
-#                 Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
-#                 Line(Pt(0.0, 0.0), Pt(10.0, 0.0)),
-#             ],
-#             [
-#                 Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
-#                 Line(Pt(10.0, 0.0), Pt(20.0, 0.0)),
-#             ],
-#             [
-#                 Line(Pt(0.0, 20.0), Pt(0.0, 30.0)),
-#                 Line(Pt(20.0, 0.0), Pt(30.0, 0.0)),
-#             ],
-#             [
-#                 Line(Pt(0.0, 30.0), Pt(0.0, 40.0)),
-#                 Line(Pt(30.0, 0.0), Pt(40.0, 0.0)),
-#             ],
-#         ]
-#     )
-#
-#
-# def test_multi_fork_produces_lines_in_sync_with_each_other():
-#     actuals = do_eval(
-#         "20:F^:S",
-#         n=21,
-#         rand=None,
-#         max_forks=20
-#     )
-#
-#     def assert_line(n):
-#         assert (
-#             actuals[n] ==
-#             [Line(Pt(0.0, n * 10.0), Pt(0., (n + 1) * 10.0))] * 20
-#         )
-#
-#     assert_line(0)
-#     assert_line(1)
-#     assert_line(2)
-#     # ...
-#     assert_line(16)
-#     assert_line(17)
-#     assert_line(18)
-#     assert_line(19)
-#     assert_line(20)
+def test_fork_repeated_creates_multiple_forks():
+    result = do_eval_debug("T(5, F) d+=10", n=2)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [0, 1, 2, 3, 4, 5]
+    assert len(result) == 2
+
+
+def test_fork_repeated_past_fork_limit_gets_max_fork_id():
+    result = do_eval_debug("T(5, F) d+=10", n=2, rand=None, max_forks=1)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [5]
+    assert len(result) == 2
+
+
+def test_does_not_lock_if_no_lines_emitted():
+    do_eval("d+=10", n=100)
+
+
+def test_past_fork_limit_lines_still_move_you():
+    assert (
+        do_eval("F() S()", n=4, rand=None, max_forks=1) ==
+        [
+            [Line(Pt(0.0, 0.0), Pt(0.0, 10.0))],
+            [Line(Pt(0.0, 10.0), Pt(0.0, 20.0))],
+            [Line(Pt(0.0, 20.0), Pt(0.0, 30.0))],
+            [Line(Pt(0.0, 30.0), Pt(0.0, 40.0))],
+        ]
+    )
+
+
+def test_parallel_past_fork_limit_lines_still_move_you():
+    # Fork into 2 lines, then proceed forwards, forking
+    # each time.  Should essentially act as if no forking
+    # was happening.
+    assert (
+        do_eval("F() d=f d*=90 ^ S() F()", n=4, rand=None, max_forks=2) ==
+        [
+            [
+                Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+                Line(Pt(0.0, 0.0), Pt(10.0, 0.0)),
+            ],
+            [
+                Line(Pt(0.0, 10.0), Pt(0.0, 20.0)),
+                Line(Pt(10.0, 0.0), Pt(20.0, 0.0)),
+            ],
+            [
+                Line(Pt(0.0, 20.0), Pt(0.0, 30.0)),
+                Line(Pt(20.0, 0.0), Pt(30.0, 0.0)),
+            ],
+            [
+                Line(Pt(0.0, 30.0), Pt(0.0, 40.0)),
+                Line(Pt(30.0, 0.0), Pt(40.0, 0.0)),
+            ],
+        ]
+    )
+
+
+def test_multi_fork_produces_lines_in_sync_with_each_other():
+    actuals = do_eval(
+        "T(20, F) ^ S()",
+        n=21,
+        rand=None,
+        max_forks=20
+    )
+
+    def assert_line(n):
+        assert (
+            actuals[n] ==
+            [Line(Pt(0.0, n * 10.0), Pt(0., (n + 1) * 10.0))] * 20
+        )
+
+    assert_line(0)
+    assert_line(1)
+    assert_line(2)
+    # ...
+    assert_line(16)
+    assert_line(17)
+    assert_line(18)
+    assert_line(19)
+    assert_line(20)
