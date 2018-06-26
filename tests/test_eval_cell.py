@@ -404,43 +404,43 @@ def test_repeat_starts_at_label_if_present():
     )
 
 
-# def test_fork_draws_lines_in_parallel():
-#     assert (
-#         do_eval(":F:S", 1) ==
-#         [
-#             [
-#                 Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
-#                 Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
-#             ],
-#         ]
-#     )
-#
-#
-# def fork_ids(debug_time_step):
-#     return list(
-#         env_vars["f"].value if "f" in env_vars else 0
-#         for _, env_vars in debug_time_step
-#     )
-#
-#
-# def test_fork_increments_the_fork_id():
-#     result = do_eval_debug(":F+d:F+d", 4)
-#     assert fork_ids(result[0]) == [0]
-#     assert fork_ids(result[1]) == [0, 1]
-#     assert fork_ids(result[2]) == [0, 1]
-#     assert fork_ids(result[3]) == [0, 1, 2, 3]
-#     assert len(result) == 4
-#
-#
-# def test_forking_at_fork_limit_increases_fork_id():
-#     result = do_eval_debug(":F+d:F+d", n=4, rand=None, max_forks=2)
-#     assert fork_ids(result[0]) == [0]
-#     assert fork_ids(result[1]) == [0, 1]
-#     assert fork_ids(result[2]) == [0, 1]
-#     assert fork_ids(result[3]) == [2, 3]  # More forks, but old ones are gone
-#     assert len(result) == 4
-#
-#
+def test_fork_draws_lines_in_parallel():
+    assert (
+        do_eval("F() S()", 1) ==
+        [
+            [
+                Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+                Line(Pt(0.0, 0.0), Pt(0.0, 10.0)),
+            ],
+        ]
+    )
+
+
+def fork_ids(debug_time_step):
+    return list(
+        env_vars["f"].value if "f" in env_vars else 0
+        for _, env_vars in debug_time_step
+    )
+
+
+def test_fork_increments_the_fork_id():
+    result = do_eval_debug("F() d+=10 F() d+=10", 4)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [0, 1]
+    assert fork_ids(result[2]) == [0, 1]
+    assert fork_ids(result[3]) == [0, 1, 2, 3]
+    assert len(result) == 4
+
+
+def test_forking_at_fork_limit_increases_fork_id():
+    result = do_eval_debug("F() d+=10 F() d+=10", n=4, rand=None, max_forks=2)
+    assert fork_ids(result[0]) == [0]
+    assert fork_ids(result[1]) == [0, 1]
+    assert fork_ids(result[2]) == [0, 1]
+    assert fork_ids(result[3]) == [2, 3]  # More forks, but old ones are gone
+    assert len(result) == 4
+
+
 # def test_fork_repeated_creates_multiple_forks():
 #     result = do_eval_debug("5:F+d", n=2)
 #     assert fork_ids(result[0]) == [0]
