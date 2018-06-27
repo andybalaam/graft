@@ -10,7 +10,12 @@ from graftlib.make_graft_env import make_graft_env
 from graftlib.programenv import ProgramEnv
 
 
-SKIPPED = object()
+@attr.s
+class Skipped:
+    pass
+
+
+SKIPPED = Skipped()
 
 
 def consolidate_skipped(maybe_skipped):
@@ -76,11 +81,17 @@ class RunningProgram:
             self.pc = self.label
         statement = self.program[self.pc]
         self.pc += 1
-        return non_strokes_to_none(
-            consolidate_skipped(
-                self.statement(statement)
-            )
-        )
+        self.statement(statement)
+        ret = self.env.clear_strokes()
+        if len(ret) == 0:
+            return [None]
+        else:
+            return ret
+        # return non_strokes_to_none(
+        #     consolidate_skipped(
+        #         self.statement(statement)
+        #     )
+        # )
 
     def statement(self, statement):
         stmt_type = type(statement)
@@ -158,6 +169,7 @@ class MultipleRunningPrograms:
         # so the output of the main fork would be lots of
         # SKIPPED, but we merge them all together into a
         # single None in consolidate_skipped().
+        # cloned_running_program.env.stroke(SKIPPED)
         return SKIPPED
 
 

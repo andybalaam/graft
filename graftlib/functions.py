@@ -9,7 +9,7 @@ from graftlib.numbervalue import NumberValue
 from graftlib.pt import Pt
 
 
-def step(env):
+def _calc_step(env):
     th = theta(env)
     s = step_size(env)
     old_pos = pos(env)
@@ -17,34 +17,49 @@ def step(env):
         old_pos.x + s * math.sin(th),
         old_pos.y + s * math.cos(th),
     )
+    return old_pos, new_pos
+
+
+def step(env):
+    old_pos, new_pos = _calc_step(env)
     set_pos(env, new_pos)
-    return [Line(
-        old_pos,
-        new_pos,
-        color=color(env),
-        size=brush_size(env)
-    )]
+    env.stroke(
+        Line(
+            old_pos,
+            new_pos,
+            color=color(env),
+            size=brush_size(env)
+        )
+    )
+    return [None]
 
 
 def dot(env):
-    return [Dot(
-        pos(env),
-        color(env),
-        brush_size(env)
-    )]
+    env.stroke(
+        Dot(
+            pos(env),
+            color(env),
+            brush_size(env)
+        )
+    )
+    return [None]
 
 
 def line_to(env):
-    return [Line(
-        prev_pos(env),
-        pos(env),
-        color=color(env),
-        size=brush_size(env),
-    )]
+    env.stroke(
+        Line(
+            prev_pos(env),
+            pos(env),
+            color=color(env),
+            size=brush_size(env),
+        )
+    )
+    return [None]
 
 
 def jump(env):
-    step(env)
+    _, new_pos = _calc_step(env)
+    set_pos(env, new_pos)
     return [None]
 
 
