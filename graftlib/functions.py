@@ -31,7 +31,6 @@ def step(env):
             size=brush_size(env)
         )
     )
-    return [None]
 
 
 def dot(env):
@@ -42,7 +41,6 @@ def dot(env):
             brush_size(env)
         )
     )
-    return [None]
 
 
 def line_to(env):
@@ -54,13 +52,11 @@ def line_to(env):
             size=brush_size(env),
         )
     )
-    return [None]
 
 
 def jump(env):
     _, new_pos = _calc_step(env)
     set_pos(env, new_pos)
-    return [None]
 
 
 def random(env):

@@ -43,19 +43,14 @@ class RunningProgram:
         statement = self.program[self.pc]
         self.pc += 1
         self.statement(statement)
-        ret = self.env.clear_strokes()
-        if len(ret) == 0:
-            return [None]
-        else:
-            return ret
+        return self.env.clear_strokes()
 
     def statement(self, statement):
         stmt_type = type(statement)
         if stmt_type == LabelTree:
             self.set_label()
-            return [None]
         else:
-            return self.eval_expr(self.env, statement)
+            self.eval_expr(self.env, statement)
 
     def fork(self):
         return self.fork_callback.__call__(
@@ -102,6 +97,8 @@ class MultipleRunningPrograms:
         for prog, queue in self.programs:
             if empty(queue):
                 queue.extend(prog.next())
+            if empty(queue):
+                queue.append(None)
 
         ret = []
         for prog, queue in self.programs:

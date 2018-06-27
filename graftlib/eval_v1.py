@@ -45,9 +45,9 @@ class Evaluator:
             )
 
     def _function_call_userdefined(self, fn_def: FunctionDef) -> List:
-        ret = []
+        ret = None
         for stmt in fn_def.body:
-            ret += self.statement(stmt)
+            ret = self.statement(stmt)
         return ret
 
     def _function_call_once(self, function_call_stmt: FunctionCall) -> List:
@@ -58,9 +58,9 @@ class Evaluator:
             return self._function_call_userdefined(fn)
 
     def _function_call(self, function_call_stmt: FunctionCall) -> List:
-        ret = []
+        ret = None
         for _i in range(function_call_stmt.repeat):
-            ret += self._function_call_once(function_call_stmt)
+            ret = self._function_call_once(function_call_stmt)
         return ret
 
     def _value(self, value_expr):
@@ -95,11 +95,10 @@ class Evaluator:
             return self._function_call(statement)
         elif stmt_type == Modify:
             self._modify(statement)
-            return [None]
         elif stmt_type == Symbol:
-            return [None]
+            pass
         elif stmt_type == Number:
-            return [None]
+            pass
         elif stmt_type == LabelTree:
             raise Exception(
                 "You cannot (yet?) define labels inside functions.")
