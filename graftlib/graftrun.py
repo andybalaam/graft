@@ -10,45 +10,6 @@ from graftlib.make_graft_env import make_graft_env
 from graftlib.programenv import ProgramEnv
 
 
-@attr.s
-class Skipped:
-    pass
-
-
-SKIPPED = Skipped()
-
-
-def consolidate_skipped(maybe_skipped):
-    """
-    If the supplied iterable contains SKIPPED,
-    filter all of them out, but emit a None
-    instead of the first one.
-
-    This allows us to return many SKIPPED
-    from fork() and get just one None out
-    at the end - this happens in the main
-    fork, and each new fork also emits just
-    one None, so they are in sync.
-    """
-    done_none = False
-    for item in maybe_skipped:
-        if item == SKIPPED:
-            if not done_none:
-                yield None
-                done_none = True
-        else:
-            yield item
-
-
-def non_strokes_to_none(maybe_strokes):
-    def sns(maybe_stroke):
-        if type(maybe_stroke) in (Line, Dot):
-            return maybe_stroke
-        else:
-            return None
-    return [sns(item) for item in maybe_strokes]
-
-
 class RunningProgram:
     def __init__(
             self,
@@ -87,11 +48,6 @@ class RunningProgram:
             return [None]
         else:
             return ret
-        # return non_strokes_to_none(
-        #     consolidate_skipped(
-        #         self.statement(statement)
-        #     )
-        # )
 
     def statement(self, statement):
         stmt_type = type(statement)
@@ -165,12 +121,6 @@ class MultipleRunningPrograms:
     def fork(self, cloned_running_program: RunningProgram):
         functions.set_fork_id(cloned_running_program.env, self.next_fork_id())
         self.new_programs.append((cloned_running_program, []))
-        # If we fork many times, we return SKIPPED many times,
-        # so the output of the main fork would be lots of
-        # SKIPPED, but we merge them all together into a
-        # single None in consolidate_skipped().
-        # cloned_running_program.env.stroke(SKIPPED)
-        return SKIPPED
 
 
 @attr.s
