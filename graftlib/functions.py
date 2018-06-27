@@ -60,11 +60,11 @@ def jump(env):
 
 
 def random(env):
-    return [NumberValue(float(env.rand.__call__(-10, 10)))]
+    return NumberValue(float(env.rand.__call__(-10, 10)))
 
 
 def fork(env):
-    return [env.fork_callback.__call__()]
+    return env.fork_callback.__call__()
 
 
 def theta(self) -> float:

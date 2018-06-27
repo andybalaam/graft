@@ -69,7 +69,7 @@ class Evaluator:
             neg = -1.0 if value_expr.negative else 1.0
             return NumberValue(float(value_expr.value) * neg)
         elif type_ == FunctionCall:
-            return self._function_call(value_expr)[-1]
+            return self._function_call(value_expr)
         elif type_ == Symbol:
             return self.env.get(value_expr.value)
         else:

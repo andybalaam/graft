@@ -226,8 +226,12 @@ def test_turn_right_and_jump():
 
 def test_turn_random_and_move():
     def r(_a, _b):
-        return 90
-    assert do_eval("d+=R() S()", n=1, rand=r) == [[Line(Pt(0, 0), Pt(10, 0))]]
+        return 9
+
+    assert (
+        do_eval("d+=R()*10 S()", n=1, rand=r) ==
+        [[Line(Pt(0, 0), Pt(10, 0))]]
+    )
 
 
 def test_bare_number_does_nothing():
