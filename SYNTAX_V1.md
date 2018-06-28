@@ -14,7 +14,7 @@ newer syntax, which is a little easier to read, and more flexible.
 Circle:
 
 ```bash
-./graft ':S+d'   # Step forward, then turn 10 degrees
+./graft --syntax=v1 ':S+d'   # Step forward, then turn 10 degrees
 ```
 
 ![](images/circle.gif)
@@ -24,7 +24,7 @@ Thick, rough, red circles saved to a GIF:
 ```bash
 # Set red to 100, set brush size to 10,
 # turn a random amount, then turn 10 degrees, then step forward
-./graft '100=r10=z:R~+d+d:S' --frames=100 --gif=cir.gif --width=100 --height=75
+./graft --syntax=v1 '100=r10=z:R~+d+d:S' --frames=100 --gif=cir.gif --width=100 --height=75
 ```
 
 ![](images/rough-circle.gif)
@@ -32,7 +32,7 @@ Thick, rough, red circles saved to a GIF:
 Spinning box:
 
 ```bash
-./graft '100=s:J90+d:S90+d:S90+d:S90+d15+d'
+./graft --syntax=v1 '100=s:J90+d:S90+d:S90+d:S90+d15+d'
 ```
 
 ![](images/rotating-square.gif)
@@ -40,7 +40,7 @@ Spinning box:
 Flock of tiddlers:
 
 ```bash
-./graft ':F:R~+d+d:S'
+./graft --syntax=v1 ':F:R~+d+d:S'
 ```
 
 ![](images/tiddlers.gif)
@@ -48,7 +48,7 @@ Flock of tiddlers:
 Explosion:
 
 ```bash
-./graft '0=dd^11:F;f~=d30d;dd~+d10:S1+dd' --max-forks=100000 --frames=40
+./graft --syntax=v1 '0=dd^11:F;f~=d30d;dd~+d10:S1+dd' --max-forks=100000 --frames=40
 ```
 
 ![](images/explosion.gif)
@@ -56,7 +56,7 @@ Explosion:
 Windmill:
 
 ```bash
-./graft --frames=20 '70=b90=a20=s-10=d10:{:S4+d}35:F10=s;f~=r;f~=g;f~=b20r45g75b;f~=d10d4:{:S+d}6:{20-a:S+d}^1=s+d:S'
+./graft --syntax=v1 --frames=20 '70=b90=a20=s-10=d10:{:S4+d}35:F10=s;f~=r;f~=g;f~=b20r45g75b;f~=d10d4:{:S+d}6:{20-a:S+d}^1=s+d:S'
 ```
 
 ![](images/windmill.gif)
@@ -257,7 +257,7 @@ For example, to split into 2 lines and then make each of them move randomly,
 run:
 
 ```bash
-./graft ':F^:R~=d36d:S'
+./graft --syntax=v1 ':F^:R~=d36d:S'
 ```
 
 The above program means:
@@ -271,7 +271,7 @@ The above program means:
 To split into more lines, put a number before `:F`.  For example:
 
 ```bash
-./graft '3:F^:R~=d36d:S'
+./graft --syntax=v1 '3:F^:R~=d36d:S'
 ```
 
 This program splits into 4 lines, and draws randomly as in the previous
@@ -284,7 +284,7 @@ its version of `f` set to the next number: 1, 2 etc.
 For example:
 
 ```bash
-./graft '17:F;f~=d20d^+d:S'
+./graft --syntax=v1 '17:F;f~=d20d^+d:S'
 ```
 
 The above program means:
