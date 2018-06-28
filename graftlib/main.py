@@ -122,9 +122,15 @@ def main(world: World) -> int:
         help="How many steps to use to calculate the initial zoom level.",
     )
     argparser.add_argument(
-        '--cell',
-        action="store_true",
-        help="Write programs in Cell, instead of normal Graft syntax.",
+        '--syntax',
+        choices=["v1", "cell"],
+        default="cell",
+        help=(
+            "Choose which code style you want to use - v1 syntax uses " +
+            "e.g. :R to call the R function, whereas cell syntax uses " +
+            "the more familiar R().  For more info on the v1 syntax, " +
+            "see SYNTAX_V1.md in the source repository."
+        ),
     )
     argparser.add_argument(
         'program',
@@ -135,14 +141,14 @@ def main(world: World) -> int:
 
     frames = None if args.frames < 0 else args.frames
 
-    if args.cell:
-        lex = lex_cell
-        parse = parse_cell
-        eval_expr = eval_cell
-    else:
+    if args.syntax == "v1":
         lex = lex_v1
         parse = parse_v1
         eval_expr = eval_v1
+    else:
+        lex = lex_cell
+        parse = parse_cell
+        eval_expr = eval_cell
 
     program_values = graftrun(
         parse(lex(args.program)),
