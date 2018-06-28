@@ -1,4 +1,13 @@
-# Graft Generative Animation Language
+# Graft Syntax "v1"
+
+This page describes the old "v1" syntax for Graft.  Most people will probably
+want to use the new syntax, but for people who wrote programs for the old
+version, or people who like writing programs that look like a cat walking
+across a keyboard, it should still work fine, and we're not planning on getting
+rid of it.
+
+Most people should probably look at the [README](README.md), and learn the
+newer syntax, which is a little easier to read, and more flexible.
 
 ## Examples
 
@@ -290,65 +299,3 @@ The above program means:
 Here's what it looks like:
 
 ![](images/flower.gif)
-
-## Command line arguments
-
-```bash
-$ ./graft --help
-usage: graft [-h] [--frames NUMBER_OF_FRAMES] [--gif GIF_FILENAME]
-             [--width WIDTH] [--height HEIGHT] [--max-forks MAX_FORKS]
-             [--lookahead-steps LOOKAHEAD_STEPS]
-             program
-
-positional arguments:
-  program               The actual graft program to run, e.g. '+d:S' to draw a
-                        circle.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --frames NUMBER_OF_FRAMES
-                        How many frames of the animation to draw, or -1 to
-                        play forever.
-  --gif GIF_FILENAME    Make an animated GIF instead of displaying on screen.
-                        (Requires --frames=n where n > 0.)
-  --width WIDTH         The width in pixels of the animation.
-  --height HEIGHT       The height in pixels of the animation.
-  --max-forks MAX_FORKS
-                        The number of forked lines that can run in parallel.
-  --lookahead-steps LOOKAHEAD_STEPS
-                        How many steps to use to calculate the initial zoom
-                        level.
-```
-
-## Mastodon bot
-
-The easiest way to try crafting a generative animation is to toot a program
-mentioning @graft@mastodon.social.  If you've never tooted before, see
-[Mastodon.social](https://mastodon.social) to find out how to register.
-
-### Running the bot
-
-To run the bot yourself:
-
-```bash
-sudo apt install python3-pip
-pip3 install Mastodon.py
-```
-
-```bash
-$ ./bot-mastodon --help
-usage: bot-mastodon [-h] [--register-app] [--user USER] [--password PASSWORD]
-                    [--toot TOOT]
-
-optional arguments:
-  -h, --help           show this help message and exit
-  --register-app       ONLY DO THIS ONCE - register this app with
-                       mastodon.social. The client secret will be stored in
-                       ~/.graftbot/mastodon/clientcred.secret
-  --user USER          The username of the user on mastodon.social. You must
-                       provide this and --password the first time you run. The
-                       credentials will be stored in
-                       ~/.graftbot/mastodon/usercred.secret
-  --password PASSWORD  The password of the user on mastodon.social.
-  --toot TOOT          Toot something!
-```
