@@ -500,3 +500,10 @@ def test_multi_fork_produces_lines_in_sync_with_each_other():
     assert_line(18)
     assert_line(19)
     assert_line(20)
+
+
+def test_strokes_inside_functions_work():
+    assert (
+        do_eval(":{:S}", n=1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
+    )

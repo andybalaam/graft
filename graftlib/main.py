@@ -134,7 +134,10 @@ def main(world: World) -> int:
     )
     argparser.add_argument(
         'program',
-        help="The actual graft program to run, e.g. '+d:S' to draw a circle."
+        help=(
+            "The actual graft program to run, e.g. 'd+=10 S()' " +
+            "to draw a circle."
+        )
     )
 
     args = argparser.parse_args(world.argv[1:])

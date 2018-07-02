@@ -1,11 +1,27 @@
 # Graft Generative Animation Language
 
+## Try it out online via Mastodon
+
+The easiest way to try crafting a generative animation is to toot a program
+mentioning @graft@mastodon.social.  If you've never tooted before, see
+[Mastodon.social](https://mastodon.social) to find out how to register.
+
+## Install
+
+To install Graft, clone this repository and make sure you have Python 3.6 or
+above.
+
+To display the animations in a window, install the Python bindings for
+GTK3 and Cairo.
+
+To create animated gifs, install the ImageMagick utilities too.
+
 ## Examples
 
-Circle:
+To draw a circle:
 
 ```bash
-./graft ':S+d'   # Step forward, then turn 10 degrees
+./graft 'S() d+=10'   # Step forward, then turn 10 degrees
 ```
 
 ![](images/circle.gif)
@@ -15,7 +31,7 @@ Thick, rough, red circles saved to a GIF:
 ```bash
 # Set red to 100, set brush size to 10,
 # turn a random amount, then turn 10 degrees, then step forward
-./graft '100=r10=z:R~+d+d:S' --frames=100 --gif=cir.gif --width=100 --height=75
+./graft 'r=100 z=10 d+=R()+10 S()' --frames=100 --gif=cir.gif --width=100 --height=75
 ```
 
 ![](images/rough-circle.gif)
@@ -23,7 +39,7 @@ Thick, rough, red circles saved to a GIF:
 Spinning box:
 
 ```bash
-./graft '100=s:J90+d:S90+d:S90+d:S90+d15+d'
+./graft 's=100 J() d+=90 S() d+=90 S() d+=90 S() d+=90 d+=15'
 ```
 
 ![](images/rotating-square.gif)
@@ -31,7 +47,7 @@ Spinning box:
 Flock of tiddlers:
 
 ```bash
-./graft ':F:R~+d+d:S'
+./graft 'F() d+=R()+10 S()'
 ```
 
 ![](images/tiddlers.gif)
@@ -39,7 +55,7 @@ Flock of tiddlers:
 Explosion:
 
 ```bash
-./graft '0=dd^11:F;f~=d30d;dd~+d10:S1+dd' --max-forks=100000 --frames=40
+./graft 'dd=0 ^ T(11,F) d=f*30 d+=dd T(10,S) dd+=1' --max-forks=100000 --frames=40
 ```
 
 ![](images/explosion.gif)
@@ -47,7 +63,7 @@ Explosion:
 Windmill:
 
 ```bash
-./graft --frames=20 '70=b90=a20=s-10=d10:{:S4+d}35:F10=s;f~=r;f~=g;f~=b20r45g75b;f~=d10d4:{:S+d}6:{20-a:S+d}^1=s+d:S'
+./graft --frames=20 'b=70 a=90 s=20 d-=10 T(10,{S() d+=4}) T(35,F) s=10 r=f g=f b=f r*=20 g*=45 b*=75 d=f*10 T(4,{S() d+=10}) T(6,{a-=20 S() d+=10}) ^ s=1 d+=10 S()'
 ```
 
 ![](images/windmill.gif)
@@ -58,51 +74,51 @@ There are more examples in the [animations](animations) directory.
 
 To turn, change the variable `d`:
 
-* `+d` means turn 10 degrees clockwise.
-* `45+d` means turn 45 degrees clockwise.
-* `90-d` means turn 90 degrees anti-clockwise.
-* `90=d` means set the angle to 90 degrees (face right).
-* `-45=d` means set the angle to minus 45 degrees (face up-left).
+* `d+=45` means turn 45 degrees clockwise.
+* `d-=90` means turn 90 degrees anti-clockwise.
+* `s=90` means set the angle to 90 degrees (face right).
 
-To step forward (drawing a line), use the command `:S`:
+To step forward (drawing a line), use the command `S()`:
 
-* `:S` means step forward.  By default, this moves 10 units forward.
+* `S()` means step forward.  By default, this moves 10 units forward.
 
 To change the step size, change the variable `s`:
 
-* `20=s:S` means change step size to 20, and step forward.
-* `2/s:S` means halve the step size (divide by 2), and step forward.
+* `s=20 S()` means change step size to 20, and step forward.
+* `s/=2 S()` means halve the step size (divide by 2), and step forward.
 
 To change the width of the lines, change the variable `z`:
 
-* `1.5z:S` means multiply width by 1.5 times, and step forward.
+* `z*=1.5 S()` means multiply width by 1.5 times, and step forward.
 
-To do something several times, write a number, then the function to call,
-either using a function name, or making a little function then and there:
+To do something several times, call the `T` function, saying how many times
+to do it, and giving the name of the function to call, or making a little
+function right there:
 
-* `2:S` means step twice.
-* `36:{+d:S}` means turn then step 36 times.
+* `T(2,S)` means step twice.
+* `T(36,{d+=10 S()})` means turn then step 36 times.
 
 By default, the whole of your program repeats over and over.  To repeat only
 the last section (meaning the first section only runs once), add a label with
 `^`:
 
-* `1=s^+d1+s:S` means start with a step size of 1, and increase it (and the
-  angle), then step, every time.  (Without the `^` the value of `s` would be
-  reset back to 1 every time.)
+* `s=1 ^ d+=10 s+=1 S()` means start with a step size of 1, and increase it
+  (and the angle), then step, every time.  (Without the `^` the value of `s`
+  would be reset back to 1 every time, because we'd start again at the
+  beginning.)
 
 ## Special variables
 
 Graft contains some variables with special meanings:
 
 * `d` - "direction": the angle in degrees we are facing.
-* `s` - "step size": how far the next `:S` call will move us.
+* `s` - "step size": how far the next `S()` call will move us.
 * `z` - "size of brush": width of brush used for drawing lines.
 * `r`, `g`, `b` - "red", "green", "blue": components of the colour of the
    brush (0-100).
 * `a` - "alpha": transparency of the brush (0=transparent, 100=solid).
 * `f` - "fork id": the number of the line we are currently controlling - this
-  changes when we use `:F` to "fork" into multiple lines.
+  changes when we use `F()` to "fork" into multiple lines.
 
 The colour and transparency values may be set to values outside the range.
 Increasing or decreasing a value smoothly will result in gradual increase and
@@ -112,13 +128,13 @@ then decrease in the displayed value, because numbers over 100 wrap around to
 When graft starts, the following default values are set:
 
 ```graft
-0=d
-10=s
-5=z
-0=r
-0=g
-0=b
-100=a
+d=0
+s=10
+z=5
+r=0
+g=0
+b=0
+a=100
 ```
 
 ## Built-in functions
@@ -135,10 +151,17 @@ The following functions are pre-defined in graft:
 
 ## Language reference
 
+Graft's syntax is a modified version of
+[Cell](https://github.com/andybalaam/cell), and you can find out a lot more
+about how Cell works on its web site.  The key modifications used in Graft are
+that spaces are used to separate statements instead of semi-colons, and
+variables can be modified.
+
 ### Numbers
 
 Numbers are all held as floating point numbers.
 
+<!--
 They are written with an optional "-" followed by some digits, optionally
 including a decimal point:
 
@@ -146,6 +169,24 @@ including a decimal point:
 number ::= ["-"] digit* ["." digit*]
 digit  ::= "0"..."9"
 ```
+-->
+
+They are written as some digits, optionally
+including a decimal point:
+
+```
+number ::= digit* ["." digit*]
+digit  ::= "0"..."9"
+```
+
+Note: writing negative numbers is not supported (coming soon), but you can
+get one by doing a subtraction:
+
+```
+x=0 x-=10
+```
+
+Now `x` is equal to -10.
 
 Note: when lines are actually drawn, all numbers are rounded to the nearest
 0.1, but this does not affect variable values, just on-screen position.
@@ -164,51 +205,49 @@ those holding functions are written in upper case.
 
 ### Changing variable values
 
-To set a variable value, write the required value, then "=", then the variable
-name:
+To set a variable value, write the variable name, then "=", then the value.
 
 ```
-assignment ::= input "=" symbol
-input = number | functiondef | (symbol | functioncall) "~"
+assignment ::= symbol "=" input
+input = number | functiondef | (symbol | functioncall)
 ```
 
-To modify a variable value by 10, write the "+" or "-" operator with no
-argument before its name:
+To add, subtract, or divide by a number, write the variable name, then a modifying operator `+=`,
+`-=`, `*=` or `/=`, then write the number.  Example:
 
-```
-increase ::= "+" symbol
-decrease ::= "-" symbol
-```
-
-To add, subtract, or divide by a number, write the number, then
-the operation `+`, `-`, or `/` respectively, then the symbol.  Example:
-
-* `3.1/d` - divide `d` by 3.1.
+* `d/=3.1` - divide `d` by 3.1.
 
 To multiply, write a number next to the symbol:
 
-* `-4.5d` - multiply `d` by -4.5.
-
-To provide a variable value, or the return value of a function, as the
-input for an operator, write the variable name of call the function, then
-suffix it with `~`.  Examples:
-
-* `s~+d` - add the value of `s` to `d` (leaving `s` unchanged).
-* `:R~/s` - divide `s` by the return value from the function `R`.
+* `d*=4.5` - multiply `d` by 4.5.
 
 ```
-modify ::= multiply | input operator symbol
-multiply ::= input symbol
-operator ::= "+" | "-" | "/"
+modify ::= symbol modify_operator input
+modify_operator ::= "+=" | "-=" | "*=" | "/="
+```
+
+### Expressions
+
+To calculate an something, write numbers or variables joined by an operator
+like "+", "-", "*", or "/":
+
+```
+x=10*R()
+```
+
+```
+expression ::= number | symbol | functioncall | modify | combination
+combination ::= expression operator expression
+operator :== "+" | "-" | "*" | "/"
 ```
 
 ### Running functions
 
-To run a function, write how many times to run it (optional), then `:` and
-then its name:
+To run a function, write its name, then "(", then the arguments separated by
+commands, and then ")":
 
 ```
-functioncall ::= [number] ":" symbol
+functioncall ::= symbol "(" [argument] ["," argument]* ")"
 ```
 
 ### Labels
@@ -222,19 +261,34 @@ label ::= "^"
 
 ### Combining statements
 
-To run multiple statements, write them next to each other.  If an expression
-would be ambiguous, or two symbols would run together, separate statements
-with `;`:
+To run multiple statements, write them next to each other, separated by spaces
+or new lines:
 
 ```
 program ::= statement+
-statement ::= expression [";"]
-expression ::= functioncall | modify | increase | decrease | assignment | label
+statement ::= statement_body [" " | "\n"]
+statement_body ::= expression | label
 ```
 
 ### Defining functions
 
-To describe a function, write "{", then the commands, then "}":
+To describe a function, write "{", then the commands, then "}".  If the
+function has arguments, write ":(" after the "{", then the arguments separated
+by ",", then ")", and the commands after that.
+
+The return value of the function is the value of the last statement inside it.
+
+```
+StepTurnStep={S() d+=10 S()}
+```
+
+```
+Double={:(x) x*2}
+```
+
+```
+Polygon={:(n, side) s=side T(n, {d+=360/n S()})}
+```
 
 ```
 functiondef ::= "{" program "}"
@@ -242,27 +296,27 @@ functiondef ::= "{" program "}"
 
 ### Forking
 
-If you want to draw two lines simultaneously, use the `:F` command.
+If you want to draw two lines simultaneously, use the `F()` function.
 
 For example, to split into 2 lines and then make each of them move randomly,
 run:
 
 ```bash
-./graft ':F^:R~=d36d:S'
+./graft 'F() ^ d=R()*36 S()'
 ```
 
 The above program means:
 
-* `:F` - split into 2 lines
+* `F()` - split into 2 lines
 * `^` - set a label - when we reach the end we will restart here
-* `:R~=d` - set `d` to a random number between -10 and 10
-* `36d` - multiply `d` by 36
-* `:S` - draw a line in the direction (`d`) we are facing
+* `d=R()*26` - set `d` to a random number between -360 and 360
+* `S()` - draw a line in the direction (`d`) we are facing
 
-To split into more lines, put a number before `:F`.  For example:
+To split into more lines, wrap the call to `F` with a `T`, meaning do it
+several times.  For example:
 
 ```bash
-./graft '3:F^:R~=d36d:S'
+./graft 'T(3,F) ^ d=R()*36 S()'
 ```
 
 This program splits into 4 lines, and draws randomly as in the previous
@@ -275,17 +329,15 @@ its version of `f` set to the next number: 1, 2 etc.
 For example:
 
 ```bash
-./graft '17:F;f~=d20d^+d:S'
+./graft 'T(17,F) d=f*20 ^ d+=10 S()'
 ```
 
 The above program means:
 
-* `17:F` - split into 18 lines
-* `;` - this separates the previous statement from the next one
-* `f~=d` - set `d` to the value of `f` - this is different for each line -
-  0, 1, 2, etc.
-* `20d` - multiply `d` by 20
-* `:S` - draw a line in the direction (`d`) we are facing
+* `T(17,F)` - split into 18 lines
+* `d=f*20` - set `d` to 20 times the value of `f` - f is different for each
+  line - 0, 1, 2, etc.)
+* `S()` - draw a line in the direction (`d`) we are facing
 
 Here's what it looks like:
 
@@ -297,12 +349,12 @@ Here's what it looks like:
 $ ./graft --help
 usage: graft [-h] [--frames NUMBER_OF_FRAMES] [--gif GIF_FILENAME]
              [--width WIDTH] [--height HEIGHT] [--max-forks MAX_FORKS]
-             [--lookahead-steps LOOKAHEAD_STEPS]
+             [--lookahead-steps LOOKAHEAD_STEPS] [--syntax {v1,cell}]
              program
 
 positional arguments:
-  program               The actual graft program to run, e.g. '+d:S' to draw a
-                        circle.
+  program               The actual graft program to run, e.g. 'd+=10 S()' to
+                        draw a circle.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -318,15 +370,14 @@ optional arguments:
   --lookahead-steps LOOKAHEAD_STEPS
                         How many steps to use to calculate the initial zoom
                         level.
+  --syntax {v1,cell}    Choose which code style you want to use - v1 syntax
+                        uses e.g. :R to call the R function, whereas cell
+                        syntax uses the more familiar R(). For more info on
+                        the v1 syntax, see SYNTAX_V1.md in the source
+                        repository.
 ```
 
-## Mastodon bot
-
-The easiest way to try crafting a generative animation is to toot a program
-mentioning @graft@mastodon.social.  If you've never tooted before, see
-[Mastodon.social](https://mastodon.social) to find out how to register.
-
-### Running the bot
+## Running the Mastodon bot
 
 To run the bot yourself:
 

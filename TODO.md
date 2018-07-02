@@ -7,10 +7,24 @@
   + Share Env between syntaxes
   + Break out code that will be re-used from eval_
   + Break out syntax-1-specific code from eval_
-  - Create Graft execution environment
-  - Update all examples
-  - Switch between 2 syntaxes on command line
-  - Default to new syntax
+  + Create Graft execution environment
+  + Switch between 2 syntaxes on command line
+  + Default to new syntax
+  + Update README
+  * Update all examples
+
+- Cell improvements
+  - Add negative numbers (add back in to README, including the *= example)
+  - Add <, == etc
+  - Add If
+  - Add lists
+  - Add While, For
+  - Add Map, Reduce?
+
+- Run mypy and fix type errors
+- Add type annotations
+
+- Vector operations
 
 ## Later
 

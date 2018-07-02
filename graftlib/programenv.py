@@ -46,8 +46,8 @@ class ProgramEnv:
         Returns the collected strokes and clears
         the list so more may be added.
         """
-        ret = self._strokes
-        self._strokes = []
+        ret = list(self._strokes)
+        self._strokes.clear()
         return ret
 
     def get(self, name):
