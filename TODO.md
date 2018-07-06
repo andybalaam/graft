@@ -1,6 +1,6 @@
 # Graft TODO
 
-- Cell syntax
+= Cell syntax
   + Import Cell lexer, parser, evaluator
   + Convert it to space-separated commands
   + Break out classes from eval_
@@ -11,10 +11,10 @@
   + Switch between 2 syntaxes on command line
   + Default to new syntax
   + Update README
-  * Update all examples
+  + Update all examples
 
 - Cell improvements
-  - Add negative numbers (add back in to README, including the *= example)
+  + Add negative numbers (add back in to README, including the *= example)
   - Add <, == etc
   - Add If
   - Add lists

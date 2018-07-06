@@ -89,7 +89,7 @@ To change the step size, change the variable `s`:
 
 To change the width of the lines, change the variable `z`:
 
-* `z*=1.5 S()` means multiply width by 1.5 times, and step forward.
+* `z*=-1.5 S()` means multiply width by -1.5, and step forward.
 
 To do something several times, call the `T` function, saying how many times
 to do it, and giving the name of the function to call, or making a little
@@ -161,7 +161,6 @@ variables can be modified.
 
 Numbers are all held as floating point numbers.
 
-<!--
 They are written with an optional "-" followed by some digits, optionally
 including a decimal point:
 
@@ -169,24 +168,11 @@ including a decimal point:
 number ::= ["-"] digit* ["." digit*]
 digit  ::= "0"..."9"
 ```
--->
 
-They are written as some digits, optionally
-including a decimal point:
-
-```
-number ::= digit* ["." digit*]
-digit  ::= "0"..."9"
-```
-
-Note: writing negative numbers is not supported (coming soon), but you can
-get one by doing a subtraction:
-
-```
-x=0 x-=10
-```
-
-Now `x` is equal to -10.
+Note: because of Cell's "interesting" grouping rules, be careful when writing
+"-" followed by an expression.  A leading "-" will negate the whole expression,
+so "-3+4" will equal -7, not 1.  To force the order of evaluation, break your
+expressions into multiple statements.
 
 Note: when lines are actually drawn, all numbers are rounded to the nearest
 0.1, but this does not affect variable values, just on-screen position.

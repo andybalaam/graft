@@ -6,6 +6,8 @@ from graftlib.parse_cell import (
     AssignmentTree,
     FunctionCallTree,
     FunctionDefTree,
+    ModifyTree,
+    NegativeTree,
     NumberTree,
     OperationTree,
     StringTree,
@@ -30,11 +32,28 @@ def test_Number_is_parsed_as_expression():
     assert parsed("56") == [NumberTree("56")]
 
 
+def test_Negative_number_is_parsed_as_expression():
+    assert parsed("-56") == [NegativeTree(NumberTree("56"))]
+
+
 def test_Sum_of_numbers_is_parsed_as_expression():
     assert (
         parsed("32+44") ==
         [
             OperationTree("+", NumberTree("32"), NumberTree("44"))
+        ]
+    )
+
+
+def test_Sum_of_negative_numbers_is_parsed_as_expression():
+    assert (
+        parsed("32+-44") ==
+        [
+            OperationTree(
+                "+",
+                NumberTree("32"),
+                NegativeTree(NumberTree("44")),
+            )
         ]
     )
 
@@ -57,7 +76,19 @@ def test_Modify_symbol_is_parsed_as_expression():
     )
 
 
-def test_Modify_symbol_is_parsed_as_expression():
+def test_Modify_by_negative_is_parsed_as_expression():
+    assert (
+        parsed("foo*=-44") ==
+        [
+            ModifyTree(
+                "*=",
+                SymbolTree("foo"), NegativeTree(NumberTree("44"))
+            )
+        ]
+    )
+
+
+def test_Modify_nonsymbol_is_an_error():
     with pytest.raises(
         Exception,
         match=r"You can't modify \(\*=\) anything except a symbol\."
@@ -74,11 +105,36 @@ def test_Multiplication_of_symbols_is_parsed_as_expression():
     )
 
 
+def test_Multiplication_of_negative_symbols_is_parsed_as_expression():
+    assert (
+        parsed("foo*-bar") ==
+        [
+            OperationTree(
+                "*",
+                SymbolTree("foo"),
+                NegativeTree(SymbolTree("bar"))
+            )
+        ]
+    )
+
+
 def test_Variable_assignment_gets_parsed():
     assert (
         parsed("x=3") ==
         [
             AssignmentTree(SymbolTree("x"), NumberTree("3"))
+        ]
+    )
+
+
+def test_Variable_assignment_to_negative_gets_parsed():
+    assert (
+        parsed("x=--3") ==
+        [
+            AssignmentTree(
+                SymbolTree("x"),
+                NegativeTree(NegativeTree(NumberTree("3"))),
+            )
         ]
     )
 

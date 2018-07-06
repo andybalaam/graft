@@ -35,6 +35,11 @@ class ModifyTree:
 
 
 @attr.s
+class NegativeTree:
+    value = attr.ib()
+
+
+@attr.s
 class NumberTree:
     value: str = attr.ib()
 
@@ -91,6 +96,8 @@ class _Parser:
             return self.next_expression(SymbolTree(tok.value))
         elif typ == OperatorToken:
             nxt = self.next_expression(None)
+            if prev is None and tok.value == "-":
+                return self.next_expression(NegativeTree(nxt))
             return self.next_expression(OperationTree(tok.value, prev, nxt))
         elif typ == LabelToken:
             return self.next_expression(LabelTree())
