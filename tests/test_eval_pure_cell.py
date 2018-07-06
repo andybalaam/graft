@@ -39,6 +39,7 @@ def test_Evaluating_an_empty_program_gives_none():
 def test_Evaluating_a_primitive_returns_itself():
     assert evald("3") == NumberValue(3)
     assert evald("3.1") == NumberValue(3.1)
+    assert evald("-3.1") == NumberValue(-3.1)
     assert evald("'foo'") == StringValue("foo")
 
 
@@ -46,6 +47,7 @@ def test_Arithmetic_expressions_come_out_correct():
     assert evald("3+4") == NumberValue(7)
     assert evald("3-4") == NumberValue(-1)
     assert evald("3*4") == NumberValue(12)
+    assert evald("3*-4") == NumberValue(-12)
     assert evald("3/4") == NumberValue(0.75)
 
 
@@ -86,8 +88,16 @@ def test_Modifying_a_value_is_allowed():
     assert evald("x=30 x=10 x") == NumberValue(10)
 
 
+def test_Negating_a_symbol():
+    assert evald("x=30 x=10 -x") == NumberValue(-10)
+
+
 def test_Value_of_an_assignment_is_the_value_assigned():
     assert evald("x=31") == NumberValue(31)
+
+
+def test_Negative_assignment():
+    assert evald("x=-31") == NumberValue(-31)
 
 
 def test_None_evaluates_to_None():

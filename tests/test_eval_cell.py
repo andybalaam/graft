@@ -381,6 +381,13 @@ def test_go_then_line():
     )
 
 
+def test_go_then_line_negatives():
+    assert (
+        do_eval("x=-10 y=-15 x+=-10 y+=-1 L()", 1) ==
+        [[Line(Pt(-10.0, -15.0), Pt(-20.0, -16.0))]]
+    )
+
+
 def test_go_then_line_modified():
     assert (
         do_eval("x=10 y=15 x+=10 y+=1 L()", 1) ==

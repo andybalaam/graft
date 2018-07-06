@@ -8,6 +8,7 @@ from graftlib.parse_cell import (
     FunctionCallTree,
     FunctionDefTree,
     ModifyTree,
+    NegativeTree,
     NumberTree,
     OperationTree,
     StringTree,
@@ -117,6 +118,8 @@ def _eval(env, expr):
     typ = type(expr)
     if typ == NumberTree:
         return NumberValue(float(expr.value))
+    elif typ == NegativeTree:
+        return NumberValue(-_eval(env, expr.value).value)
     elif typ == StringTree:
         return StringValue(expr.value)
     elif typ in (NoneValue, NativeFunctionValue):
