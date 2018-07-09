@@ -1,18 +1,5 @@
 # Graft TODO
 
-= Cell syntax
-  + Import Cell lexer, parser, evaluator
-  + Convert it to space-separated commands
-  + Break out classes from eval_
-  + Share Env between syntaxes
-  + Break out code that will be re-used from eval_
-  + Break out syntax-1-specific code from eval_
-  + Create Graft execution environment
-  + Switch between 2 syntaxes on command line
-  + Default to new syntax
-  + Update README
-  + Update all examples
-
 - Cell improvements
   + Add negative numbers (add back in to README, including the *= example)
   - Add <, == etc

@@ -150,7 +150,13 @@ def _eval(env, expr):
             expr.body,
             env.make_child()
         )
-    elif typ == UserFunctionValue:
+    elif typ in (
+        NativeFunctionValue,
+        NoneValue,
+        NumberValue,
+        StringValue,
+        UserFunctionValue
+    ):
         return expr
     else:
         raise Exception("Unknown expression type: " + str(expr))

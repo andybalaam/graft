@@ -539,3 +539,45 @@ def test_strokes_inside_functions_work():
         do_eval("P={S()} P()", n=1) ==
         [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
     )
+
+
+def test_if_executes_if_1():
+    assert (
+        do_eval("If(1,S)", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
+    )
+
+
+def test_if_executes_if_minus_1():
+    assert (
+        do_eval("If(-1,S)", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
+    )
+
+
+def test_if_executes_if_nonzero():
+    assert (
+        do_eval("If(20,S)", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
+    )
+
+
+def test_if_does_not_execute_if_zero():
+    assert (
+        do_eval("If(0,S) D()", 1) ==
+        [[Dot(Pt(0.0, 0.0))]]
+    )
+
+
+def test_if_does_not_execute_if_zero_via_expression():
+    assert (
+        do_eval("If(1-1,S) D()", 1) ==
+        [[Dot(Pt(0.0, 0.0))]]
+    )
+
+
+def test_if_executes_if_nonzero_via_symbol():
+    assert (
+        do_eval("foo=-20 If(foo,S)", 1) ==
+        [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
+    )
