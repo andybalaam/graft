@@ -543,42 +543,42 @@ def test_strokes_inside_functions_work():
 
 def test_if_executes_if_1():
     assert (
-        do_eval("If(1,S)", 1) ==
+        do_eval("If(1,S,{})", 1) ==
         [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
     )
 
 
 def test_if_executes_if_minus_1():
     assert (
-        do_eval("If(-1,S)", 1) ==
+        do_eval("If(-1,S,{})", 1) ==
         [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
     )
 
 
 def test_if_executes_if_nonzero():
     assert (
-        do_eval("If(20,S)", 1) ==
+        do_eval("If(20,S,{})", 1) ==
         [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
     )
 
 
 def test_if_does_not_execute_if_zero():
     assert (
-        do_eval("If(0,S) D()", 1) ==
+        do_eval("If(0,S,{}) D()", 1) ==
         [[Dot(Pt(0.0, 0.0))]]
     )
 
 
 def test_if_does_not_execute_if_zero_via_expression():
     assert (
-        do_eval("If(1-1,S) D()", 1) ==
+        do_eval("If(1-1,S,{}) D()", 1) ==
         [[Dot(Pt(0.0, 0.0))]]
     )
 
 
 def test_if_executes_if_nonzero_via_symbol():
     assert (
-        do_eval("foo=-20 If(foo,S)", 1) ==
+        do_eval("foo=-20 If(foo,S,{})", 1) ==
         [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
     )
 
@@ -588,9 +588,9 @@ def test_lt_compares_numbers():
         do_eval(
             """
             x=0
-            If(1<2,{x+=1})
-            If(2<1,{x+=10})
-            If(1<1,{x+=100})
+            If(1<2,{x+=1},{})
+            If(2<1,{x+=10},{})
+            If(1<1,{x+=100},{})
             D()
             """,
             n=1,
@@ -606,9 +606,9 @@ def test_gt_compares_numbers():
             one=1
             two=2
             x=0
-            If(one>two,{x+=1})
-            If(two>one,{x+=10})
-            If(one>one,{x+=100})
+            If(one>two,{x+=1},{})
+            If(two>one,{x+=10},{})
+            If(one>one,{x+=100},{})
             D()
             """,
             n=1,
@@ -622,9 +622,9 @@ def test_lte_compares_numbers():
         do_eval(
             """
             x=0
-            If(1<=2,{x+=1})
-            If(2<=1,{x+=10})
-            If(1<=1,{x+=100})
+            If(1<=2,{x+=1},{})
+            If(2<=1,{x+=10},{})
+            If(1<=1,{x+=100},{})
             D()
             """,
             n=1,
@@ -640,9 +640,9 @@ def test_gte_compares_numbers():
             one=1
             two=2
             x=0
-            If(one>=two,{x+=1})
-            If(two>=one,{x+=10})
-            If(one>=one,{x+=100})
+            If(one>=two,{x+=1},{})
+            If(two>=one,{x+=10},{})
+            If(one>=one,{x+=100},{})
             D()
             """,
             n=1,
@@ -658,13 +658,20 @@ def test_double_equals_compares_numbers():
             one=1
             two=2
             x=0
-            If(one==2,{x+=1})
-            If(2==one,{x+=10})
-            If(one==one,{x+=100})
-            If(one==two,{x+=1000})
+            If(one==2,{x+=1},{})
+            If(2==one,{x+=10},{})
+            If(one==one,{x+=100},{})
+            If(one==two,{x+=1000},{})
             D()
             """,
             n=1,
         ) ==
         [[Dot(Pt(100, 0))]]
+    )
+
+
+def test_if_expression():
+    assert (
+        do_eval("foo=3 x=If(foo>0,{1},{-1}) D()", 1) ==
+        [[Dot(Pt(1.0, 0.0))]]
     )

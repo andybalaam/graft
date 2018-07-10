@@ -118,10 +118,7 @@ def _function_call(expr, env):
 
 
 def eval_cell(env, expr):
-    ret = _eval(env, expr)
-    # Wrap values in [] if they are not already
-    # a list of strokes.
-    return ret if type(ret) is list else [ret]
+    return _eval(env, expr)
 
 
 def _eval(env, expr):
