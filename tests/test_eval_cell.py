@@ -581,3 +581,71 @@ def test_if_executes_if_nonzero_via_symbol():
         do_eval("foo=-20 If(foo,S)", 1) ==
         [[Line(Pt(0.0, 0.0), Pt(0.0, 10.0))]]
     )
+
+
+def test_lt_compares_numbers():
+    assert (
+        do_eval(
+            """
+            x=0
+            If(1<2,{x+=1})
+            If(2<1,{x+=10})
+            If(1<1,{x+=100})
+            D()
+            """,
+            n=1,
+        ) ==
+        [[Dot(Pt(1, 0))]]
+    )
+
+
+def test_gt_compares_numbers():
+    assert (
+        do_eval(
+            """
+            one=1
+            two=2
+            x=0
+            If(one>two,{x+=1})
+            If(two>one,{x+=10})
+            If(one>one,{x+=100})
+            D()
+            """,
+            n=1,
+        ) ==
+        [[Dot(Pt(10, 0))]]
+    )
+
+
+def test_lte_compares_numbers():
+    assert (
+        do_eval(
+            """
+            x=0
+            If(1<=2,{x+=1})
+            If(2<=1,{x+=10})
+            If(1<=1,{x+=100})
+            D()
+            """,
+            n=1,
+        ) ==
+        [[Dot(Pt(101, 0))]]
+    )
+
+
+def test_gte_compares_numbers():
+    assert (
+        do_eval(
+            """
+            one=1
+            two=2
+            x=0
+            If(one>=two,{x+=1})
+            If(two>=one,{x+=10})
+            If(one>=one,{x+=100})
+            D()
+            """,
+            n=1,
+        ) ==
+        [[Dot(Pt(110, 0))]]
+    )

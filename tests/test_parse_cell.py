@@ -155,6 +155,25 @@ def test_Label_is_parsed():
     )
 
 
+def test_Comparisons_are_parsed():
+    assert (
+        parsed("12<3") ==
+        [OperationTree("<", NumberTree("12"), NumberTree("3"))]
+    )
+    assert (
+        parsed("12>x") ==
+        [OperationTree(">", NumberTree("12"), SymbolTree("x"))]
+    )
+    assert (
+        parsed("x<=1") ==
+        [OperationTree("<=", SymbolTree("x"), NumberTree("1"))]
+    )
+    assert (
+        parsed("y>=x") ==
+        [OperationTree(">=", SymbolTree("y"), SymbolTree("x"))]
+    )
+
+
 def test_Function_call_with_various_args_gets_parsed():
     assert (
         parsed("print('a',3,4/12)") ==

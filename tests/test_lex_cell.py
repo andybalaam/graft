@@ -182,9 +182,14 @@ def test_Arithmetic_operators_produce_operation_tokens():
     assert lexed("-") == [OperatorToken("-")]
     assert lexed("*") == [OperatorToken("*")]
     assert lexed("/") == [OperatorToken("/")]
+    assert lexed("<") == [OperatorToken("<")]
+    assert lexed(">") == [OperatorToken(">")]
+    assert lexed("<=") == [OperatorToken("<=")]
+    assert lexed(">=") == [OperatorToken(">=")]
+    # assert lexed("==") == [OperatorToken("==")]
 
 
-def test_Arithmetic_operators_produce_operation_tokens():
+def test_Modify_operators_modify_tokens():
     assert lexed("+=") == [ModifyToken("+=")]
     assert lexed("-=") == [ModifyToken("-=")]
     assert lexed("*=") == [ModifyToken("*=")]

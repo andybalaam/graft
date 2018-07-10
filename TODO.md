@@ -2,8 +2,8 @@
 
 - Cell improvements
   + Add negative numbers (add back in to README, including the *= example)
-  - Add <, == etc
-  - Add If
+  * Add <, == etc
+  + Add If
   - Add lists
   - Add While, For
   - Add Map, Reduce?

@@ -166,11 +166,14 @@ def lex_cell(chars_iter):
         elif c == "^":
             yield LabelToken()
 
-        elif c in "+-*/":
+        elif c in "+-*/<>":
             nc = chars.next
             if nc == "=":
                 chars.move_next()
-                yield ModifyToken(c + nc)
+                if c in "+-*/":
+                    yield ModifyToken(c + nc)
+                else:
+                    yield OperatorToken(c + nc)
             else:
                 yield OperatorToken(c)
 
