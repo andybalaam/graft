@@ -162,7 +162,12 @@ def lex_cell(chars_iter):
         elif c == ":":
             yield ParamListPreludeToken()
         elif c == "=":
-            yield AssignmentToken()
+            nc = chars.next
+            if nc == "=":
+                chars.move_next()
+                yield OperatorToken(c + nc)
+            else:
+                yield AssignmentToken()
         elif c == "^":
             yield LabelToken()
 

@@ -172,6 +172,10 @@ def test_Comparisons_are_parsed():
         parsed("y>=x") ==
         [OperationTree(">=", SymbolTree("y"), SymbolTree("x"))]
     )
+    assert (
+        parsed("y==x") ==
+        [OperationTree("==", SymbolTree("y"), SymbolTree("x"))]
+    )
 
 
 def test_Function_call_with_various_args_gets_parsed():

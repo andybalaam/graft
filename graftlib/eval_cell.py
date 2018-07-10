@@ -56,6 +56,8 @@ def _operation(expr, env):
         return NumberValue(1.0 if arg1.value >= arg2.value else 0.0)
     elif expr.operation == "<=":
         return NumberValue(1.0 if arg1.value <= arg2.value else 0.0)
+    elif expr.operation == "==":
+        return NumberValue(1.0 if arg1.value == arg2.value else 0.0)
     else:
         raise Exception("Unknown operation: " + expr.operation)
 

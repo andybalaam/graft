@@ -649,3 +649,22 @@ def test_gte_compares_numbers():
         ) ==
         [[Dot(Pt(110, 0))]]
     )
+
+
+def test_double_equals_compares_numbers():
+    assert (
+        do_eval(
+            """
+            one=1
+            two=2
+            x=0
+            If(one==2,{x+=1})
+            If(2==one,{x+=10})
+            If(one==one,{x+=100})
+            If(one==two,{x+=1000})
+            D()
+            """,
+            n=1,
+        ) ==
+        [[Dot(Pt(100, 0))]]
+    )
