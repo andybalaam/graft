@@ -5,6 +5,7 @@ from graftlib.peekablestream import PeekableStream
 from graftlib.labeltree import LabelTree
 from graftlib.lex_cell import (
     AssignmentToken,
+    EndArrayToken,
     EndFunctionDefToken,
     EndParamListToken,
     LabelToken,
@@ -13,12 +14,18 @@ from graftlib.lex_cell import (
     NumberToken,
     OperatorToken,
     ParamListPreludeToken,
+    StartArrayToken,
     StartFunctionDefToken,
     StartParamListToken,
     StatementSeparatorToken,
     StringToken,
     SymbolToken,
 )
+
+
+@attr.s
+class ArrayTree:
+    value: List = attr.ib()
 
 
 @attr.s
@@ -110,6 +117,10 @@ class _Parser:
             body = self.multiple_expressions(
                 StatementSeparatorToken, EndFunctionDefToken)
             return self.next_expression(FunctionDefTree(params, body))
+        elif typ == StartArrayToken:
+            contents = self.multiple_expressions(
+                ListSeparatorToken, EndArrayToken)
+            return self.next_expression(ArrayTree(contents))
         elif typ == AssignmentToken:
             if type(prev) != SymbolTree:
                 raise Exception(

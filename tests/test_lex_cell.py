@@ -2,6 +2,7 @@ import pytest
 from graftlib.lex_cell import (
     lex_cell,
     AssignmentToken,
+    EndArrayToken,
     EndFunctionDefToken,
     EndParamListToken,
     LabelToken,
@@ -10,6 +11,7 @@ from graftlib.lex_cell import (
     NumberToken,
     OperatorToken,
     ParamListPreludeToken,
+    StartArrayToken,
     StartFunctionDefToken,
     StartParamListToken,
     StatementSeparatorToken,
@@ -233,3 +235,16 @@ def test_Tabs_are_an_error():
         message=r'Tab characters are not allowed in Graft.'
     ):
         lexed("aaa\tbbb")
+
+
+def test_Square_brackets_produce_array_tokens():
+    assert (
+        lexed("[3,4]") ==
+        [
+            StartArrayToken(),
+            NumberToken("3"),
+            ListSeparatorToken(),
+            NumberToken("4"),
+            EndArrayToken(),
+        ]
+    )

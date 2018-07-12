@@ -4,6 +4,7 @@ import attr
 
 from graftlib.labeltree import LabelTree
 from graftlib.parse_cell import (
+    ArrayTree,
     AssignmentTree,
     FunctionCallTree,
     FunctionDefTree,
@@ -23,6 +24,11 @@ from graftlib.numbervalue import NumberValue
 @attr.s
 class NoneValue:
     pass
+
+
+@attr.s
+class ArrayValue:
+    value: List = attr.ib()
 
 
 @attr.s
@@ -157,6 +163,8 @@ def _eval(env, expr):
             expr.body,
             env.make_child()
         )
+    elif typ == ArrayTree:
+        return ArrayValue([_eval(env, x) for x in expr.value])
     elif typ in (
         NativeFunctionValue,
         NoneValue,

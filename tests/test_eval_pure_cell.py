@@ -2,6 +2,7 @@ import pytest
 from graftlib.lex_cell import lex_cell
 from graftlib.parse_cell import FunctionCallTree, parse_cell
 from graftlib.eval_cell import (
+    ArrayValue,
     NativeFunctionValue,
     NoneValue,
     NumberValue,
@@ -302,4 +303,10 @@ def test_A_closure_holds_updateable_values():
             env
         ) ==
         NumberValue(2)
+    )
+
+
+def test_Array_parses():
+    assert (
+        evald("[3,4]") == ArrayValue([NumberValue(3), NumberValue(4)])
     )

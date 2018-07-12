@@ -12,6 +12,13 @@ class AssignmentToken:
 
 
 @attr.s
+class EndArrayToken:
+    @staticmethod
+    def code():
+        return "]"
+
+
+@attr.s
 class EndFunctionDefToken:
     @staticmethod
     def code():
@@ -71,10 +78,10 @@ class ParamListPreludeToken:
 
 
 @attr.s
-class StartParamListToken:
+class StartArrayToken:
     @staticmethod
     def code():
-        return "("
+        return "["
 
 
 @attr.s
@@ -82,6 +89,13 @@ class StartFunctionDefToken:
     @staticmethod
     def code():
         return "{"
+
+
+@attr.s
+class StartParamListToken:
+    @staticmethod
+    def code():
+        return "("
 
 
 @attr.s
@@ -157,6 +171,10 @@ def lex_cell(chars_iter):
             yield StartFunctionDefToken()
         elif c == "}":
             yield EndFunctionDefToken()
+        elif c == "[":
+            yield StartArrayToken()
+        elif c == "]":
+            yield EndArrayToken()
         elif c == ",":
             yield ListSeparatorToken()
         elif c == ":":

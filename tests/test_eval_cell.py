@@ -675,3 +675,14 @@ def test_if_expression():
         do_eval("foo=3 x=If(foo>0,{1},{-1}) D()", 1) ==
         [[Dot(Pt(1.0, 0.0))]]
     )
+
+
+def NOT_IMPLEMENTED_YET_test_For_over_array():
+    assert (
+        do_eval("arr=[7,2] For(arr,{:(it)x=it D()}) S()", 3) ==
+        [
+            [Dot(Pt(7.0, 0.0))],
+            [Dot(Pt(2.0, 0.0))],
+            [Line(Pt(2.0, 0.0), Pt(2.0, 10.0))],
+        ]
+    )

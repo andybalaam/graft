@@ -3,6 +3,7 @@ from graftlib.lex_cell import lex_cell
 from graftlib.labeltree import LabelTree
 from graftlib.parse_cell import (
     parse_cell,
+    ArrayTree,
     AssignmentTree,
     FunctionCallTree,
     FunctionDefTree,
@@ -298,7 +299,22 @@ def test_Empty_function_definition_with_params_gets_parsed():
                     SymbolTree("aa"),
                     SymbolTree("bb"),
                     SymbolTree("cc"),
-                    SymbolTree("dd")
+                    SymbolTree("dd"),
+                ],
+                []
+            )
+        ]
+    )
+
+
+def test_Trailing_comma_in_arg_list_is_ignored():
+    assert (
+        parsed("{:(aa,bb,)}") ==
+        [
+            FunctionDefTree(
+                [
+                    SymbolTree("aa"),
+                    SymbolTree("bb"),
                 ],
                 []
             )
@@ -453,6 +469,34 @@ def test_Spaces_are_allowed_where_unimportant():
                     NumberTree("3"),
                     NumberTree("4"),
                 ]
+            )
+        ]
+    )
+
+
+def test_Array_literal_parses():
+    assert (
+        parsed("[3,4]") ==
+        [
+            ArrayTree(
+                [
+                    NumberTree("3"),
+                    NumberTree("4"),
+                ],
+            )
+        ]
+    )
+
+
+def test_Trailing_comma_in_array_is_ignored():
+    assert (
+        parsed("[a, bb,]") ==
+        [
+            ArrayTree(
+                [
+                    SymbolTree("a"),
+                    SymbolTree("bb"),
+                ],
             )
         ]
     )
