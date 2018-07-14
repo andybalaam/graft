@@ -6,9 +6,10 @@
   + Add If
   + Add lists
   + For
+  - For over iterator
+  - Len
   - Range
   - While
-  - Map, Reduce?
 
 - Run mypy and fix type errors
 - Add type annotations
@@ -26,9 +27,10 @@
 
 ## To define
 
+### Vector operations to allow orbit-like stuff
+
+Goal: easy to do e.g. gravity
+
 ### "Stamps" - different brush shapes
-### If
 ### goto
-### Passing arguments to functions
-### Local variables
 ### Macros
