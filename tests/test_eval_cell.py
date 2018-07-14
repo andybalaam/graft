@@ -677,12 +677,36 @@ def test_if_expression():
     )
 
 
-def NOT_IMPLEMENTED_YET_test_For_over_array():
+def test_For_over_array():
     assert (
         do_eval("arr=[7,2] For(arr,{:(it)x=it D()}) S()", 3) ==
         [
             [Dot(Pt(7.0, 0.0))],
             [Dot(Pt(2.0, 0.0))],
             [Line(Pt(2.0, 0.0), Pt(2.0, 10.0))],
+        ]
+    )
+
+
+def test_For_over_double_array():
+    assert (
+        do_eval(
+            """
+            For(
+                [[1,1],[2,2]],
+                {:(it)
+                    x=Get(it,0)
+                    y=Get(it,1)
+                    D()
+                }
+            )
+            S()
+            """,
+            3
+        ) ==
+        [
+            [Dot(Pt(1.0, 1.0))],
+            [Dot(Pt(2.0, 2.0))],
+            [Line(Pt(2.0, 2.0), Pt(2.0, 12.0))]
         ]
     )

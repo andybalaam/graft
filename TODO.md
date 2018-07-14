@@ -4,9 +4,11 @@
   + Add negative numbers (add back in to README, including the *= example)
   + Add <, == etc
   + Add If
-  - Add lists
-  - Add While, For
-  - Add Map, Reduce?
+  + Add lists
+  + For
+  - Range
+  - While
+  - Map, Reduce?
 
 - Run mypy and fix type errors
 - Add type annotations

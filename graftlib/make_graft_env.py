@@ -5,7 +5,10 @@ from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.numbervalue import NumberValue
 
 
-def _add_standard_functions(env: Env):
+def add_standard_functions(env: Env):
+    env.set("Add", NativeFunctionValue(cellfunctions.add))
+    env.set("Get", NativeFunctionValue(cellfunctions.get))
+    env.set("For", NativeFunctionValue(cellfunctions.for_))
     env.set("If", NativeFunctionValue(cellfunctions.if_))
     env.set("T", NativeFunctionValue(cellfunctions.times))
 
@@ -33,7 +36,7 @@ def make_graft_env() -> Env:
     """Create an environment with all the default Graft values"""
 
     ret = Env()
-    _add_standard_functions(ret)
+    add_standard_functions(ret)
     _add_graft_symbols(ret)
 
     return ret

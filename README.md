@@ -137,7 +137,7 @@ b=0
 a=100
 ```
 
-## Built-in functions
+## Drawing functions
 
 The following functions are pre-defined in graft:
 
@@ -212,9 +212,9 @@ modify ::= symbol modify_operator input
 modify_operator ::= "+=" | "-=" | "*=" | "/="
 ```
 
-### Expressions
+### Mathematical expressions
 
-To calculate an something, write numbers or variables joined by an operator
+To calculate something, write numbers or variables joined by an operator
 like "+", "-", "*", or "/":
 
 ```
@@ -222,9 +222,34 @@ x=10*R()
 ```
 
 ```
-expression ::= number | symbol | functioncall | modify | combination
-combination ::= expression operator expression
+expression ::= number | symbol | functioncall | modify | combination | array
+combination ::= expression ( operator | comparison ) expression
 operator :== "+" | "-" | "*" | "/"
+```
+
+### Comparisons
+
+To compare two numbers, write them joined by a comparison operator like "<",
+">", "<=", ">=", or "==".  The answer is 1 if the condition is true, or zero
+if not.
+
+```
+a=3 b=4 c=a<b d=a>=b
+```
+
+In the above program, `c` is set to 0, because `a` is not less than `b`, but
+`d` is set to 1 because a is greater than or equal to b.
+
+To check whether two values are equal, use the "==" operator.  "<" means "less
+than" (checks whether the first is smaller than the second), "<=" means "less
+than or equal to", ">" means "greater than" (checks whether the first is bigger
+than the second) and ">=" means "greater than or equal to".
+
+Normally, comparisons are used as conditions in thing like the `If` function -
+see the "Logic" section below for more.
+
+```
+comparison :== "<" | ">" | "<=" | ">=" | "=="
 ```
 
 ### Running functions
@@ -328,6 +353,105 @@ The above program means:
 Here's what it looks like:
 
 ![](images/flower.gif)
+
+### Arrays
+
+You can make a list of things by writing an array:
+
+```
+array ::= "[" [expression] ["," expression]* "]"
+```
+
+and you can get things back out with the `Get` function, and add things with
+the `Add` function:
+
+For example, this program draws a dot at 3, 0 and another at 5, 0:
+
+```bash
+./graft 'ds=[2,3] Add(ds,5) x=Get(ds,1) D() x=Get(ds,2) D()'
+```
+
+`Get` counts the items in the array starting with zero, so to get the first
+item in `ds` write `Get(ds,0)` and to get the third item write `Get(ds,2)`.
+
+`Add` always adds at the end.
+
+### Logic
+
+You can decide different things to do using the `If` function.  The first
+argument is the value you are using to make a decision, and the second and
+third arguments are the things to do (they are functions).
+
+So, the following program draws a dot if `foo` is not equal to zero, and a line
+otherwise:
+
+```bash
+./graft 'foo=1 If(foo,{x=10 y=10 D()},{s=100 S()})'
+```
+
+Since we set `foo` to 1, it draws a dot (since the part containing `D()` is
+called), but if we change `foo` to be zero, like this:
+
+```bash
+./graft 'foo=0 If(foo,{x=10 y=10 D()},{s=100 S()})'
+```
+
+then it draws a line because the part containing `S()` is called.
+
+If we wanted a different coloured line for each of our forks, we could do this:
+
+```bash
+./graft 'F() r=0 g=0 If(f==0,{r=100},{g=100 d+=180}) ^ S() d+=10'
+```
+
+The above code works because when we call `F()` to fork into two lines, the
+variable `f` gets sets to a different number, and we use that inside the `If`
+to change our line colour (and direction).
+
+For more details, see the "Decisions" section inside "Function reference".
+
+### Loops
+
+You can use functions like `T` ("Times") to repeat things, and `For` to loop
+through arrays.  See the "Loops" section inside "Function reference".
+
+## Function reference
+
+This section describes the general functions provided with the programming
+language used by Graft.  These are for doing programming jobs like looping,
+making decisions and using arrays.  For functions that affect how things look
+and draw things on the screen, see the separate section "Drawing Functions".
+
+### Arrays
+
+`Add(arr,item)` - add `item` to the end of `arr`.  `item` can be any type
+(including an array) and `arr` must be an array.
+
+`Get(arr,index)` - extract a single value from `arr` (which must be an array).
+The value to extract is given by `index` which must be a number. Numbering
+starts at zero, so if you want the first item in an array, use `Get(arr,0)`,
+and if you want the last item in a 3-item array, use `Get(arr,2)`.
+
+### Decisions
+
+`If(cond,then_fn,else_fn)` - decide on a condition.  `then_fn` and `else_fn`
+must be functions that take no arguments.  `cond` must be a number, and if it
+is zero, then `else_fn` is run.  Otherwise, if `cond` is any other number,
+`then_fn` is run. Often, the functions to run are defined in the same line, and
+the condition to check is expressed using a comparison operator.  For example:
+`If(x>2,{y=17},{y=0})`.
+
+### Loops
+
+`T(repeats,fn)` - do something repeatedly ("T" stands for "Times").  `repeats`
+must be a number, and `fn` must be a function that takes no arguments.  `fn`
+is run `repeats` number of times.
+
+`For(arr,fn)` - loop through a list of things (array).  `arr` must be an array,
+and `fn` must be a function that takes one argument.  `fn` will be run once
+for every item in `arr`, and that item will be passed as an argument to `fn`.
+The return value of `For` is an array containing the values returned from each
+call to `fn` in the same order as the original items.
 
 ## Command line arguments
 

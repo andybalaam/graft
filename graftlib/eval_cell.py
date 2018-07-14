@@ -166,6 +166,7 @@ def _eval(env, expr):
     elif typ == ArrayTree:
         return ArrayValue([_eval(env, x) for x in expr.value])
     elif typ in (
+        ArrayValue,
         NativeFunctionValue,
         NoneValue,
         NumberValue,

@@ -11,6 +11,7 @@ from graftlib.eval_cell import (
     eval_cell_list,
 )
 from graftlib.env import Env
+from graftlib import make_graft_env
 
 
 # --- Utils ---
@@ -19,6 +20,8 @@ from graftlib.env import Env
 def evald(inp, env=None):
     if env is None:
         env = Env(None, None)
+        make_graft_env.add_standard_functions(env)
+        env.eval_expr = eval_cell
     return eval_cell_list(parse_cell(lex_cell(inp)), env)
 
 
@@ -306,7 +309,50 @@ def test_A_closure_holds_updateable_values():
     )
 
 
-def test_Array_parses():
+def test_Array_literal():
     assert (
         evald("[3,4]") == ArrayValue([NumberValue(3), NumberValue(4)])
+    )
+
+
+def test_Get_from_array():
+    assert evald("x=[3,4] Get(x,0)") == NumberValue(3)
+
+
+def test_Get_from_array_literal():
+    assert evald("Get([3,4],1)") == NumberValue(4)
+
+
+def test_Add_to_array_literal():
+    assert (
+        evald("Add([3,4],1)") ==
+        ArrayValue(
+            [
+                NumberValue(3),
+                NumberValue(4),
+                NumberValue(1),
+            ]
+        )
+    )
+
+
+def test_Get_wraps_around():
+    assert evald("Get([0,1,2,3,4],-1)") == NumberValue(4)
+    assert evald("Get([0,1,2,3,4],-2)") == NumberValue(3)
+    assert evald("Get([0,1,2,3,4],5)") == NumberValue(0)
+    assert evald("Get([0,1,2,3,4],6.1)") == NumberValue(1)
+    assert evald("Get([0,1,2,3,4],11)") == NumberValue(1)
+
+
+def test_For_is_really_a_map():
+    assert (
+        evald(
+            """
+                For(
+                    [1,2,3],
+                    {:(it) it*2}
+                )
+            """
+        ) ==
+        evald("[2,4,6]")
     )
