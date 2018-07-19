@@ -1,9 +1,17 @@
 from graftlib import cellfunctions
+from graftlib import cellstdlib
 from graftlib import functions
 from graftlib.env import Env
 from graftlib.endofloopvalue import EndOfLoopValue
+from graftlib.eval_cell import eval_cell_list
+from graftlib.lex_cell import lex_cell
 from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.numbervalue import NumberValue
+from graftlib.parse_cell import parse_cell
+
+
+def exec_cell(code, env):
+    eval_cell_list(parse_cell(lex_cell(code)), env)
 
 
 def add_cell_symbols(env: Env):
@@ -14,6 +22,7 @@ def add_cell_symbols(env: Env):
     env.set("If", NativeFunctionValue(cellfunctions.if_))
     env.set("Len", NativeFunctionValue(cellfunctions.len_))
     env.set("T", NativeFunctionValue(cellfunctions.times))
+    exec_cell(cellstdlib.cellstdlib, env)
 
 
 def _add_graft_symbols(env: Env):

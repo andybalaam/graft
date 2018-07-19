@@ -8,7 +8,7 @@
   + For
   + For over iterator
   + Len
-  - Range
+  + Range
   - While
 
 - Run mypy and fix type errors

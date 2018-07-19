@@ -384,3 +384,7 @@ def test_For_calls_function_until_it_returns_endofloop():
         ) ==
         evald("[3,6,9]")
     )
+
+
+def test_Range_builtin():
+    assert evald("For(Range(3),{:(i)i})") == evald("[0,1,2]")
