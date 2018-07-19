@@ -710,3 +710,22 @@ def test_For_over_double_array():
             [Line(Pt(2.0, 2.0), Pt(2.0, 12.0))]
         ]
     )
+
+
+def test_For_myrange():
+    assert (
+        do_eval(
+            """
+            myrange={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}}
+            For(myrange(5),{:(i) x=i*10 D()})
+            """,
+            5
+        ) ==
+        [
+            [Dot(Pt(0.0, 0.0))],
+            [Dot(Pt(10.0, 0.0))],
+            [Dot(Pt(20.0, 0.0))],
+            [Dot(Pt(30.0, 0.0))],
+            [Dot(Pt(40.0, 0.0))],
+        ]
+    )

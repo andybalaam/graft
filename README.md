@@ -443,15 +443,46 @@ the condition to check is expressed using a comparison operator.  For example:
 
 ### Loops
 
-`T(repeats,fn)` - do something repeatedly ("T" stands for "Times").  `repeats`
-must be a number, and `fn` must be a function that takes no arguments.  `fn`
-is run `repeats` number of times.
+`T(repeats,body_fn)` - do something repeatedly ("T" stands for "Times").
+`repeats` must be a number, and `body_fn` must be a function that takes no
+arguments.  `body_fn` is run `repeats` number of times.
 
-`For(arr,fn)` - loop through a list of things (array).  `arr` must be an array,
-and `fn` must be a function that takes one argument.  `fn` will be run once
-for every item in `arr`, and that item will be passed as an argument to `fn`.
-The return value of `For` is an array containing the values returned from each
-call to `fn` in the same order as the original items.
+`For(arr,body_fn)` - loop through a list of things (array).  `arr` must be an
+array, and `body_fn` must be a function that takes one argument.  `body_fn`
+will be run once for every item in `arr`, and that item will be passed as an
+argument to `body_fn`.  The return value of `For` is an array containing the
+values returned from each call to `body_fn` in the same order as the original
+items.
+
+`For(iter_fn,body_fn)` - this alternative form of `For` allows looping over the
+elements of an iterator function `iter_fn`.  `iter_fn` must be a function that
+takes no arguments and each time it is called, returns an item to process, or
+the special `endofloop` symbol when it is finished.  `body_fn` must be a
+function that takes one argument, and it will be run once for every item, and
+that item will be passed as an argument to `body_fn`.  The return value of
+`For` is an array containing the values returned from each call to `body_fn` in
+the same order as the items returned from each call to `iter_fn`..
+
+For example, we may write a `range` function like this:
+
+```
+range={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}}
+```
+
+that returns numbers 0, 1, ... max-1, and use it to provide items for a loop
+like this:
+
+```
+For(range(5),{:(i) x=i*10 D()})
+```
+
+So our whole program looks like this:
+
+```bash
+./graft 'range={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}} For(range(5),{:(i) x=i*10 D()})'
+```
+
+and it draws 5 dots at x positions 0, 1, 2, 3 and 4.
 
 ## Command line arguments
 

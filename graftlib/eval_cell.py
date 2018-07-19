@@ -118,8 +118,11 @@ def _function_call(expr, env):
         return fn.py_fn(env, *args)
     else:
         raise Exception(
-            "Attempted to call something that is not a function: %s" %
-            str(fn)
+            "Attempted to call something that is not a function: " +
+            "%s, which is %s" % (
+                str(expr.fn),
+                str(fn),
+            )
         )
 
 

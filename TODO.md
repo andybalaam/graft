@@ -6,7 +6,7 @@
   + Add If
   + Add lists
   + For
-  - For over iterator
+  + For over iterator
   - Len
   - Range
   - While

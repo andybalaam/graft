@@ -1,11 +1,13 @@
 from graftlib import cellfunctions
 from graftlib import functions
 from graftlib.env import Env
+from graftlib.endofloopvalue import EndOfLoopValue
 from graftlib.nativefunctionvalue import NativeFunctionValue
 from graftlib.numbervalue import NumberValue
 
 
-def add_standard_functions(env: Env):
+def add_cell_symbols(env: Env):
+    env.set("endofloop", EndOfLoopValue)
     env.set("Add", NativeFunctionValue(cellfunctions.add))
     env.set("Get", NativeFunctionValue(cellfunctions.get))
     env.set("For", NativeFunctionValue(cellfunctions.for_))
@@ -36,7 +38,7 @@ def make_graft_env() -> Env:
     """Create an environment with all the default Graft values"""
 
     ret = Env()
-    add_standard_functions(ret)
+    add_cell_symbols(ret)
     _add_graft_symbols(ret)
 
     return ret

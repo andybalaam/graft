@@ -1,5 +1,7 @@
 from graftlib.parse_cell import FunctionCallTree
 from graftlib.eval_cell import ArrayValue
+from graftlib.eval_cell import UserFunctionValue
+from graftlib.nativefunctionvalue import NativeFunctionValue
 
 
 def times(env, reps, fn):
@@ -11,11 +13,32 @@ def times(env, reps, fn):
     return ret
 
 
+def until_endofloop(env, fn):
+    while True:
+        y = env.eval_expr(env, FunctionCallTree(fn, []))
+        if y == env.get("endofloop"):
+            break
+        else:
+            yield y
+
+
 def for_(env, arr, fn):
+
+    if type(arr) == ArrayValue:
+        inp = arr.value
+    elif type(arr) in (UserFunctionValue, NativeFunctionValue):
+        inp = until_endofloop(env, arr)
+    else:
+        raise Exception(
+            "Unexpected first argument to For: expected an array or a " +
+            "function that eventually returns endofloop, but got: " +
+            "%s." % arr
+        )
+
     return ArrayValue(
         [
-            env.eval_expr(env, FunctionCallTree(fn, [arr.value[i]]))
-            for i in range(len(arr.value))
+            env.eval_expr(env, FunctionCallTree(fn, [item]))
+            for item in inp
         ]
     )
 

@@ -1,6 +1,5 @@
 import pytest
-from graftlib.lex_cell import lex_cell
-from graftlib.parse_cell import FunctionCallTree, parse_cell
+from graftlib.env import Env
 from graftlib.eval_cell import (
     ArrayValue,
     NativeFunctionValue,
@@ -10,18 +9,24 @@ from graftlib.eval_cell import (
     eval_cell,
     eval_cell_list,
 )
-from graftlib.env import Env
+from graftlib.lex_cell import lex_cell
+from graftlib.parse_cell import FunctionCallTree, parse_cell
+from graftlib.programenv import ProgramEnv
 from graftlib import make_graft_env
 
 
 # --- Utils ---
 
 
+def make_env():
+    ret = ProgramEnv(Env(), None, None, eval_cell)
+    make_graft_env.add_cell_symbols(ret)
+    return ret
+
+
 def evald(inp, env=None):
     if env is None:
-        env = Env(None, None)
-        make_graft_env.add_standard_functions(env)
-        env.eval_expr = eval_cell
+        env = make_env()
     return eval_cell_list(parse_cell(lex_cell(inp)), env)
 
 
@@ -105,7 +110,10 @@ def test_Negative_assignment():
 
 
 def test_None_evaluates_to_None():
-    assert eval_cell_list([NoneValue()], Env(None, None)) == NoneValue()
+    assert (
+        eval_cell_list([NoneValue()], make_env) ==
+        NoneValue()
+    )
 
 
 def test_Calling_a_function_returns_its_last_value():
@@ -168,7 +176,7 @@ def test_A_symbol_within_a_function_has_the_local_value():
 def test_Native_function_gets_called():
     def native_fn(_env, x, y):
         return NumberValue(x.value + y.value)
-    env = Env(None, None)
+    env = make_env()
     env.set("native_fn", NativeFunctionValue(native_fn))
     assert evald("native_fn(2,8)", env) == NumberValue(10)
 
@@ -197,7 +205,7 @@ def test_Wrong_number_of_arguments_to_a_native_function_is_an_error():
 
     def native_fn3(_env, _x, _y, _z):
         return NumberValue(12)
-    env = Env(None, None)
+    env = make_env()
     env.set("native_fn0", NativeFunctionValue(native_fn0))
     env.set("native_fn3", NativeFunctionValue(native_fn3))
     assert_prog_fails(
@@ -264,7 +272,7 @@ def test_Modifying_inside_an_env_modifies_the_outside():
 def test_A_native_function_can_edit_the_environment():
     def mx3(env):
         env.set("x", NumberValue(3))
-    env = Env(None, None)
+    env = make_env()
     env.set("make_x_three", NativeFunctionValue(mx3))
     assert (
         evald("x=1 make_x_three() x", env) ==
@@ -282,7 +290,7 @@ def test_A_closure_holds_updateable_values():
         else:
             ret = else_fn
         return eval_cell_list([FunctionCallTree(ret, [])], env)
-    env = Env(None, None)
+    env = make_env()
     env.set("dumb_set", NativeFunctionValue(dumb_set))
     env.set("dumb_if_equal", NativeFunctionValue(dumb_if_equal))
     assert (
@@ -355,4 +363,20 @@ def test_For_is_really_a_map():
             """
         ) ==
         evald("[2,4,6]")
+    )
+
+
+def test_For_calls_function_until_it_returns_endofloop():
+    assert (
+        evald(
+            """
+                counter=0
+                iter={counter+=1 If(counter>3,{endofloop},{counter})}
+                For(
+                    iter,
+                    {:(it) it*3}
+                )
+            """
+        ) ==
+        evald("[3,6,9]")
     )
