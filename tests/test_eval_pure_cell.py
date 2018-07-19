@@ -388,3 +388,8 @@ def test_For_calls_function_until_it_returns_endofloop():
 
 def test_Range_builtin():
     assert evald("For(Range(3),{:(i)i})") == evald("[0,1,2]")
+
+
+def test_Not_builtin():
+    assert evald("If(    3==3 ,{0},{3})") == evald("0")
+    assert evald("If(Not(3==3),{0},{3})") == evald("3")
