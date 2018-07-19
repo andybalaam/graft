@@ -344,6 +344,10 @@ def test_Add_to_array_literal():
     )
 
 
+def test_Length_of_array():
+    assert evald("Len([3,4,7,9,300])") == evald("5")
+
+
 def test_Get_wraps_around():
     assert evald("Get([0,1,2,3,4],-1)") == NumberValue(4)
     assert evald("Get([0,1,2,3,4],-2)") == NumberValue(3)

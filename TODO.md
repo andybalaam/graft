@@ -7,7 +7,7 @@
   + Add lists
   + For
   + For over iterator
-  - Len
+  + Len
   - Range
   - While
 

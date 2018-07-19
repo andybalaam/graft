@@ -12,6 +12,7 @@ def add_cell_symbols(env: Env):
     env.set("Get", NativeFunctionValue(cellfunctions.get))
     env.set("For", NativeFunctionValue(cellfunctions.for_))
     env.set("If", NativeFunctionValue(cellfunctions.if_))
+    env.set("Len", NativeFunctionValue(cellfunctions.len_))
     env.set("T", NativeFunctionValue(cellfunctions.times))
 
 

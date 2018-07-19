@@ -2,6 +2,7 @@ from graftlib.parse_cell import FunctionCallTree
 from graftlib.eval_cell import ArrayValue
 from graftlib.eval_cell import UserFunctionValue
 from graftlib.nativefunctionvalue import NativeFunctionValue
+from graftlib.numbervalue import NumberValue
 
 
 def times(env, reps, fn):
@@ -57,3 +58,7 @@ def get(env, array, index):
 def add(env, array, item):
     array.value.append(item)
     return array
+
+
+def len_(env, array):
+    return NumberValue(len(array.value))
