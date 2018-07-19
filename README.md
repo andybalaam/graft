@@ -432,6 +432,9 @@ The value to extract is given by `index` which must be a number. Numbering
 starts at zero, so if you want the first item in an array, use `Get(arr,0)`,
 and if you want the last item in a 3-item array, use `Get(arr,2)`.
 
+`Len(arr)` - find the length of an array.  `arr` must be an array, and `Len`
+returns the number of items in `arr`.
+
 ### Decisions
 
 `If(cond,then_fn,else_fn)` - decide on a condition.  `then_fn` and `else_fn`
@@ -440,6 +443,9 @@ is zero, then `else_fn` is run.  Otherwise, if `cond` is any other number,
 `then_fn` is run. Often, the functions to run are defined in the same line, and
 the condition to check is expressed using a comparison operator.  For example:
 `If(x>2,{y=17},{y=0})`.
+
+`Not(cond)` - reverse a condition.  `cond` must be a number.  If `cond` is
+0, `Not` returns 1.  Otherwise, `Not` returns 0.
 
 ### Loops
 
