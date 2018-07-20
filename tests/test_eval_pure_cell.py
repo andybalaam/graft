@@ -409,3 +409,20 @@ def test_While_repeatedly_calls_body_and_returns_an_array():
     )
     assert evald("If(    3==3 ,{0},{3})") == evald("0")
     assert evald("If(Not(3==3),{0},{3})") == evald("3")
+
+
+def test_Maths_functions_give_correct_answers():
+    def r(nv):
+        return NumberValue(round(nv.value))
+    assert r(evald("Sin(0)")) == evald("0")
+    assert r(evald("Sin(90)")) == evald("1")
+    assert r(evald("Cos(0)")) == evald("1")
+    assert r(evald("Cos(90)")) == evald("0")
+    assert r(evald("Tan(0)")) == evald("0")
+    assert r(evald("ASin(1)")) == evald("90")
+    assert r(evald("ACos(0)")) == evald("90")
+    assert r(evald("ATan(0)")) == evald("0")
+    assert r(evald("ATan2(1,1)")) == evald("45")
+    assert r(evald("Sqrt(16)")) == evald("4")
+    assert r(evald("Pow(2,3)")) == evald("8")
+    assert r(evald("Hypot(3,4)")) == evald("5")

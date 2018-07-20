@@ -497,6 +497,31 @@ non-zero number, `body_fn` is called.  This is repeated until `conf_fn`
 returns zero.  `While` returns an array of all the return values of the
 calls to `body_fn` in the order they were called.
 
+### Maths
+
+You can perform a number of standard mathematical operations in Graft,
+using these functions:
+
+* `Sin(deg)`
+* `Cos(deg)`
+* `Tan(deg)`
+* `ASin(num)`
+* `ACos(num)`
+* `ATan(num)`
+* `ATan2(opp,adj)`
+* `Sqrt(num)`
+* `Pow(num,exp)`
+* `Hypot(x,y)`
+
+All of these functions take numbers as arguments, and return numbers.  `Sin`,
+`Cos` and `Tan` take angles in degrees, and `ASin`, `ACos`, `ATan` and `ATan2`
+return angles in degrees.
+
+To provide these functions, Graft wraps the original Python implementations, so
+for detailed information about how they work, see the [Python
+math](https://docs.python.org/3/library/math.html) documentation, but note that
+Graft adapts the functions to work in degrees rather than radians.
+
 ## Command line arguments
 
 ```bash

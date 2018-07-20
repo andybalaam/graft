@@ -1,21 +1,16 @@
 # Graft TODO
 
-- Cell improvements
-  + Add negative numbers (add back in to README, including the *= example)
-  + Add <, == etc
-  + Add If
-  + Add lists
-  + For
-  + For over iterator
-  + Len
-  + Range
-  - Not
-  - While
++ Cell improvements
+
+- Vector operations
+ + Sin, Cos, Tan, ASin, ACos, ATan, ATan2, Sqrt, Square, Hypot, Pow, Exp
+ - Pi
+ - Gravity around the origin
+ - 2d functions e.g. distance
+ - Positions of other forks
 
 - Run mypy and fix type errors
 - Add type annotations
-
-- Vector operations
 
 ## Later
 
