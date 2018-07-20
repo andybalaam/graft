@@ -393,3 +393,19 @@ def test_Range_builtin():
 def test_Not_builtin():
     assert evald("If(    3==3 ,{0},{3})") == evald("0")
     assert evald("If(Not(3==3),{0},{3})") == evald("3")
+
+
+def test_While_repeatedly_calls_body_and_returns_an_array():
+    assert (
+        evald(
+            """
+                vals=[9,3,5]
+                i=7
+                j=3
+                While({i<10},{j-=1 i+=1 Get(vals,j)})
+            """
+        ) ==
+        evald("[5,3,9]")
+    )
+    assert evald("If(    3==3 ,{0},{3})") == evald("0")
+    assert evald("If(Not(3==3),{0},{3})") == evald("3")

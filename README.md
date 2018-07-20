@@ -469,26 +469,33 @@ that item will be passed as an argument to `body_fn`.  The return value of
 `For` is an array containing the values returned from each call to `body_fn` in
 the same order as the items returned from each call to `iter_fn`..
 
-For example, we may write a `range` function like this:
+For example, we may write a `Myrange` function like this:
 
 ```
-range={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}}
+Myrange={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}}
 ```
 
 that returns numbers 0, 1, ... max-1, and use it to provide items for a loop
 like this:
 
 ```
-For(range(5),{:(i) x=i*10 D()})
+For(Myrange(5),{:(i) x=i*10 D()})
 ```
 
 So our whole program looks like this:
 
 ```bash
-./graft 'range={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}} For(range(5),{:(i) x=i*10 D()})'
+./graft 'Myrange={:(max) i=-1 {i+=1 If(i<max,{i},{endofloop})}} For(Myrange(5),{:(i) x=i*10 D()})'
 ```
 
 and it draws 5 dots at x positions 0, 1, 2, 3 and 4.
+
+`While(cond_fn,body_fn)` - repeat an action until a condition is met.
+`conf_fn` must be a function taking no arguments, and `body_fn` also  must be
+a function taking no arguments.  `cond_fn` is called, and if it returns a
+non-zero number, `body_fn` is called.  This is repeated until `conf_fn`
+returns zero.  `While` returns an array of all the return values of the
+calls to `body_fn` in the order they were called.
 
 ## Command line arguments
 
