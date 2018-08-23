@@ -87,14 +87,11 @@ def _post_error_toot(mastodon, status_id, error, program, acct):
     return new_status["id"]
 
 
-whitespace_re = re.compile(r"\s")
-
-
 def _run_and_toot(world, mastodon, n):
     acct = n["account"]["acct"]
     toot = strip_html(n["status"]["content"])
     status_id = n["status"]["id"]
-    program = whitespace_re.sub("", toot.replace("@graft", ""))
+    program = toot.replace("@graft", "")
 
     _follow(mastodon, acct)
 
