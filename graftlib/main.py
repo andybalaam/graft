@@ -17,7 +17,7 @@ from graftlib.ui.gifui import GifUi
 
 
 # How many strokes we are allowed before we start deleting old ones.
-max_strokes = 500
+max_strokes = 200
 
 
 # Size of the dot indicating where we are.
@@ -30,7 +30,7 @@ default_height = 200
 
 
 # Default number of parallel forks if not overridden by --max-forks
-default_max_forks = 100
+default_max_forks = 20
 
 
 # How far to run the animation initially to decide what

@@ -29,7 +29,7 @@ def _make_gif(world, program):
     argv = [
         "./graft",
         "--gif", gif_file,
-        "--frames", "200",
+        "--frames", "100",
         "--width", "227",
         "--height", "127",
         program
