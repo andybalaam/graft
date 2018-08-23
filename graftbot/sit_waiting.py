@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 import os
-import re
 import time
 
 from mastodon import Mastodon
@@ -48,8 +47,16 @@ def _make_gif(world, program):
     return gif_file
 
 
-def _follow(mastodon, acct):
-    mastodon.follows(acct)
+def _follow(world, mastodon, acct_dict):
+    if "#nobot" in acct_dict["note"]:
+        world.stdout.write(
+            "User {acct} has #nobot in bio, so not following.".format(
+                acct=acct_dict["acct"]
+            )
+        )
+        return
+    else:
+        mastodon.account_follow(acct_dict["id"])
 
 
 def _post_gif(mastodon, gif_file, program, acct):
@@ -88,12 +95,13 @@ def _post_error_toot(mastodon, status_id, error, program, acct):
 
 
 def _run_and_toot(world, mastodon, n):
-    acct = n["account"]["acct"]
+    acct_dict = n["account"]
+    acct = acct_dict["acct"]
     toot = strip_html(n["status"]["content"])
     status_id = n["status"]["id"]
     program = toot.replace("@graft", "")
 
-    _follow(mastodon, acct)
+    _follow(world, mastodon, acct_dict)
 
     world.stdout.write(
         "Processing notification {notif_id} from @{acct}: '{toot}'\n".format(
