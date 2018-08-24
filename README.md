@@ -320,7 +320,7 @@ The above program means:
 
 * `F()` - split into 2 lines
 * `^` - set a label - when we reach the end we will restart here
-* `d=R()*26` - set `d` to a random number between -360 and 360
+* `d=R()*36` - set `d` to a random number between -360 and 360
 * `S()` - draw a line in the direction (`d`) we are facing
 
 To split into more lines, wrap the call to `F` with a `T`, meaning do it
