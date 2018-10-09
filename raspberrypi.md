@@ -21,7 +21,7 @@ sudo apt install python3-attr at-spi2-core
 sudo apt install imagemagick
 ```
 
-* To download Graft and switch the the Raspberry Pi version, type in these
+* To download Graft and switch to the Raspberry Pi version, type in these
   commands, pressing Enter after each line.
 
 ```bash
