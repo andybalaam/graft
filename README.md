@@ -9,12 +9,28 @@ mentioning @graft@mastodon.social.  If you've never tooted before, see
 ## Install
 
 To install Graft, clone this repository and make sure you have Python 3.6 or
-above.
+above, and the `attr` library.
 
 To display the animations in a window, install the Python bindings for
 GTK3 and Cairo.
 
 To create animated gifs, install the ImageMagick utilities too.
+
+On Ubuntu and similar systems, that amounts to:
+
+```bash
+sudo apt install python3 python3-attr python3-cairo python3-gi-cairo imagemagick
+```
+
+## Install on Raspberry Pi
+
+Follow the [Raspberry Pi Setup](raspberrypi.md) instructions.
+
+## Worksheet
+
+If you'd like a fun way to get started with making animations, try
+the worksheet
+["Tell a story by making animations with code"](http://www.artificialworlds.net/blog/2018/09/24/worksheet-tell-a-story-by-making-animations-with-code/).
 
 ## Examples
 
