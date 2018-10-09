@@ -16,10 +16,11 @@ GTK3 and Cairo.
 
 To create animated gifs, install the ImageMagick utilities too.
 
-On Ubuntu and similar systems, that amounts to:
+On Ubuntu and similar systems, this should install everything you need:
 
 ```bash
-sudo apt install python3 python3-attr python3-cairo python3-gi-cairo imagemagick
+sudo apt install make
+make setup
 ```
 
 ## Install on Raspberry Pi
