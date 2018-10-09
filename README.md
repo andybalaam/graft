@@ -261,7 +261,7 @@ than" (checks whether the first is smaller than the second), "<=" means "less
 than or equal to", ">" means "greater than" (checks whether the first is bigger
 than the second) and ">=" means "greater than or equal to".
 
-Normally, comparisons are used as conditions in thing like the `If` function -
+Normally, comparisons are used as conditions in things like the `If` function -
 see the "Logic" section below for more.
 
 ```
