@@ -21,7 +21,7 @@ class RunningProgram:
             pc=None,
             label=None,
     ):
-        self.program: List = program
+        self.program = program
         self.rand = rand
         self.fork_callback = fork_callback
         self.env = ProgramEnv(env, rand, self.fork, eval_expr)
@@ -122,9 +122,9 @@ class MultipleRunningPrograms:
 
 @attr.s
 class FramesCounter:
-    max_count: int = attr.ib()
-    non_frames: int = attr.ib(default=0, init=False)
-    count: int = attr.ib(default=0, init=False)
+    max_count = attr.ib()
+    non_frames = attr.ib(default=0, init=False)
+    count = attr.ib(default=0, init=False)
 
     def next_frame(self, parallel_commands):
         """

@@ -4,7 +4,7 @@ import attr
 
 @attr.s
 class Peekable:
-    _it: Iterator = attr.ib()
+    _it = attr.ib()
     _nxt = attr.ib(None, init=False)
 
     def __attrs_post_init__(self) -> None:

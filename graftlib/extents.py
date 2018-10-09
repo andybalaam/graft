@@ -10,19 +10,19 @@ from graftlib.strokeoptimiser import Elided
 
 @attr.s
 class Extents:
-    _x_min: float = attr.ib(0.0, init=False)
-    _x_max: float = attr.ib(0.0, init=False)
-    _y_min: float = attr.ib(0.0, init=False)
-    _y_max: float = attr.ib(0.0, init=False)
+    _x_min = attr.ib(0.0, init=False)
+    _x_max = attr.ib(0.0, init=False)
+    _y_min = attr.ib(0.0, init=False)
+    _y_max = attr.ib(0.0, init=False)
 
     def __attrs_post_init__(self) -> None:
         self.reset()
 
     def reset(self):
-        self._x_min = 1_000_000.0
-        self._x_max = -1_000_000.0
-        self._y_min = 1_000_000.0
-        self._y_max = -1_000_000.0
+        self._x_min = 1000000.0
+        self._x_max = -1000000.0
+        self._y_min = 1000000.0
+        self._y_max = -1000000.0
 
     def add_cmd(self, cmd):
         if cmd is None:

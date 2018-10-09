@@ -28,19 +28,19 @@ class NoneValue:
 
 @attr.s
 class ArrayValue:
-    value: List = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
 class StringValue:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
 class UserFunctionValue:
-    params: List = attr.ib()
-    body: List = attr.ib()
-    env: Env = attr.ib()
+    params = attr.ib()
+    body = attr.ib()
+    env = attr.ib()
 
 
 def _operation(expr, env):

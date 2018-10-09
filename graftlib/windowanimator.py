@@ -13,8 +13,8 @@ def _limit(val, r):
 
 @attr.s
 class _SmoothValue:
-    value: float = attr.ib()
-    _v: float = attr.ib(0, init=False)
+    value = attr.ib()
+    _v = attr.ib(0, init=False)
 
     def set_target(self, target: float, movement_scale: float):
         dist = target - self.value
@@ -38,12 +38,12 @@ class WindowAnimator:
 
     lookahead_steps = attr.ib()
 
-    x: Optional[_SmoothValue] = attr.ib(None, init=False)
-    y: Optional[_SmoothValue] = attr.ib(None, init=False)
-    w: Optional[_SmoothValue] = attr.ib(None, init=False)
-    h: Optional[_SmoothValue] = attr.ib(None, init=False)
+    x = attr.ib(None, init=False)
+    y = attr.ib(None, init=False)
+    w = attr.ib(None, init=False)
+    h = attr.ib(None, init=False)
 
-    counter: int = attr.ib(0, init=False)
+    counter = attr.ib(0, init=False)
 
     def animate(self, extents, window_size) -> (float, float, float):
         centre = extents.centre()

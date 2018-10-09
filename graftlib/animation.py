@@ -17,8 +17,8 @@ class Animation:
             max_strokes,
             dot_size,
     ):
-        self.strokes: List[Union[Line, Dot]] = []
-        self.poss: List[Pt] = []
+        self.strokes = []
+        self.poss = []
         self.extents = Extents()
         self.window_animator = WindowAnimator(lookahead_steps)
         self.commands = self.extents.train_on(commands, lookahead_steps)

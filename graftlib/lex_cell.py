@@ -48,7 +48,7 @@ class ListSeparatorToken:
 
 @attr.s
 class ModifyToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
     def code(self):
         return self.value
@@ -56,7 +56,7 @@ class ModifyToken:
 
 @attr.s
 class NumberToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
     def code(self):
         return self.value
@@ -64,7 +64,7 @@ class NumberToken:
 
 @attr.s
 class OperatorToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
     def code(self):
         return self.value
@@ -107,7 +107,7 @@ class StatementSeparatorToken:
 
 @attr.s
 class StringToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
     def code(self):
         return '"%s"' % self.value
@@ -115,7 +115,7 @@ class StringToken:
 
 @attr.s
 class SymbolToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
     def code(self):
         return self.value

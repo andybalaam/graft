@@ -18,24 +18,24 @@ import attr
 @attr.s
 class FunctionCall:
     fn = attr.ib()
-    repeat: Optional = attr.ib(default=1)
+    repeat = attr.ib(default=1)
 
 
 @attr.s
 class FunctionDef:
-    body: List = attr.ib()
+    body = attr.ib()
 
 
 @attr.s
 class IncompleteTree:
     """Returned when parsing stopped in the middle of a parse tree"""
-    tokens: List = attr.ib()
+    tokens = attr.ib()
 
 
 @attr.s
 class Number:
-    value: str = attr.ib()
-    negative: bool = attr.ib(default=False)
+    value = attr.ib()
+    negative = attr.ib(default=False)
 
     def negate(self):
         self.negative = not self.negative
@@ -43,14 +43,14 @@ class Number:
 
 @attr.s
 class Modify:
-    sym: str = attr.ib()
-    op: str = attr.ib()
+    sym = attr.ib()
+    op = attr.ib()
     value = attr.ib(None, convert=lambda x: Number("10") if x is None else x)
 
 
 @attr.s
 class Symbol:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 def _swallow_continuations(tok, it: Peekable):
@@ -61,9 +61,9 @@ def _swallow_continuations(tok, it: Peekable):
 
 @attr.s
 class _Parser:
-    it: Peekable = attr.ib()
+    it = attr.ib()
     end_tok_type = attr.ib()
-    single_item: bool = attr.ib()
+    single_item = attr.ib()
 
     def greedy(self):
         return _Parser(self.it, self.end_tok_type, True)
@@ -103,7 +103,7 @@ class _Parser:
             if so_far is None:
                 if tok.value == "-":
                     if type(self.it.peek()) == NumberToken:
-                        ret: Number = self.greedy().next_tree()
+                        ret = self.greedy().next_tree()
                         ret.negate()
                         return self.next_or_single(ret)
 

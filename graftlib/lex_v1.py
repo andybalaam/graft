@@ -32,12 +32,12 @@ class LabelToken:
 
 @attr.s
 class NumberToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
 class OperatorToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
@@ -52,7 +52,7 @@ class StartFunctionDefToken:
 
 @attr.s
 class SymbolToken:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 def _collect(c: str, it: Iterator[str], regex: Pattern) -> str:
@@ -68,15 +68,15 @@ def _collect(c: str, it: Iterator[str], regex: Pattern) -> str:
     return ret
 
 
-tilda: Pattern = re.compile("~")
-caret: Pattern = re.compile(r"\^")
-close_brace: Pattern = re.compile("}")
-digit: Pattern = re.compile("[0-9.]")
-colon: Pattern = re.compile(":")
-open_brace: Pattern = re.compile("{")
-operator: Pattern = re.compile("[-+/=]")
-semicolon: Pattern = re.compile(";")
-symbol_letter: Pattern = re.compile("[_a-zA-Z]")
+tilda = re.compile("~")
+caret = re.compile(r"\^")
+close_brace = re.compile("}")
+digit = re.compile("[0-9.]")
+colon = re.compile(":")
+open_brace = re.compile("{")
+operator = re.compile("[-+/=]")
+semicolon = re.compile(";")
+symbol_letter = re.compile("[_a-zA-Z]")
 
 
 def _next_token(c: str, it: Iterable[str]):

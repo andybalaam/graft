@@ -33,7 +33,7 @@ def _operator_fn(opstr: str):
 
 class Evaluator:
     def __init__(self, env):
-        self.env: Env = env
+        self.env = env
 
     def _function_call_symbol(self, fn_name):
         fnwrap = self.env.get(fn_name)

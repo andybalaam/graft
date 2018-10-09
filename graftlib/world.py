@@ -4,8 +4,8 @@ import attr
 
 @attr.s
 class World:
-    argv: List[str] = attr.ib()
-    stdin: Iterable[str] = attr.ib()
+    argv = attr.ib()
+    stdin = attr.ib()
     stdout = attr.ib()
     stderr = attr.ib()
     random = attr.ib()

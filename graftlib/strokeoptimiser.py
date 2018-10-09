@@ -8,7 +8,7 @@ from graftlib.round_ import round_stroke
 
 @attr.s
 class Elided:
-    item: Union[Line, Dot] = attr.ib()
+    item = attr.ib()
 
 
 @attr.s
@@ -20,9 +20,9 @@ class StrokeOptimiser:
     stroke, we emit an Elided instead.
     """
 
-    strokes: List[Union[Dot, Line]] = attr.ib()
+    strokes = attr.ib()
 
-    seen_strokes: Set[Union[Dot, Line]] = (
+    seen_strokes = (
         attr.ib(attr.Factory(set), init=False)
     )
 
@@ -30,7 +30,7 @@ class StrokeOptimiser:
         return self
 
     def __next__(self) -> List[Union[Dot, Line, Elided]]:
-        parallel_strokes: List[Union[Dot, Line]] = next(self.strokes)
+        parallel_strokes = next(self.strokes)
         return [self._elide_if_seen(stroke) for stroke in parallel_strokes]
 
     def _elide_if_seen(self, stroke: Union[Dot, Line]):

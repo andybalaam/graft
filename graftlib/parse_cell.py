@@ -25,7 +25,7 @@ from graftlib.lex_cell import (
 
 @attr.s
 class ArrayTree:
-    value: List = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
@@ -36,7 +36,7 @@ class AssignmentTree:
 
 @attr.s
 class ModifyTree:
-    operation: str = attr.ib()
+    operation = attr.ib()
     symbol = attr.ib()
     value = attr.ib()
 
@@ -48,36 +48,36 @@ class NegativeTree:
 
 @attr.s
 class NumberTree:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
 class FunctionCallTree:
     fn = attr.ib()
-    args: List = attr.ib()
+    args = attr.ib()
 
 
 @attr.s
 class FunctionDefTree:
-    params: List = attr.ib()
-    body: List = attr.ib()
+    params = attr.ib()
+    body = attr.ib()
 
 
 @attr.s
 class OperationTree:
-    operation: str = attr.ib()
+    operation = attr.ib()
     left = attr.ib()
     right = attr.ib()
 
 
 @attr.s
 class StringTree:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 @attr.s
 class SymbolTree:
-    value: str = attr.ib()
+    value = attr.ib()
 
 
 class _Parser:
