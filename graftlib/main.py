@@ -17,7 +17,7 @@ from graftlib.ui.gifui import GifUi
 
 
 # How many strokes we are allowed before we start deleting old ones.
-max_strokes = 200
+default_max_strokes = 200
 
 
 # Size of the dot indicating where we are.
@@ -63,6 +63,7 @@ def make_animation(
         program_values,
         frames: Optional[int],
         lookahead_steps: int,
+        max_strokes: int,
 ):
     """
     Given the values from evaluating a program, return an iterator that
@@ -116,6 +117,12 @@ def main(world: World) -> int:
         help="The number of forked lines that can run in parallel.",
     )
     argparser.add_argument(
+        '--max-strokes',
+        default=default_max_strokes,
+        type=int,
+        help="The number of strokes allowed before old ones are deleted.",
+    )
+    argparser.add_argument(
         '--lookahead-steps',
         default=default_lookahead_steps,
         type=int,
@@ -161,7 +168,12 @@ def main(world: World) -> int:
         eval_expr,
     )
 
-    animation = make_animation(program_values, frames, args.lookahead_steps)
+    animation = make_animation(
+        program_values,
+        frames,
+        args.lookahead_steps,
+        args.max_strokes
+    )
     image_size = (args.width, args.height)
 
     if args.gif:
