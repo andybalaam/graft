@@ -1,6 +1,6 @@
 ## How to set up Graft on the Raspberry Pi
 
-Because the Rapsberry Pi uses a slightly older Python version, there is a
+Because the Raspberry Pi uses a slightly older Python version, there is a
 special version of Graft for it.
 
 Here's how to get it:
