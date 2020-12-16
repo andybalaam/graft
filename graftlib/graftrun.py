@@ -171,7 +171,10 @@ def graftrun_debug(
     frames_counter = FramesCounter(n)
     for parallel_commands in _run_program(program, rand, max_forks, eval_expr):
         yield copy_envs(parallel_commands)
-        frames_counter.next_frame(parallel_commands)
+        try:
+            frames_counter.next_frame(parallel_commands)
+        except StopIteration:
+            break
 
 
 #: Iterable[Tree], n -> Iterable[Command]
@@ -191,4 +194,7 @@ def graftrun(
         commands = [x[0] for x in cmds_envs]
         if any(commands):
             yield commands
-        frames_counter.next_frame(cmds_envs)
+        try:
+            frames_counter.next_frame(cmds_envs)
+        except StopIteration:
+            break

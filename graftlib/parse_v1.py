@@ -45,7 +45,7 @@ class Number:
 class Modify:
     sym: str = attr.ib()
     op: str = attr.ib()
-    value = attr.ib(None, convert=lambda x: Number("10") if x is None else x)
+    value = attr.ib(None, converter=lambda x: Number("10") if x is None else x)
 
 
 @attr.s
