@@ -10,6 +10,10 @@ import graftlib
 from graftlib.world import World
 
 
+MAX_TOOT_LENGTH = 499
+MAX_DESC_LENGTH = 199
+
+
 def _check_for_unseen_notifications(world, mastodon):
     last_notif = world.fs.read_file_or_none(graftbot.dirs.last_notif_file())
     return mastodon.notifications(since_id=last_notif)
@@ -65,17 +69,17 @@ def _post_gif(mastodon, gif_file, program, acct):
         description="Graft program '{program}' by @{acct}".format(
             program=program,
             acct=acct,
-        ),
+            )[:MAX_DESC_LENGTH],
     )
     return media["id"]
 
 
 def _post_toot(mastodon, status_id, media_id, program, acct):
     new_status = mastodon.status_post(
-        status="'{program}' by @{acct}".format(
+        status="by @{acct}: '{program}'".format(
             program=program,
             acct=acct,
-        ),
+            )[:MAX_TOOT_LENGTH],
         in_reply_to_id=status_id,
         media_ids=[media_id],
     )
@@ -88,7 +92,7 @@ def _post_error_toot(mastodon, status_id, error, program, acct):
             acct=acct,
             error=error,
             program=program,
-        ),
+            )[:MAX_TOOT_LENGTH],
         in_reply_to_id=status_id,
     )
     return new_status["id"]
@@ -134,12 +138,12 @@ def _run_and_toot(world, mastodon, n):
 
 def _run_and_toot_first(world, mastodon, notifs):
     for n in notifs:
-        if n["type"] != "mention":
+        try:
+            if n["type"] == "mention":
+                _run_and_toot(world, mastodon, n)
+                break  # Only do one at a time
+        finally:
             _update_last_notif(world, n["id"])
-        else:
-            _run_and_toot(world, mastodon, n)
-            _update_last_notif(world, n["id"])
-            break  # Only do one at a time
 
 
 def sit_waiting(world: World, api_base_url: str) -> int:
