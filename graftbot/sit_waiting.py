@@ -64,12 +64,15 @@ def _follow(world, mastodon, acct_dict):
 
 
 def _post_gif(mastodon, gif_file, program, acct):
+    # TODO: Switch to synchronous=False if we run out of API allowance.
+    #       Will require us to check when the upload is done somehow.
     media = mastodon.media_post(
         gif_file,
         description="Graft program '{program}' by @{acct}".format(
             program=program,
             acct=acct,
             )[:MAX_DESC_LENGTH],
+        synchronous=True
     )
     return media["id"]
 
