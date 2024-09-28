@@ -9,7 +9,7 @@ mentioning @graft@mastodon.social.  If you've never tooted before, see
 ## Install
 
 To install Graft, clone this repository and make sure you have Python 3.6 or
-above, and the `attr` library.
+above, and the `attr` and `mastodon` libraries.
 
 To display the animations in a window, install the Python bindings for
 GTK3 and Cairo.

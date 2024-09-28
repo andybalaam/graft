@@ -24,3 +24,6 @@ test-full:
 		--pep8 \
 		--pylama \
 		--pylint --pylint-rcfile=.pylintrc \
+
+docker-build:
+	docker build -t graft .
