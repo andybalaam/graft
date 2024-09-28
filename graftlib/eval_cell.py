@@ -113,7 +113,7 @@ def _function_call(expr, env):
             new_env.set_new(p.value, a)
         return eval_cell_list(fn.body, new_env)
     elif typ == NativeFunctionValue:
-        params = inspect.getargspec(fn.py_fn).args
+        params = inspect.getfullargspec(fn.py_fn).args
         fail_if_wrong_number_of_args(expr.fn, params[1:], args)
         return fn.py_fn(env, *args)
     else:
