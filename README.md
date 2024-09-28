@@ -93,7 +93,7 @@ To turn, change the variable `d`:
 
 * `d+=45` means turn 45 degrees clockwise.
 * `d-=90` means turn 90 degrees anti-clockwise.
-* `s=90` means set the angle to 90 degrees (face right).
+* `d=90` means set the angle to 90 degrees (face right).
 
 To step forward (drawing a line), use the command `S()`:
 
